@@ -1,0 +1,124 @@
+.table {
+  width: 100%;
+ 
+  &-headers {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    margin-left: 15px;
+    
+    p {
+      margin: 0;
+      font-weight: 700;
+    }
+  }
+
+  &-row {
+    display: flex;
+    flex-direction: row-reverse;
+  }
+
+  &-cell {
+    border: 1px solid black;
+    width: 100px;
+    text-align: center;
+    padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    input {
+      width:40px;
+    }
+  }
+}
+
+.app-container {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 20px;
+
+  h1 {
+    text-align: center;
+  }
+}
+
+.addCustomer {
+
+  &-wrapper {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: end;
+    align-items: center;
+    font-family: expo-brand-demi,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+
+
+
+    input {
+      height: 24px;
+      margin-left: 1px;
+      &::-webkit-input-placeholder { /* Edge */
+        text-align: right;
+      }
+      
+      &:-ms-input-placeholder { /* Internet Explorer 10-11 */
+        text-align: right;
+      }
+      
+      &::placeholder {
+        text-align: right;
+        
+      }
+    }
+  }
+  
+
+  &-button {
+      align-items: center;
+      background-color: initial;
+      background-image: linear-gradient(#464d55, #25292e);
+      border-radius: 3px;
+      border-width: 0;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, .1),0 3px 6px rgba(0, 0, 0, .05);
+      box-sizing: border-box;
+      color: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      flex-direction: column;
+      font-family: expo-brand-demi,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+      height: 30px;
+      justify-content: center;
+      line-height: 1;
+      margin: 0;
+      outline: none;
+      overflow: hidden;
+      padding: 0 16px;
+      text-align: center;
+      text-decoration: none;
+      transform: translate3d(0, 0, 0);
+      transition: all 150ms;
+      vertical-align: baseline;
+      white-space: nowrap;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    
+    
+    &:hover {
+      box-shadow: rgba(0, 1, 0, .2) 0 2px 8px;
+      opacity: .85;
+    }
+    
+    &:active {
+      outline: 0;
+    }
+    
+    &:focus {
+      box-shadow: rgba(0, 0, 0, .5) 0 0 0 3px;
+    }
+    
+    
+  }
+}
+
