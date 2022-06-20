@@ -1,5 +1,6 @@
 import React, { useState, useContext } from "react";
 import { DataContext } from "../context/DataContext";
+import useClickOutside from "../hooks/useClickOutside";
 
 const AmountCell = ({
   cellValue,
@@ -9,6 +10,9 @@ const AmountCell = ({
   const { matrixData, setMatrixData } = useContext(DataContext);
   const [isFocus, setFocus] = useState(false);
   const [count, setCount] = useState(cellValue);
+  const clickRef = React.createRef(null)
+  useClickOutside(clickRef, () => setFocus(false));
+
   return (
     <>
       {" "}
@@ -30,6 +34,7 @@ const AmountCell = ({
           onClick={() => {
             setFocus(true);
           }}
+          ref={clickRef}
         >
           {count}
         </div>

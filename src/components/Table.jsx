@@ -6,7 +6,7 @@ import { DataContext } from "../context/DataContext";
 const Table = () => {
   const { matrixData } = useContext(DataContext);
   const tableData =
-    matrixData?.length &&
+    matrixData?.length ?
     matrixData.map((rowData, rowIndex) => {
       return (
         <div className="table-row" key={rowIndex}>
@@ -23,11 +23,11 @@ const Table = () => {
           })}
         </div>
       );
-    });
+    }) : null;
   return (
-    <div>
+    // <div>
       <div className="table">{tableData}</div>
-    </div>
+    /* </div> */
   );
 };
 

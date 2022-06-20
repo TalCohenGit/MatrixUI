@@ -1,40 +1,59 @@
 import { useEffect, useState, useContext } from "react";
 import "./App.scss";
+import 'normalize.css';
 import AddCustomer from "./components/AddCustomer";
-import Table from "./components/Table"
+import Table from "./components/Table";
 import products from "./mockData/products.json";
-import { getCustomerDetailsAPI, getProductsAPI } from "./api";
+import { getCustomersAPI, getProductsAPI } from "./api";
 import { DataContext } from "./context/DataContext";
 
 function App() {
-  const [customerName, setCustomerName] = useState("");
-  const {matrixData, setMatrixData, handleFetchDrivers}  = useContext(DataContext)
+  
+  const {
+    matrixData,
+    setMatrixData,
+    handleFetchDrivers,
+    customers,
+    setCustomers,
+    customerName,
+    setCustomerName,
+    getNewCustomerData,
+    setError
+  } = useContext(DataContext);
 
   const addCustomerToTable = () => {
     try {
-      const res = getCustomerDetailsAPI(customerName);
       if (matrixData?.length) {
         const productsNumber = matrixData[0].length - 3;
         const currentMatrixData = [...matrixData];
+        const newCustomerData = getNewCustomerData()
+        if(!newCustomerData){
+          setError("לקוח לא קיים")
+        }
         currentMatrixData.push([
-          ...Object.keys(res).map((customer) => res[customer]),
+          ...newCustomerData,
           ...Array(productsNumber).fill(0),
         ]);
         setMatrixData(currentMatrixData);
+      }
+      setCustomerName("");
+    } catch (e) {
+      console.log(e, "addCustomerToTable");
     }
-    setCustomerName("")
-  } catch(e) {
-    console.log(e, "addCustomerToTable")
-  }
   };
 
   useEffect(() => {
-    const rawProducts = getProductsAPI(products);
-    handleFetchDrivers()
-    rawProducts.push("איסוף", "מאושר")
-    const currentMatrixData = [...matrixData];
-    currentMatrixData.push(rawProducts);
-    setMatrixData(currentMatrixData);
+    (async () => {
+      const productData = await getProductsAPI(products);
+      const tableTitle = productData.map((element) => element["שם פריט"])
+      tableTitle.push("איסוף", "מאושר");
+      const currentMatrixData = [...matrixData];
+      currentMatrixData.push(tableTitle);
+      setMatrixData(currentMatrixData);
+      const customerList = await getCustomersAPI();
+      setCustomers(customerList);
+      handleFetchDrivers();
+    })();
   }, []);
 
   return (
@@ -45,7 +64,7 @@ function App() {
         setCustomerName={setCustomerName}
         addCustomerToTable={addCustomerToTable}
       />
-      <Table/>
+      <Table />
     </div>
   );
 }

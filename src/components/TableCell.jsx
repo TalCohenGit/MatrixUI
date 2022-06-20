@@ -12,9 +12,9 @@ const TableCell = (props) => {
   if (colIndex < 3 || rowIndex === 0) {
     cellType = <div>{cellValue}</div>;
   } else if (colIndex === rowLength - 1) {
-    cellType = <DropDownCell dropdownOptions={["להפקה", "ללא", "מיוחד"]} />;
+    cellType = <DropDownCell dropdownOptions={["להפקה", "ללא", "מיוחד"]} rowIndex={rowIndex} colIndex={colIndex}/>;
   } else if (colIndex === rowLength - 2) {
-    cellType = <DropDownCell dropdownOptions={drivers} />;
+    cellType = <DropDownCell dropdownOptions={drivers} rowIndex={rowIndex} colIndex={colIndex}/>;
   } else {
     cellType = <AmountCell {...props} />;
   }
