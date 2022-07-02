@@ -9,7 +9,8 @@ const DataContextProvider = (props) => {
   const [customers, setCustomers] = useState([]);
   const [isListVisible, toggleList] = useState(false);
   const [customerName, setCustomerName] = useState("");
-  const [errorMessage,setError] = useState("")
+  const [errorMessage, setError] = useState("");
+  const [productsMap, setProductsMap] = useState([]);
 
   const handleFetchDrivers = async () => {
     const drivers = await getDriverList();
@@ -20,10 +21,12 @@ const DataContextProvider = (props) => {
     const customerObject = customers.find(
       (customer) => customer.userName === customerName
     );
-    if(!customerObject){
-      return null
+    if (!customerObject) {
+      return null;
     }
-    return Object.values(customerObject).map(customerElement => customerElement ? customerElement : '-');
+    return Object.values(customerObject).map((customerElement) =>
+      customerElement ? customerElement : "-"
+    );
   };
   return (
     <DataContext.Provider
@@ -40,7 +43,9 @@ const DataContextProvider = (props) => {
         setCustomerName,
         getNewCustomerData,
         errorMessage,
-        setError
+        setError,
+        productsMap,
+        setProductsMap
       }}
     >
       {props.children}

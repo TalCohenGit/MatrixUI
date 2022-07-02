@@ -35,7 +35,6 @@ export const getProductsAPI = async(arr) => {
   try {
     const res = await getRecordsAPI("1")
     const elements =  JSON.parse(res.data.data)
-    console.log("elements:", elements)
     return elements
   } catch(e){
     console.log("error in getProductsAPI:", e)
