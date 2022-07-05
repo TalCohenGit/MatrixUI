@@ -4,7 +4,7 @@ import DropDownCell from "./DropDownCell";
 import { DataContext } from "../context/DataContext";
 
 const TableCell = (props) => {
-  const { rowLength, colIndex, cellValue, rowIndex, data, setData,disabled } = props;
+  const { rowLength, colIndex, cellValue, rowIndex, data, setData,disabled,bgColor } = props;
   const { drivers } = useContext(DataContext);
 
   let cellType;
@@ -40,6 +40,7 @@ const TableCell = (props) => {
       style={{
         opacity: cellValue === "" ? "0" : "1",
         pointerEvents: disabled ? "none" : "auto",
+        backgroundColor:cellValue === "" ? 'none' : bgColor
       }}
     >
       {cellType}

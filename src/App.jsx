@@ -4,7 +4,7 @@ import "normalize.css";
 import AddCustomer from "./components/AddCustomer";
 import Table from "./components/Table";
 import products from "./mockData/products.json";
-import { getCustomersAPI, getProductsAPI } from "./api";
+import { getCustomersAPI, getProductsAPI, sendTableAPI } from "./api";
 import { DataContext } from "./context/DataContext";
 import { createBalanceTable } from "./utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -14,7 +14,6 @@ function App() {
     matrixData,
     setMatrixData,
     handleFetchDrivers,
-    customers,
     setCustomers,
     customerName,
     setCustomerName,
@@ -53,10 +52,10 @@ function App() {
       }
       sum += Number(rowData[n]);
     });
-    const currentData = [... productsMap]
+    const currentData = [...productsMap];
     currentData[2][n] = sum;
-    currentData[3][n] = currentData[1][n] - sum
-    setProductsMap(currentData) 
+    currentData[3][n] = currentData[1][n] - sum;
+    setProductsMap(currentData);
   };
 
   useEffect(() => {
@@ -78,6 +77,7 @@ function App() {
       currentMatrixData.push(tableTitle);
       setMatrixData(currentMatrixData);
       const customerList = await getCustomersAPI();
+      console.log("customerList", customerList)
       setCustomers(customerList);
 
       handleFetchDrivers();
@@ -91,6 +91,7 @@ function App() {
         customerName={customerName}
         setCustomerName={setCustomerName}
         addCustomerToTable={addCustomerToTable}
+        sendTableAPI={sendTableAPI}
       />
 
       <Table
@@ -98,12 +99,14 @@ function App() {
         setData={setMatrixData}
         tableName="matrix"
         cb={calcProductsSum}
+        bgColor="#F5FFFA"
       />
       <Table
         data={productsMap}
         setData={setProductsMap}
         tableName="prototype"
         disabled
+        bgColor="#F0FFFF"
       />
     </div>
   ) : (

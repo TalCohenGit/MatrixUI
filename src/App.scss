@@ -20,14 +20,14 @@
   }
 
   &-cell {
-    border: 1px solid black;
+    border: 1px solid #a9a9a9;
     min-width: 100px;
     text-align: center;
     padding: 5px;
     display: flex;
     justify-content: center;
     align-items: center;
-
+   
     input {
       width: 40px;
     }
@@ -46,6 +46,7 @@
     margin-bottom: 5px;
     display: flex;
     align-items: center;
+    justify-content: space-between;
     font-family: expo-brand-demi, system-ui, -apple-system, BlinkMacSystemFont,
       "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
       "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
@@ -76,6 +77,8 @@
   }
 
   &-button {
+    margin: 0;
+    margin-left: auto;
     align-items: center;
     background-color: initial;
     background-image: linear-gradient(#464d55, #25292e);
@@ -94,7 +97,7 @@
     height: 30px;
     justify-content: center;
     line-height: 1;
-    margin: 0;
+    
     outline: none;
     // overflow: hidden;
     padding: 0 16px;
@@ -197,6 +200,7 @@ html {
 
 body {
   font-family: Helvetica, sans-serif;
+  background-color: #FFFAFA;
 }
 
 
@@ -204,4 +208,9 @@ body {
   position: absolute;
   top: 50%;
   left: 50%;
+}
+
+.createInvoice-button {
+  @extend .addCustomer-button;
+  margin-left: 0;
 }

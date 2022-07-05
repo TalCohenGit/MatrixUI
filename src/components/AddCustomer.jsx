@@ -2,8 +2,8 @@ import React, { useContext } from "react";
 import { DataContext } from "../context/DataContext";
 import SearchList from "./SearchList";
 
-const AddCustomer = ({ customerName, setCustomerName, addCustomerToTable }) => {
-  const { toggleList, errorMessage, setError } = useContext(DataContext);
+const AddCustomer = ({ customerName, setCustomerName, addCustomerToTable, sendTableAPI }) => {
+  const { toggleList, errorMessage, setError, matrixData } = useContext(DataContext);
   const handleChange = (value) => {
     setCustomerName(value);
     if (errorMessage?.length) {
@@ -36,6 +36,9 @@ const AddCustomer = ({ customerName, setCustomerName, addCustomerToTable }) => {
         </div>
         <button className="addCustomer-button" onClick={addCustomerToTable}>
          הוסף
+        </button>
+        <button className="createInvoice-button" onClick={() => sendTableAPI(matrixData)}>
+          הפק חשבונית
         </button>
       </div>
       {errorMessage?.length ? (
