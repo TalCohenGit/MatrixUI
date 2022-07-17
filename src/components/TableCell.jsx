@@ -14,7 +14,7 @@ const TableCell = (props) => {
   } else if (colIndex === rowLength - 1) {
     cellType = (
       <DropDownCell
-        dropdownOptions={["להפקה", "ללא", "מיוחד"]}
+        dropdownOptions={[{name: "להפקה", key: 1}, {name: "ללא", key: 2}, {name: "מיוחד", key: 3}]}
         rowIndex={rowIndex}
         colIndex={colIndex}
         data={data}

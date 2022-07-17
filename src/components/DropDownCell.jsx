@@ -1,22 +1,22 @@
 import React, { useState, useContext } from "react";
 import Select from "react-select";
-import { DataContext } from "../context/DataContext";
 
 const DropDownCell = ({ dropdownOptions, rowIndex, colIndex,data,setData }) => {
 
   const customStyles={
     indicatorSeparator: (styles) => ({display:'none'}),
   }
-  // const { matrixData, setMatrixData } = useContext(DataContext);
   const options = [];
-  dropdownOptions.map((option) =>
-    options.push({ value: option, label: option })
+  dropdownOptions.forEach((element) => {
+    options.push({ value: element.key, label: element.name })
+  }
   );
   const handleSelect = (e) => {
     setSelectedOption(e);
     const currentData = [...data];
     currentData[rowIndex][colIndex] = e.value;
     setData(currentData);
+    console.log("data is", data)
   };
   const [selectedOption, setSelectedOption] = useState(null);
 

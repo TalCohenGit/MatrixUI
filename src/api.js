@@ -30,7 +30,11 @@ export const getDriverList = async() => {
   try {
     const res = await getRecordsAPI("2", {"קוד מיון": "690"})
     const rawData = JSON.parse(res.data.data);
-    return rawData?.length && rawData.map((driver) => driver["שם חשבון"]);   
+    return rawData?.length && rawData.map((driver) => {
+    return {
+      name: driver["שם חשבון"],
+      key: driver["מפתח"]
+    }})
   } catch (e) {
     console.log("error in getDriverList:", e)
   }
