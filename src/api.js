@@ -1,5 +1,6 @@
 import axios from "axios";
 import constants from "./constants.js";
+import { handleData } from "./utils/utils.js";
 
 const getRecordsAPI = async (TID, sortKey) => {
   const headers = {
@@ -66,13 +67,24 @@ export const getProductsAPI = async(arr) => {
   } catch(e){
     console.log("error in getProductsAPI:", e)
   }
-  
 };
 
-export const sendTableAPI = async(table) => {
-  console.log("sendTableAPI", table)
+const getMatrixIDAPI = async() => {
   try {
-    await createDocAPI(table)
+    await getRecordsAPI("1")
+    return "1234"
+  } catch(e){
+    console.log("error in getMatrixIDAPI:", e)
+  }
+}
+
+export const sendTableAPI = async(tableData, productsMap) => {
+  console.log("sendTableAPI", tableData)
+  const {matrix, driverIDs, actionIDs} = handleData(tableData, productsMap)
+  const matrixID = await getMatrixIDAPI()
+  console.log("matrix,driverId,actionId, matrixID:", matrix, driverIDs, actionIDs, matrixID)
+  try {
+    await createDocAPI(tableData)
   } catch(e) {
     console.log("error in sendTableAPI:", e)
   }

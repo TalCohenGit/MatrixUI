@@ -16,7 +16,6 @@ const DropDownCell = ({ dropdownOptions, rowIndex, colIndex,data,setData }) => {
     const currentData = [...data];
     currentData[rowIndex][colIndex] = e.value;
     setData(currentData);
-    console.log("data is", data)
   };
   const [selectedOption, setSelectedOption] = useState(null);
 

@@ -10,7 +10,8 @@ const DataContextProvider = (props) => {
   const [isListVisible, toggleList] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [errorMessage, setError] = useState("");
-  const [productsMap, setProductsMap] = useState([]);
+  const [balanceTableData, setBalanceTableData] = useState([]);
+  const [productsMap, setProductsMap] = useState([])
 
   const handleFetchDrivers = async () => {
     const drivers = await getDriverList();
@@ -44,6 +45,8 @@ const DataContextProvider = (props) => {
         getNewCustomerData,
         errorMessage,
         setError,
+        balanceTableData,
+        setBalanceTableData,
         productsMap,
         setProductsMap
       }}

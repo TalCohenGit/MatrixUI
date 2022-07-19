@@ -1,9 +1,7 @@
-import React, { useContext } from "react";
+import React from "react";
 import TableCell from "./TableCell";
-import { DataContext } from "../context/DataContext";
 
 const Table = ({ data, setData, tableName, disabled = false, cb, bgColor }) => {
-  // const { matrixData } = useContext(DataContext);
   const tableData = data?.length
     ? data.map((rowData, rowIndex) => {
         return (

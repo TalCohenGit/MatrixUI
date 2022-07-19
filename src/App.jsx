@@ -6,7 +6,7 @@ import Table from "./components/Table";
 import products from "./mockData/products.json";
 import { getCustomersAPI, getProductsAPI, sendTableAPI } from "./api";
 import { DataContext } from "./context/DataContext";
-import { createBalanceTable } from "./utils/utils";
+import { createBalanceTable, getProductsNameKeyMap } from "./utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 
 function App() {
@@ -19,8 +19,9 @@ function App() {
     setCustomerName,
     getNewCustomerData,
     setError,
-    setProductsMap,
-    productsMap,
+    setBalanceTableData,
+    balanceTableData,
+    setProductsMap
   } = useContext(DataContext);
 
   const addCustomerToTable = () => {
@@ -52,18 +53,20 @@ function App() {
       }
       sum += Number(rowData[n]);
     });
-    const currentData = [...productsMap];
+    const currentData = [...balanceTableData];
     currentData[2][n] = sum;
     currentData[3][n] = currentData[1][n] - sum;
-    setProductsMap(currentData);
+    setBalanceTableData(currentData);
   };
 
   useEffect(() => {
     (async () => {
       const productsData = await getProductsAPI(products);
       const currentBalanceData = createBalanceTable(productsData);
-      setProductsMap(currentBalanceData);
-      console.log("productsData", productsData);
+      setBalanceTableData(currentBalanceData);
+      const productsMap = getProductsNameKeyMap(productsData)
+      setProductsMap(productsMap)
+      console.log("productsMap", productsMap);
       const tableTitle = [
         "שם לקוח",
         "מזהה",
@@ -76,8 +79,7 @@ function App() {
       const currentMatrixData = [...matrixData];
       currentMatrixData.push(tableTitle);
       setMatrixData(currentMatrixData);
-      const customerList = await getCustomersAPI();
-      console.log("customerList", customerList)
+      const customerList = await getCustomersAPI(productsMap);
       setCustomers(customerList);
 
       handleFetchDrivers();
@@ -102,8 +104,8 @@ function App() {
         bgColor="#F5FFFA"
       />
       <Table
-        data={productsMap}
-        setData={setProductsMap}
+        data={balanceTableData}
+        setData={setBalanceTableData}
         tableName="prototype"
         disabled
         bgColor="#F0FFFF"
