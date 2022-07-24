@@ -13,11 +13,11 @@ const getRecordsAPI = async (TID, sortKey) => {
     { TID, sortKey },
     { headers }
   );
-}
+};
 
 const createDocAPI = async (body) => {
   const headers = {
-    "Content-Type": "application/json"
+    "Content-Type": "application/json",
   };
 
   return await axios.post(
@@ -25,67 +25,98 @@ const createDocAPI = async (body) => {
     { body },
     { headers }
   );
-}
+};
 
-export const getDriverList = async() => {
+export const getDriverList = async () => {
   try {
-    const res = await getRecordsAPI("2", {"קוד מיון": "690"})
+    const res = await getRecordsAPI("2", { "קוד מיון": "690" });
     const rawData = JSON.parse(res.data.data);
-    return rawData?.length && rawData.map((driver) => {
-    return {
-      name: driver["שם חשבון"],
-      key: driver["מפתח"]
-    }})
+    return (
+      rawData?.length &&
+      rawData.map((driver) => {
+        return {
+          name: driver["שם חשבון"],
+          key: driver["מפתח"],
+        };
+      })
+    );
   } catch (e) {
-    console.log("error in getDriverList:", e)
+    console.log("error in getDriverList:", e);
   }
-  
 };
 
 export const getCustomersAPI = async () => {
   try {
-    const res = await getRecordsAPI("2")
+    const res = await getRecordsAPI("2");
     const rawData = JSON.parse(res.data.data);
 
-    return rawData?.length && rawData.map((customer) => {
-      return {
-        userName: customer["שם חשבון"],
-        itemKey: customer["מפתח"],
-        tel: customer["טלפון נייד"],
-      };
-    });
+    return (
+      rawData?.length &&
+      rawData.map((customer) => {
+        return {
+          userName: customer["שם חשבון"],
+          itemKey: customer["מפתח"],
+          tel: customer["טלפון נייד"],
+        };
+      })
+    );
   } catch (e) {
     console.log("error in getCustomersAPI: ", e);
   }
 };
 
-export const getProductsAPI = async(arr) => {
+export const getProductsAPI = async (arr) => {
   try {
-    const res = await getRecordsAPI("1")
-    const elements =  JSON.parse(res.data.data)
-    return elements
-  } catch(e){
-    console.log("error in getProductsAPI:", e)
+    const res = await getRecordsAPI("1");
+    const elements = JSON.parse(res.data.data);
+    return elements;
+  } catch (e) {
+    console.log("error in getProductsAPI:", e);
   }
 };
 
-const getMatrixIDAPI = async() => {
+const getMatrixIDAPI = async () => {
   try {
-    await getRecordsAPI("1")
-    return "1234"
-  } catch(e){
-    console.log("error in getMatrixIDAPI:", e)
+    await getRecordsAPI("1");
+    return "1234";
+  } catch (e) {
+    console.log("error in getMatrixIDAPI:", e);
   }
-}
+};
 
-export const sendTableAPI = async(tableData, productsMap) => {
-  console.log("sendTableAPI", tableData)
-  const {matrix, driverIDs, actionIDs} = handleData(tableData, productsMap)
-  const matrixID = await getMatrixIDAPI()
-  console.log("matrix,driverId,actionId, matrixID:", matrix, driverIDs, actionIDs, matrixID)
+export const sendTableAPI = async (tableData, productsMap) => {
+  console.log("sendTableAPI", tableData);
+  const { matrix, driverIDs, actionIDs, documentIDs, metaData } = handleData(
+    tableData,
+    productsMap
+  );
+  const matrixID = await getMatrixIDAPI();
+  console.log(
+    "matrix,driverId,actionId, matrixID, documentID, metaData:",
+    matrix,
+    driverIDs,
+    actionIDs,
+    matrixID,
+    documentIDs,
+    metaData
+  );
+  const mainMatrix = {
+    matrixesData: {
+      matrixID: matrixID,
+      DefaultDocID: 1,
+      DocumentID: documentIDs,
+      DefaultDriver: "PickUp",
+      DriverID: driverIDs,
+      ActionID: actionIDs,
+      ActionAutho: ["Default", "Default", "Default", "Default", "Default"],
+    },
+    data: matrix,
+  };
+
+
   try {
-    await createDocAPI(tableData)
-  } catch(e) {
-    console.log("error in sendTableAPI:", e)
+    await createDocAPI(tableData);
+  } catch (e) {
+    console.log("error in sendTableAPI:", e);
   }
-}
+};

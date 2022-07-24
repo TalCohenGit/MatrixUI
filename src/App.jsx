@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import "./App.scss";
 import "normalize.css";
 import AddCustomer from "./components/AddCustomer";
@@ -8,6 +8,8 @@ import { getCustomersAPI, getProductsAPI, sendTableAPI } from "./api";
 import { DataContext } from "./context/DataContext";
 import { createBalanceTable, getProductsNameKeyMap } from "./utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
+import Modal from "./common/components/Modal/Modal";
+import CommentsModal from "./components/CommentsModal";
 
 function App() {
   const {
@@ -21,8 +23,10 @@ function App() {
     setError,
     setBalanceTableData,
     balanceTableData,
-    setProductsMap
+    setProductsMap,
   } = useContext(DataContext);
+
+  
 
   const addCustomerToTable = () => {
     try {
@@ -66,7 +70,6 @@ function App() {
       setBalanceTableData(currentBalanceData);
       const productsMap = getProductsNameKeyMap(productsData)
       setProductsMap(productsMap)
-      console.log("productsMap", productsMap);
       const tableTitle = [
         "שם לקוח",
         "מזהה",
@@ -74,6 +77,8 @@ function App() {
         ...productsData.map((element) => element["שם פריט"]),
         "איסוף",
         "מאושר",
+        "סוג מסמך",
+        "הערות"
       ];
 
       const currentMatrixData = [...matrixData];

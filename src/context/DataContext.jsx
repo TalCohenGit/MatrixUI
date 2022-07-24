@@ -12,7 +12,7 @@ const DataContextProvider = (props) => {
   const [errorMessage, setError] = useState("");
   const [balanceTableData, setBalanceTableData] = useState([]);
   const [productsMap, setProductsMap] = useState([])
-
+  
   const handleFetchDrivers = async () => {
     const drivers = await getDriverList();
     setDrivers(drivers);
@@ -48,7 +48,7 @@ const DataContextProvider = (props) => {
         balanceTableData,
         setBalanceTableData,
         productsMap,
-        setProductsMap
+        setProductsMap,
       }}
     >
       {props.children}

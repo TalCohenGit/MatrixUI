@@ -1,6 +1,7 @@
 import React, { useContext } from "react";
 import AmountCell from "./AmountCell";
 import DropDownCell from "./DropDownCell";
+import CommentCell from "./CommentCell";
 import { DataContext } from "../context/DataContext";
 
 const TableCell = (props) => {
@@ -12,6 +13,18 @@ const TableCell = (props) => {
   if (colIndex < 3 || rowIndex === 0) {
     cellType = <div>{cellValue}</div>;
   } else if (colIndex === rowLength - 1) {
+    cellType = <CommentCell  rowIndex={rowIndex} colIndex={colIndex} data={data} setData={setData}/>
+  } else if (colIndex === rowLength - 2) {
+      cellType = (
+        <DropDownCell
+          dropdownOptions={[{name: "חשבונית מס", key: 1}, {name: "חשבונית מס זיכוי", key: 3}, {name: "הזמנה", key: 6}]}
+          rowIndex={rowIndex}
+          colIndex={colIndex}
+          data={data}
+          setData={setData}
+        />
+      );
+  } else if (colIndex === rowLength - 3) {
     cellType = (
       <DropDownCell
         dropdownOptions={[{name: "להפקה", key: 1}, {name: "ללא", key: 2}, {name: "מיוחד", key: 3}]}
@@ -21,7 +34,7 @@ const TableCell = (props) => {
         setData={setData}
       />
     );
-  } else if (colIndex === rowLength - 2) {
+  } else if (colIndex === rowLength - 4) {
     cellType = (
       <DropDownCell
         dropdownOptions={drivers}
@@ -38,9 +51,9 @@ const TableCell = (props) => {
     <div
       className="table-cell"
       style={{
-        opacity: cellValue === "" ? "0" : "1",
+        opacity: cellValue  === null ? "0" : "1",
         pointerEvents: disabled ? "none" : "auto",
-        backgroundColor:cellValue === "" ? 'none' : bgColor
+        backgroundColor: cellValue === "" ? 'none' : bgColor
       }}
     >
       {cellType}

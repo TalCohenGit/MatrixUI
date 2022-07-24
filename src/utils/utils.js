@@ -22,12 +22,14 @@ export const createBalanceTable = (data) => {
     ];
   fieldsToMap.forEach((field) => {
     tableRowData = [
-      "",
-      "",
+      null,
+      null,
       field.rowHeader,
       ...mapTable(data, field.rowKey),
-      "",
-      "",
+      null,
+      null,
+      null,
+      null
     ];
     currentBalanceData.push(tableRowData);
   });
@@ -37,20 +39,24 @@ export const createBalanceTable = (data) => {
 export const handleData = (tableData, productsMap) => {
   let matrix = JSON.parse(JSON.stringify(tableData))
   const titleLength = matrix[0].length
-  const products = matrix[0].slice(3, titleLength-2)
+  const products = matrix[0].slice(3, titleLength-4)
   const productsWithKeys = products.map(element => 
     productsMap[element]
   )
   let tableDetails = matrix.slice(1)
+  const metaData = []
+  const documentIDs = []
   const actionIDs = []
   const driverIDs = []
   tableDetails.map((rowData) => {
+    metaData.push(rowData.pop())
+    documentIDs.push(rowData.pop())
     actionIDs.push(rowData.pop())
     driverIDs.push(rowData.pop())
   })
   matrix = [productsWithKeys, ...tableDetails]
   matrix[0].unshift("AcountName", "AountKey", "CellPhone")
-  return {matrix, driverIDs, actionIDs}
+  return {matrix, driverIDs, actionIDs, documentIDs, metaData}
 }
 
 export const getProductsNameKeyMap = (products) => {

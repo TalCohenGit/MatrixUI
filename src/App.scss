@@ -214,3 +214,70 @@ body {
   @extend .addCustomer-button;
   margin-left: 0;
 }
+
+.count-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.comment {
+  position: absolute;
+  bottom:21px;
+  left: 85px;
+  cursor: pointer;
+  
+}
+
+.count {
+  position: absolute;
+  top: 10px;
+}
+
+
+
+
+.comments {
+  display: flex;
+  margin-top: 40px;
+
+  &-row {
+      display: flex;
+      margin-bottom: 10px;
+
+      input {
+          width: 200px;
+          margin-left: 10px;
+          margin-right: 10px;
+          max-height: 40px;
+      }
+  }
+
+}
+
+.plus-button {
+  cursor: pointer;
+}
+
+
+.save-button {
+  @extend .addCustomer-button;
+  margin-left: 10px;
+}
+
+
+.cancel-button {
+  @extend .addCustomer-button;
+  color:#25292e;
+  border: 1px solid #25292e;
+  background-color: #fff;
+  background-image: none;
+  margin-right: 0;
+  margin-left: 10px;
+}
+
+.action-buttons {
+  display: flex;
+  margin-top: 10px;
+  
+}

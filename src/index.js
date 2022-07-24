@@ -4,11 +4,13 @@ import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import DataContextProvider from "./context/DataContext";
+import Modal from "./common/components/Modal/Modal";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <DataContextProvider>
     <App />
+   
   </DataContextProvider>
 );
 
