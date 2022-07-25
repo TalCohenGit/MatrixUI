@@ -1,3 +1,5 @@
+import { numOfColBeforeProducts, numOfColAfterProducts } from "./constants"
+
 export const filterCustomers = (parsedName, input) => {
   return input.length && parsedName?.length && parsedName.includes(input);
 };
@@ -36,10 +38,10 @@ export const createBalanceTable = (data) => {
   return currentBalanceData;
 };
 
-export const handleData = (tableData, productsMap) => {
+export const handleMatrixData = (tableData, productsMap) => {
   let matrix = JSON.parse(JSON.stringify(tableData))
   const titleLength = matrix[0].length
-  const products = matrix[0].slice(3, titleLength-4)
+  const products = matrix[0].slice(numOfColBeforeProducts, titleLength-numOfColAfterProducts)
   const productsWithKeys = products.map(element => 
     productsMap[element]
   )
@@ -48,7 +50,9 @@ export const handleData = (tableData, productsMap) => {
   const documentIDs = []
   const actionIDs = []
   const driverIDs = []
+  const docComments = []
   tableDetails.map((rowData) => {
+    docComments.push(rowData.pop())
     metaData.push(rowData.pop())
     documentIDs.push(rowData.pop())
     actionIDs.push(rowData.pop())
@@ -56,7 +60,11 @@ export const handleData = (tableData, productsMap) => {
   })
   matrix = [productsWithKeys, ...tableDetails]
   matrix[0].unshift("AcountName", "AountKey", "CellPhone")
-  return {matrix, driverIDs, actionIDs, documentIDs, metaData}
+  return {matrix, driverIDs, actionIDs, documentIDs, metaData, docComments}
+}
+
+export const handleChangedMatrixData = (matrixComments, docComments) => {
+  console.log("matrixComments and docComments", matrixComments, docComments)
 }
 
 export const getProductsNameKeyMap = (products) => {

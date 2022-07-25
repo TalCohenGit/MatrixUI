@@ -5,6 +5,7 @@ export const DataContext = React.createContext(null);
 
 const DataContextProvider = (props) => {
   const [matrixData, setMatrixData] = useState([]);
+  const [matrixComments, setMatrixComments] = useState([]);
   const [drivers, setDrivers] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [isListVisible, toggleList] = useState(false);
@@ -49,6 +50,8 @@ const DataContextProvider = (props) => {
         setBalanceTableData,
         productsMap,
         setProductsMap,
+        matrixComments,
+        setMatrixComments
       }}
     >
       {props.children}

@@ -3,7 +3,7 @@ import { DataContext } from "../context/DataContext";
 import SearchList from "./SearchList";
 
 const AddCustomer = ({ customerName, setCustomerName, addCustomerToTable, sendTableAPI }) => {
-  const { toggleList, errorMessage, setError, matrixData, productsMap } = useContext(DataContext);
+  const { toggleList, errorMessage, setError, matrixData, productsMap, matrixComments } = useContext(DataContext);
   const handleChange = (value) => {
     setCustomerName(value);
     if (errorMessage?.length) {
@@ -37,7 +37,7 @@ const AddCustomer = ({ customerName, setCustomerName, addCustomerToTable, sendTa
         <button className="addCustomer-button" onClick={addCustomerToTable}>
          הוסף
         </button>
-        <button className="createInvoice-button" onClick={() => sendTableAPI(matrixData, productsMap)}>
+        <button className="createInvoice-button" onClick={() => sendTableAPI(matrixData, productsMap, matrixComments)}>
           הפק חשבונית
         </button>
       </div>

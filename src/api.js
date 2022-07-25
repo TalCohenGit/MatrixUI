@@ -1,6 +1,6 @@
 import axios from "axios";
-import constants from "./constants.js";
-import { handleData } from "./utils/utils.js";
+import { SERVER_NAME } from "./utils/constants";
+import { handleMatrixData, handleChangedMatrixData } from "./utils/utils.js";
 
 const getRecordsAPI = async (TID, sortKey) => {
   const headers = {
@@ -9,7 +9,7 @@ const getRecordsAPI = async (TID, sortKey) => {
   };
 
   return await axios.post(
-    constants.SERVER_NAME + "/api/getrecords",
+    SERVER_NAME + "/api/getrecords",
     { TID, sortKey },
     { headers }
   );
@@ -21,7 +21,7 @@ const createDocAPI = async (body) => {
   };
 
   return await axios.post(
-    constants.SERVER_NAME + "/api/createdoc",
+    SERVER_NAME + "/api/createdoc",
     { body },
     { headers }
   );
@@ -84,21 +84,20 @@ const getMatrixIDAPI = async () => {
   }
 };
 
-export const sendTableAPI = async (tableData, productsMap) => {
+export const sendTableAPI = async (tableData, productsMap, matrixComments) => {
   console.log("sendTableAPI", tableData);
-  const { matrix, driverIDs, actionIDs, documentIDs, metaData } = handleData(
-    tableData,
-    productsMap
-  );
+  const { matrix, driverIDs, actionIDs, documentIDs, metaData, docComments } =
+    handleMatrixData(tableData, productsMap);
   const matrixID = await getMatrixIDAPI();
   console.log(
-    "matrix,driverId,actionId, matrixID, documentID, metaData:",
+    "matrix,driverId,actionId, matrixID, documentID, metaData, docComments:",
     matrix,
     driverIDs,
     actionIDs,
     matrixID,
     documentIDs,
-    metaData
+    metaData,
+    docComments
   );
   const mainMatrix = {
     matrixesData: {
@@ -113,6 +112,11 @@ export const sendTableAPI = async (tableData, productsMap) => {
     data: matrix,
   };
 
+  const changedMatrix = {
+    matrixConfig: null,
+    matrixGlobalData: null,
+    data: handleChangedMatrixData(matrixComments, docComments)
+  }
 
   try {
     await createDocAPI(tableData);

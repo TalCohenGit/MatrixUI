@@ -7,10 +7,8 @@ import CommentsModal from "./CommentsModal";
 
 const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb }) => {
   const  [isOpen, toggleModal] = useState(false);
-
   const [isHovered, setHover] = useState(false);
   const [isFocus, setFocus] = useState(false);
-  // const [on]
   const [count, setCount] = useState(cellValue);
   const clickRef = React.createRef(null);
   useClickOutside(clickRef, () => setFocus(false));
@@ -55,12 +53,12 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb }) => {
           )}
           <span className="count">{count}</span>
 
-          {/* <button onMouseEnter={() => setCommentPart(true)}></button> */}
           {isOpen && <CommentsModal
             isOpen={isOpen}
             toggleModal={toggleModal}
             rowIndex={rowIndex}
             colIndex={colIndex}
+            modalTitle={data[0][colIndex]}
           />}
         </div>
       )}

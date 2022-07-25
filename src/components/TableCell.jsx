@@ -2,6 +2,9 @@ import React, { useContext } from "react";
 import AmountCell from "./AmountCell";
 import DropDownCell from "./DropDownCell";
 import CommentCell from "./CommentCell";
+import DocCommentCell from "./DocCommentCell.jsx";
+
+
 import { DataContext } from "../context/DataContext";
 
 const TableCell = (props) => {
@@ -12,9 +15,11 @@ const TableCell = (props) => {
 
   if (colIndex < 3 || rowIndex === 0) {
     cellType = <div>{cellValue}</div>;
-  } else if (colIndex === rowLength - 1) {
-    cellType = <CommentCell  rowIndex={rowIndex} colIndex={colIndex} data={data} setData={setData}/>
+  } else if(colIndex === rowLength - 1) {
+    cellType = <DocCommentCell rowIndex={rowIndex} colIndex={colIndex} data={data} setData={setData}/>
   } else if (colIndex === rowLength - 2) {
+    cellType = <CommentCell rowIndex={rowIndex} colIndex={colIndex} data={data} setData={setData}/>
+  } else if (colIndex === rowLength - 3) {
       cellType = (
         <DropDownCell
           dropdownOptions={[{name: "חשבונית מס", key: 1}, {name: "חשבונית מס זיכוי", key: 3}, {name: "הזמנה", key: 6}]}
@@ -24,7 +29,7 @@ const TableCell = (props) => {
           setData={setData}
         />
       );
-  } else if (colIndex === rowLength - 3) {
+  } else if (colIndex === rowLength - 4) {
     cellType = (
       <DropDownCell
         dropdownOptions={[{name: "להפקה", key: 1}, {name: "ללא", key: 2}, {name: "מיוחד", key: 3}]}
@@ -34,7 +39,7 @@ const TableCell = (props) => {
         setData={setData}
       />
     );
-  } else if (colIndex === rowLength - 4) {
+  } else if (colIndex === rowLength - 5) {
     cellType = (
       <DropDownCell
         dropdownOptions={drivers}

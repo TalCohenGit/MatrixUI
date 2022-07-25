@@ -8,8 +8,7 @@ import { getCustomersAPI, getProductsAPI, sendTableAPI } from "./api";
 import { DataContext } from "./context/DataContext";
 import { createBalanceTable, getProductsNameKeyMap } from "./utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
-import Modal from "./common/components/Modal/Modal";
-import CommentsModal from "./components/CommentsModal";
+import { numOfColBeforeProducts } from "./utils/constants";
 
 function App() {
   const {
@@ -24,14 +23,14 @@ function App() {
     setBalanceTableData,
     balanceTableData,
     setProductsMap,
+    matrixComments,
+    setMatrixComments,
   } = useContext(DataContext);
-
-  
 
   const addCustomerToTable = () => {
     try {
       if (matrixData?.length) {
-        const productsNumber = matrixData[0].length - 3;
+        const productsNumber = matrixData[0].length - numOfColBeforeProducts;
         const currentMatrixData = [...matrixData];
         const newCustomerData = getNewCustomerData();
         if (!newCustomerData) {
@@ -42,6 +41,10 @@ function App() {
           ...Array(productsNumber).fill(0),
         ]);
         setMatrixData(currentMatrixData);
+        const commentsRow = Array(productsNumber).fill(null);
+        const newMatrixComment = [...matrixComments]
+        newMatrixComment.push(commentsRow)
+        setMatrixComments(newMatrixComment)
       }
       setCustomerName("");
     } catch (e) {
@@ -68,8 +71,8 @@ function App() {
       const productsData = await getProductsAPI(products);
       const currentBalanceData = createBalanceTable(productsData);
       setBalanceTableData(currentBalanceData);
-      const productsMap = getProductsNameKeyMap(productsData)
-      setProductsMap(productsMap)
+      const productsMap = getProductsNameKeyMap(productsData);
+      setProductsMap(productsMap);
       const tableTitle = [
         "שם לקוח",
         "מזהה",
@@ -78,7 +81,8 @@ function App() {
         "איסוף",
         "מאושר",
         "סוג מסמך",
-        "הערות"
+        "הערות",
+        ""
       ];
 
       const currentMatrixData = [...matrixData];
@@ -86,7 +90,6 @@ function App() {
       setMatrixData(currentMatrixData);
       const customerList = await getCustomersAPI(productsMap);
       setCustomers(customerList);
-
       handleFetchDrivers();
     })();
   }, []);
