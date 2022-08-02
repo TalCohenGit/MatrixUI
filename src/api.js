@@ -1,6 +1,5 @@
 import axios from "axios";
 import { SERVER_NAME } from "./utils/constants";
-import { handleMatrixData, handleChangedMatrixData } from "./utils/utils.js";
 
 const getRecordsAPI = async (TID, sortKey) => {
   const headers = {
@@ -14,6 +13,15 @@ const getRecordsAPI = async (TID, sortKey) => {
     { headers }
   );
 };
+
+const getKeyAPI = async () => {
+  const headers = {
+    "Content-Type": "application/json",
+    Authorization: "Bearer 1111",
+  };
+  const keyObj = await axios.get(SERVER_NAME + "/api/generatekey")
+  return keyObj.data.key;
+}
 
 const createDocAPI = async (body) => {
   const headers = {
@@ -75,36 +83,21 @@ export const getProductsAPI = async (arr) => {
   }
 };
 
-const getMatrixIDAPI = async () => {
+export const getMatrixIDAPI = async () => {
   try {
-    await getRecordsAPI("1");
-    return "1234";
+    const key = await getKeyAPI();
+    return key;
   } catch (e) {
     console.log("error in getMatrixIDAPI:", e);
   }
 };
 
-export const sendTableAPI = async (tableData, productsMap, matrixComments) => {
-  console.log("sendTableAPI", tableData);
-  const { matrix, driverIDs, actionIDs, documentIDs, metaData, docComments } =
-    handleMatrixData(tableData, productsMap);
-  const matrixID = await getMatrixIDAPI();
-  console.log(
-    "matrix,driverId,actionId, matrixID, documentID, metaData, docComments:",
-    matrix,
-    driverIDs,
-    actionIDs,
-    matrixID,
-    documentIDs,
-    metaData,
-    docComments
-  );
+export const sendTableAPI = async (tableData, matrixID, commentMatrix) => {
+  const { matrix, driverIDs, actionIDs, documentIDs } = tableData
   const mainMatrix = {
     matrixesData: {
       matrixID: matrixID,
-      DefaultDocID: 1,
       DocumentID: documentIDs,
-      DefaultDriver: "PickUp",
       DriverID: driverIDs,
       ActionID: actionIDs,
       ActionAutho: ["Default", "Default", "Default", "Default", "Default"],
@@ -115,11 +108,12 @@ export const sendTableAPI = async (tableData, productsMap, matrixComments) => {
   const changedMatrix = {
     matrixConfig: null,
     matrixGlobalData: null,
-    data: handleChangedMatrixData(matrixComments, docComments)
+    data: commentMatrix
   }
-
   try {
-    await createDocAPI(tableData);
+    const dataToSend = {mainMatrix, changedMatrix}
+    console.log("dataToSend:", JSON.stringify(dataToSend))
+    await createDocAPI(dataToSend);
   } catch (e) {
     console.log("error in sendTableAPI:", e);
   }

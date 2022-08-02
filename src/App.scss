@@ -20,7 +20,7 @@
   }
 
   &-cell {
-    border: 1px solid #a9a9a9;
+    // border: 1px solid #a9a9a9;
     min-width: 100px;
     text-align: center;
     padding: 5px;
@@ -215,6 +215,11 @@ body {
   margin-left: 0;
 }
 
+.docComment-button {
+  @extend .addCustomer-button;
+  margin-right: 30px;
+}
+
 .count-wrapper {
   position: relative;
   width: 100%;
@@ -234,8 +239,10 @@ body {
   top: 10px;
 }
 
-
-
+.validationComment {
+  color: red;
+  margin-left: 25px;
+}
 
 .comments {
   display: flex;

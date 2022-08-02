@@ -58,7 +58,8 @@ const TableCell = (props) => {
       style={{
         opacity: cellValue  === null ? "0" : "1",
         pointerEvents: disabled ? "none" : "auto",
-        backgroundColor: cellValue === "" ? 'none' : bgColor
+        backgroundColor: cellValue === "" ? 'none' : bgColor,
+        border: colIndex === rowLength - 1 ? "0" : "1px solid #a9a9a9"
       }}
     >
       {cellType}

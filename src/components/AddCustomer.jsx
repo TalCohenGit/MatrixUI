@@ -1,9 +1,13 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { DataContext } from "../context/DataContext";
 import SearchList from "./SearchList";
+import { handleMatrixData, handleCommentMatrixData } from "../utils/utils"
+import { getMatrixIDAPI } from "../api"
 
 const AddCustomer = ({ customerName, setCustomerName, addCustomerToTable, sendTableAPI }) => {
   const { toggleList, errorMessage, setError, matrixData, productsMap, matrixComments } = useContext(DataContext);
+  const [customerValidationFailed, setCustomerValidationFailed] = useState("")
+
   const handleChange = (value) => {
     setCustomerName(value);
     if (errorMessage?.length) {
@@ -15,6 +19,21 @@ const AddCustomer = ({ customerName, setCustomerName, addCustomerToTable, sendTa
     }
     toggleList(false);
   };
+
+  const produceDoc = async(matrixData, productsMap, matrixComments, sendTableAPI) => {
+    if (matrixData.length <= 1) {
+      return
+    }
+    const validatedData = handleMatrixData(matrixData, productsMap, setCustomerValidationFailed)
+    if(!validatedData){
+      return
+    }
+    setCustomerValidationFailed("")
+    const matrixID = await getMatrixIDAPI();
+    const commentMatrixData = handleCommentMatrixData(matrixComments, validatedData["docComments"])
+    sendTableAPI(validatedData, matrixID, commentMatrixData)
+  }
+
   return (
     <>
       <div className="addCustomer-wrapper">
@@ -37,7 +56,8 @@ const AddCustomer = ({ customerName, setCustomerName, addCustomerToTable, sendTa
         <button className="addCustomer-button" onClick={addCustomerToTable}>
          הוסף
         </button>
-        <button className="createInvoice-button" onClick={() => sendTableAPI(matrixData, productsMap, matrixComments)}>
+        {customerValidationFailed ? <p className="validationComment"> הפקת חשבונית לא בוצעה! חסרות שדות עבור הלקוח {customerValidationFailed}</p> : null}
+        <button className="createInvoice-button" onClick={() => produceDoc(matrixData, productsMap, matrixComments, sendTableAPI)}>
           הפק חשבונית
         </button>
       </div>

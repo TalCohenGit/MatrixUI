@@ -32,20 +32,22 @@ export const createBalanceTable = (data) => {
       null,
       null,
       null,
+      null
     ];
     currentBalanceData.push(tableRowData);
   });
   return currentBalanceData;
 };
 
-export const handleMatrixData = (tableData, productsMap) => {
+const validateValueExist = (valueToCheck, setComment) => {
+  if(!valueToCheck) {
+    setComment()
+  }
+}
+
+export const handleMatrixData = (tableData, productsMap, setCustomerValidationFailed) => {
   let matrix = JSON.parse(JSON.stringify(tableData));
   const titleLength = matrix[0].length;
-  const products = matrix[0].slice(
-    numOfColBeforeProducts,
-    titleLength - numOfColAfterProducts
-  );
-  const productsWithKeys = products.map((element) => productsMap[element]);
   let tableDetails = matrix.slice(1);
   const metaData = [];
   const documentIDs = [];
@@ -53,19 +55,36 @@ export const handleMatrixData = (tableData, productsMap) => {
   const driverIDs = [];
   const docComments = [];
   tableDetails.map((rowData) => {
-    docComments.push(rowData.pop());
-    metaData.push(rowData.pop());
-    documentIDs.push(rowData.pop());
-    actionIDs.push(rowData.pop());
-    driverIDs.push(rowData.pop());
+    docComments.push(rowData.pop())
+    rowData.pop();
+    const docId = rowData.pop()
+    documentIDs.push(docId);
+    const actionID = rowData.pop()
+    actionIDs.push(actionID);
+    const driverID = rowData.pop()
+    if (!driverID || !actionID || !docId){
+      const customerName = rowData[0]
+      setCustomerValidationFailed(customerName)
+      return;
+    }
+    driverIDs.push(driverID);
   });
+
+  if(!driverIDs.length){
+    return
+  }
+  
+  const products = matrix[0].slice(
+    numOfColBeforeProducts,
+    titleLength - numOfColAfterProducts
+  );
+  const productsWithKeys = products.map((element) => productsMap[element]);
   matrix = [productsWithKeys, ...tableDetails];
   matrix[0].unshift("AcountName", "AountKey", "CellPhone");
-  return { matrix, driverIDs, actionIDs, documentIDs, metaData, docComments };
+  return { matrix, driverIDs, actionIDs, documentIDs, docComments };
 };
 
-export const handleChangedMatrixData = (matrixComments, docComments) => {
-  console.log(" handleChangedMatrixDatamatrixComments and docComments", matrixComments, docComments);
+export const handleCommentMatrixData = (matrixComments, docComments) => {
   const matrixCommentToSend = []
   matrixComments.forEach((commentsRow, index) => {
     let cellsData = [];
@@ -81,7 +100,6 @@ export const handleChangedMatrixData = (matrixComments, docComments) => {
         cellsData.push(commentsObj);
       }
     });
-    console.log("cellsData:", cellsData)
     const docData = !docComments[index]? null : docComments[index]
     matrixCommentToSend.push({"cellsData": cellsData, "docData": docData})
   });
