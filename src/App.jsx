@@ -25,6 +25,8 @@ function App() {
     setProductsMap,
     matrixComments,
     setMatrixComments,
+    products,
+    setProducts,
   } = useContext(DataContext);
 
   const addCustomerToTable = () => {
@@ -52,6 +54,25 @@ function App() {
     }
   };
 
+  const addProductToTable = (products) => {
+    const currentMatrix = matrixData
+    const columnIndxToAdd = currentMatrix[0].length - 5
+    const arrayWithColumn = currentMatrix.map((row, rowIndex) => {
+        let newArr;
+        if (products.length > 0) {
+          if(rowIndex == 0) {
+            newArr = [...row.slice(0, 3), ...products, ...row.slice(columnIndxToAdd,  currentMatrix[0].length)]
+          } else {
+            newArr = [...row.slice(0, 3), ...Array(products.length).fill(0), ...row.slice(columnIndxToAdd,  currentMatrix[0].length)]
+          }
+        } else {
+          newArr = [...row.slice(0, 3), ...row.slice(columnIndxToAdd, currentMatrix[0].length)]
+        }
+        return newArr
+      })
+    setMatrixData(arrayWithColumn)
+  }
+
   const calcProductsSum = (n) => {
     let sum = 0;
     matrixData.forEach((rowData, rowDataIndex) => {
@@ -69,6 +90,9 @@ function App() {
   useEffect(() => {
     (async () => {
       const productsData = await getProductsAPI(products);
+      // const currentProducts = [...products]
+      const productsNames = productsData.map((element) => element["שם פריט"])
+      setProducts(productsNames)
       const currentBalanceData = createBalanceTable(productsData);
       setBalanceTableData(currentBalanceData);
       const productsMap = getProductsNameKeyMap(productsData);
@@ -77,7 +101,6 @@ function App() {
         "שם לקוח",
         "מזהה",
         "טלפון",
-        ...productsData.map((element) => element["שם פריט"]),
         "איסוף",
         "מאושר",
         "סוג מסמך",
@@ -102,6 +125,7 @@ function App() {
         setCustomerName={setCustomerName}
         addCustomerToTable={addCustomerToTable}
         sendTableAPI={sendTableAPI}
+        addProductToTable={addProductToTable}
       />
 
       <Table

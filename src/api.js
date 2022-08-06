@@ -73,9 +73,13 @@ export const getCustomersAPI = async () => {
   }
 };
 
-export const getProductsAPI = async (arr) => {
+export const getProductsAPI = async (arr, validationModal) => {
   try {
     const res = await getRecordsAPI("1");
+    const validationError = res.data.validationError
+    // if(validationError.length > 0) {
+    //   validationModal()
+    // }
     const elements = JSON.parse(res.data.data);
     return elements;
   } catch (e) {
