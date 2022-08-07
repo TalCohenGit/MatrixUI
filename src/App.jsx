@@ -6,7 +6,7 @@ import Table from "./components/Table";
 import products from "./mockData/products.json";
 import { getCustomersAPI, getProductsAPI, sendTableAPI } from "./api";
 import { DataContext } from "./context/DataContext";
-import { createBalanceTable, getProductsNameKeyMap } from "./utils/utils";
+import { getProductsNameKeyMap, updateBalanceTable, getUniqProducts } from "./utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import { numOfColBeforeProducts } from "./utils/constants";
 
@@ -54,16 +54,16 @@ function App() {
     }
   };
 
-  const addProductToTable = (products) => {
+  const addProductToTable = (selectedProductNames) => {
     const currentMatrix = matrixData
     const columnIndxToAdd = currentMatrix[0].length - 5
     const arrayWithColumn = currentMatrix.map((row, rowIndex) => {
         let newArr;
-        if (products.length > 0) {
+        if (selectedProductNames.length > 0) {
           if(rowIndex == 0) {
-            newArr = [...row.slice(0, 3), ...products, ...row.slice(columnIndxToAdd,  currentMatrix[0].length)]
+            newArr = [...row.slice(0, 3), ...selectedProductNames, ...row.slice(columnIndxToAdd,  currentMatrix[0].length)]
           } else {
-            newArr = [...row.slice(0, 3), ...Array(products.length).fill(0), ...row.slice(columnIndxToAdd,  currentMatrix[0].length)]
+            newArr = [...row.slice(0, 3), ...Array(selectedProductNames.length).fill(0), ...row.slice(columnIndxToAdd,  currentMatrix[0].length)]
           }
         } else {
           newArr = [...row.slice(0, 3), ...row.slice(columnIndxToAdd, currentMatrix[0].length)]
@@ -71,6 +71,9 @@ function App() {
         return newArr
       })
     setMatrixData(arrayWithColumn)
+    const currentBalanceData = updateBalanceTable(selectedProductNames, products)
+    setBalanceTableData(currentBalanceData);
+
   }
 
   const calcProductsSum = (n) => {
@@ -90,12 +93,9 @@ function App() {
   useEffect(() => {
     (async () => {
       const productsData = await getProductsAPI(products);
-      // const currentProducts = [...products]
-      const productsNames = productsData.map((element) => element["שם פריט"])
-      setProducts(productsNames)
-      const currentBalanceData = createBalanceTable(productsData);
-      setBalanceTableData(currentBalanceData);
-      const productsMap = getProductsNameKeyMap(productsData);
+      const uniqProducts = productsData.length > 0 ? getUniqProducts(productsData) : undefined
+      setProducts(uniqProducts)
+      const productsMap = getProductsNameKeyMap(uniqProducts);
       setProductsMap(productsMap);
       const tableTitle = [
         "שם לקוח",

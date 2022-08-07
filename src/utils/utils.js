@@ -1,4 +1,5 @@
 import { numOfColBeforeProducts, numOfColAfterProducts } from "./constants";
+import _ from "lodash"
 
 export const filterCustomers = (parsedName, input) => {
   return input.length && parsedName?.length && parsedName.includes(input);
@@ -38,6 +39,15 @@ export const createBalanceTable = (data) => {
   });
   return currentBalanceData;
 };
+
+export const updateBalanceTable = (productsNames, productsData) => {   
+  const selectedProducts = productsData.filter(product => productsNames.includes(product["שם פריט"]))
+  return createBalanceTable(selectedProducts)
+}
+
+export const getUniqProducts = (productsData) => {
+   return _.uniqBy(productsData, "שם פריט")
+}
 
 const validateValueExist = (valueToCheck, setComment) => {
   if(!valueToCheck) {

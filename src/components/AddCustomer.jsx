@@ -27,7 +27,7 @@ const AddCustomer = ({
 
   const productsOptions = [];
   products.forEach((element) => {
-    productsOptions.push({ value: element, label: element });
+    productsOptions.push({ value:  element["שם פריט"], label:  element["שם פריט"] });
   });
   const options = [{ value: "*", label: "הכל" } , ...productsOptions]
 
@@ -44,8 +44,6 @@ const AddCustomer = ({
   };
 
   const handleProductsSelect = (value, event) => {
-    console.log("handleProductsSelect, event:", event);
-    console.log("this", this)
     let selectedValues = []
     if (event.action === "select-option" && event.option.value === "*") {
       setSelectedOptions(options)
