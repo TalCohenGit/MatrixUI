@@ -14,7 +14,7 @@ const TableCell = (props) => {
   let cellType;
 
   if (colIndex < 3 || rowIndex === 0) {
-    cellType = <div>{cellValue}</div>;
+    cellType = cellValue
   } else if(colIndex === rowLength - 1) {
     cellType = <DocCommentCell rowIndex={rowIndex} colIndex={colIndex} data={data} setData={setData}/>
   } else if (colIndex === rowLength - 2) {

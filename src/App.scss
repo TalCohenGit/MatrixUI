@@ -27,7 +27,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-   
+    width: 128px;
+    word-break: break-word;
     input {
       width: 40px;
     }
@@ -44,6 +45,7 @@
 .addCustomer {
   &-wrapper {
     margin-bottom: 5px;
+    margin-left: 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -78,7 +80,7 @@
 
   &-button {
     margin: 0;
-    margin-left: auto;
+    // margin-left: auto;
     align-items: center;
     background-color: initial;
     background-image: linear-gradient(#464d55, #25292e);
@@ -215,6 +217,11 @@ body {
   margin-left: 0;
 }
 
+.chooseProduct {
+  margin-left: auto;
+  margin-right: 20px
+}
+
 .docComment-button {
   @extend .addCustomer-button;
   margin-right: 30px;
@@ -228,15 +235,15 @@ body {
 
 .comment {
   position: absolute;
-  bottom:21px;
-  left: 85px;
+  right: 0;
+  top: 0;
   cursor: pointer;
   
 }
 
 .count {
   position: absolute;
-  top: 10px;
+  top: 25%;
 }
 
 .validationComment {

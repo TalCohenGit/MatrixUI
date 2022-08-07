@@ -23,13 +23,16 @@ const AddCustomer = ({
     products,
   } = useContext(DataContext);
   const [customerValidationFailed, setCustomerValidationFailed] = useState("");
-  const [selectedOptions, setSelectedOptions] = useState([])
+  const [selectedOptions, setSelectedOptions] = useState([]);
 
   const productsOptions = [];
   products.forEach((element) => {
-    productsOptions.push({ value:  element["שם פריט"], label:  element["שם פריט"] });
+    productsOptions.push({
+      value: element["שם פריט"],
+      label: element["שם פריט"],
+    });
   });
-  const options = [{ value: "*", label: "הכל" } , ...productsOptions]
+  const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
   const handleChange = (value) => {
     setCustomerName(value);
@@ -44,20 +47,23 @@ const AddCustomer = ({
   };
 
   const handleProductsSelect = (value, event) => {
-    let selectedValues = []
+    let selectedValues = [];
     if (event.action === "select-option" && event.option.value === "*") {
-      setSelectedOptions(options)
-      selectedValues = productsOptions.map((element) => element.value)
-    } else if(event.action ==="deselect-option" && event.option.value === "*") {
-      setSelectedOptions([])
-    } else if(event.action ==="deselect-option") {
-      const values = value.filter(o => o.value !== "*")
-      setSelectedOptions(values)
-      selectedValues = values.map((element) => element.value)
+      setSelectedOptions(options);
+      selectedValues = productsOptions.map((element) => element.value);
+    } else if (
+      event.action === "deselect-option" &&
+      event.option.value === "*"
+    ) {
+      setSelectedOptions([]);
+    } else if (event.action === "deselect-option") {
+      const values = value.filter((o) => o.value !== "*");
+      setSelectedOptions(values);
+      selectedValues = values.map((element) => element.value);
     } else {
       setSelectedOptions(value);
-      selectedValues = value.map((element) => element.value)
-   }
+      selectedValues = value.map((element) => element.value);
+    }
     addProductToTable(selectedValues);
   };
 
@@ -67,7 +73,7 @@ const AddCustomer = ({
     } else {
       return `${placeholderButtonLabel}: ${value.length} נבחרו`;
     }
-  }
+  };
 
   const produceDoc = async (
     matrixData,
@@ -116,15 +122,17 @@ const AddCustomer = ({
         <button className="addCustomer-button" onClick={addCustomerToTable}>
           הוסף
         </button>
-        <ReactMultiSelectCheckboxes
-          options={options}
-          onChange={handleProductsSelect}
-          placeholderButtonLabel="מוצרים"
-          getDropdownButtonLabel={getDropdownButtonLabel}
-          value={selectedOptions}
-          placeholder={"חפש.."}
-          setState={setSelectedOptions}
-        />
+        <div className="chooseProduct">
+          <ReactMultiSelectCheckboxes
+            options={options}
+            onChange={handleProductsSelect}
+            placeholderButtonLabel="מוצרים"
+            getDropdownButtonLabel={getDropdownButtonLabel}
+            value={selectedOptions}
+            placeholder={"חפש.."}
+            setState={setSelectedOptions}
+          />
+        </div>
         {customerValidationFailed ? (
           <p className="validationComment">
             {" "}

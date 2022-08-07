@@ -15,6 +15,9 @@ export const mapTable = (data, key) =>
   });
 
 export const createBalanceTable = (data) => {
+  if(!data.length){
+    return
+  }
   let tableRowData = [],
     currentBalanceData = [],
     fieldsToMap = [
