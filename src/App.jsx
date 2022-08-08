@@ -8,7 +8,8 @@ import { getCustomersAPI, getProductsAPI, sendTableAPI } from "./api";
 import { DataContext } from "./context/DataContext";
 import { getProductsNameKeyMap, updateBalanceTable, getUniqProducts } from "./utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
-import { numOfColBeforeProducts } from "./utils/constants";
+import { numOfColBeforeProducts, numOfColAfterProducts } from "./utils/constants";
+import Modal from "./common/components/Modal/Modal";
 
 function App() {
   const {
@@ -28,6 +29,9 @@ function App() {
     products,
     setProducts,
   } = useContext(DataContext);
+
+  const  [isOpen, toggleModal] = useState(true);
+  const [validationErrors, setValidationError] = useState([])
 
   const addCustomerToTable = () => {
     try {
@@ -56,7 +60,7 @@ function App() {
 
   const addProductToTable = (selectedProductNames) => {
     const currentMatrix = matrixData
-    const columnIndxToAdd = currentMatrix[0].length - 5
+    const columnIndxToAdd = currentMatrix[0].length - numOfColAfterProducts
     const arrayWithColumn = currentMatrix.map((row, rowIndex) => {
         let newArr;
         if (selectedProductNames.length > 0) {
@@ -73,8 +77,21 @@ function App() {
     setMatrixData(arrayWithColumn)
     const currentBalanceData = updateBalanceTable(selectedProductNames, products)
     setBalanceTableData(currentBalanceData);
-
   }
+
+  const validationModal = (validationErrors) => {
+    if (validationErrors.length > 0) {
+      setValidationError(validationErrors)
+      toggleModal(true)
+    }
+  }
+
+  const dataDoubles = validationErrors.map(validation => {
+    return <div>
+      { validation["ערך "] }
+    </div>
+  })
+  
 
   const calcProductsSum = (n) => {
     let sum = 0;
@@ -92,7 +109,7 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      const productsData = await getProductsAPI(products);
+      const productsData = await getProductsAPI(products, validationModal);
       const uniqProducts = productsData.length > 0 ? getUniqProducts(productsData) : undefined
       setProducts(uniqProducts)
       const productsMap = getProductsNameKeyMap(uniqProducts);
@@ -120,6 +137,14 @@ function App() {
   return matrixData?.length ? (
     <div className="app-container">
       <h1>גת אביגדור קופה רושמת</h1>
+      <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={"נא לטפל בכפילויות של הנתונים"}>
+      <div>{dataDoubles}</div>
+      <div className="action-buttons">
+        <button className="cancel-button" onClick={() => toggleModal(false)}>
+          בטל
+        </button>
+      </div>
+      </Modal>
       <AddCustomer
         customerName={customerName}
         setCustomerName={setCustomerName}

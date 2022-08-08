@@ -3,7 +3,6 @@ import { DataContext } from "../context/DataContext";
 import SearchList from "./SearchList";
 import { handleMatrixData, handleCommentMatrixData } from "../utils/utils";
 import { getMatrixIDAPI } from "../api";
-import Select from "react-select";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 
 const AddCustomer = ({

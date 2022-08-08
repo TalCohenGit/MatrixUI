@@ -11,6 +11,13 @@ const CommentsModal = ({ isOpen, toggleModal, rowIndex, colIndex, modalTitle }) 
   const [comments, setComments] = useState([intialValue]);
   const { matrixComments, setMatrixComments} = useContext(DataContext)
 
+  useEffect(() => {
+    const commentsInCell = matrixComments[rowIndex-1][colIndex-numOfColBeforeProducts]
+    if(commentsInCell){
+      setComments(commentsInCell) 
+    }
+  }, []);
+
   const customStyles = {
     menu: () => ({
       width: 200,
@@ -33,6 +40,12 @@ const CommentsModal = ({ isOpen, toggleModal, rowIndex, colIndex, modalTitle }) 
   const addCommentsRow = () => {
     setComments([...comments, intialValue]);
   };
+
+  const getCommentLabel = (commentsOptions, selectValue) => {
+    const commentObj = commentsOptions.find(element => element.value === selectValue)
+    return commentObj.label
+  }
+
   const [selectedOption, setSelectedOption] = useState({
     value: "price",
     label: "מחיר",
@@ -42,7 +55,7 @@ const CommentsModal = ({ isOpen, toggleModal, rowIndex, colIndex, modalTitle }) 
     return (
       <div className="comments-row" key={index}>
         <Select
-          placeholder="בחר מהרשימה..."
+          placeholder={comment?.selectValue ?  getCommentLabel(commentsOptions, comment.selectValue): "בחר מהרשימה..."}
           onChange={(e) => handleSelect(e, index, "selectValue")}
           options={commentsOptions}
           styles={customStyles}
