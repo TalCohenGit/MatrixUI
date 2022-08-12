@@ -3,7 +3,6 @@ import "./App.scss";
 import "normalize.css";
 import AddCustomer from "./components/AddCustomer";
 import Table from "./components/Table";
-import products from "./mockData/products.json";
 import { getCustomersAPI, getProductsAPI, sendTableAPI } from "./api";
 import { DataContext } from "./context/DataContext";
 import { getProductsNameKeyMap, updateBalanceTable, getUniqProducts } from "./utils/utils";
@@ -91,7 +90,6 @@ function App() {
       { validation["ערך "] }
     </div>
   })
-  
 
   const calcProductsSum = (n) => {
     let sum = 0;
@@ -121,7 +119,7 @@ function App() {
         "איסוף",
         "מאושר",
         "סוג מסמך",
-        "הערות",
+        "הערות למסמך",
         ""
       ];
 
@@ -132,7 +130,16 @@ function App() {
       setCustomers(customerList);
       handleFetchDrivers();
     })();
+    
   }, []);
+
+  // useEffect(()=>{
+  //   return () => {
+      
+  //   } 
+  // },[])
+
+  useEffect(()=>{},[])
 
   return matrixData?.length ? (
     <div className="app-container">

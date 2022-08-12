@@ -62,14 +62,16 @@ export const handleMatrixData = (tableData, productsMap, setCustomerValidationFa
   let matrix = JSON.parse(JSON.stringify(tableData));
   const titleLength = matrix[0].length;
   let tableDetails = matrix.slice(1);
+  const acountKeys = []
   const metaData = [];
   const documentIDs = [];
   const actionIDs = [];
   const driverIDs = [];
   const docComments = [];
-  tableDetails.map((rowData) => {
-    docComments.push(rowData.pop())
-    rowData.pop();
+  tableDetails = tableDetails.map((rowData) => {
+    acountKeys.push(rowData[1])
+    metaData.push(rowData.pop())
+    docComments.push(rowData.pop());
     const docId = rowData.pop()
     documentIDs.push(docId);
     const actionID = rowData.pop()
@@ -81,7 +83,8 @@ export const handleMatrixData = (tableData, productsMap, setCustomerValidationFa
       return;
     }
     driverIDs.push(driverID);
-  });
+    return [rowData.slice(3)]
+    });
 
   if(!driverIDs.length){
     return
@@ -93,11 +96,10 @@ export const handleMatrixData = (tableData, productsMap, setCustomerValidationFa
   );
   const productsWithKeys = products.map((element) => productsMap[element]);
   matrix = [productsWithKeys, ...tableDetails];
-  matrix[0].unshift("AcountName", "AountKey", "CellPhone");
-  return { matrix, driverIDs, actionIDs, documentIDs, docComments };
+  return { matrix, driverIDs, actionIDs, documentIDs, docComments, acountKeys, metaData };
 };
 
-export const handleCommentMatrixData = (matrixComments, docComments) => {
+export const handleCommentMatrixData = (matrixComments, docComments, metaData) => {
   const matrixCommentToSend = []
   matrixComments.forEach((commentsRow, index) => {
     let cellsData = [];
@@ -114,7 +116,11 @@ export const handleCommentMatrixData = (matrixComments, docComments) => {
       }
     });
     const docData = !docComments[index]? null : docComments[index]
-    matrixCommentToSend.push({"cellsData": cellsData, "docData": docData})
+    const matrixCommentRow = {"cellsData": cellsData, "docData": docData}
+    if(metaData[index]) {
+      matrixCommentRow["metaData"] = {"Details": metaData[index]}
+    }
+    matrixCommentToSend.push(matrixCommentRow)
   });
   return matrixCommentToSend
 };

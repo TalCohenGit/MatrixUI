@@ -95,7 +95,8 @@ const AddCustomer = ({
     const matrixID = await getMatrixIDAPI();
     const commentMatrixData = handleCommentMatrixData(
       matrixComments,
-      validatedData["docComments"]
+      validatedData["docComments"],
+      validatedData["metaData"]
     );
     sendTableAPI(validatedData, matrixID, commentMatrixData);
   };

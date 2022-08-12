@@ -11,7 +11,7 @@ const DocCommentCell = ({ rowIndex, colIndex, data, setData }) => {
   return (
     <div>
         <button className="docComment-button" onClick={openModal}>
-         הערה למסמך
+         הערות
         </button>
         <DocCommentModal isOpen={isOpen} toggleModal={toggleModal} rowIndex={rowIndex} colIndex={colIndex} data={data} setData={setData}/> 
     </div>

@@ -1,14 +1,14 @@
 export const commentsOptions = [
-  { value: "price", label: "מחיר" },
-  { value: "quantity", label: "כמות" },
-  { value: "discountPrc", label: "מחיר לאחר הנחה" },
-  { value: "commitionPrc", label: "עמלה" },
-  { value: "lineNoForSorting", label: "מספר קו לצורך מיון" },
-  { value: "warehouse", label: "מחסן" },
-  { value: "details", label: "פרטים" },
-  { value: "reference", label: "ייחוס" },
-  { value: "packs", label: "אריזות" },
-  { value: "alternum", label: "מספר אחר" },
+  { value: "Price", label: "מחיר" },
+  { value: "Quantity", label: "כמות" },
+  { value: "DiscountPrc", label: "מחיר לאחר הנחה" },
+  { value: "CommitionPrc", label: "עמלה" },
+  { value: "LineNoForSorting", label: "מספר קו לצורך מיון" },
+  { value: "Warehouse", label: "מחסן" },
+  { value: "Details", label: "פרטים" },
+  { value: "Reference", label: "ייחוס" },
+  { value: "Packs", label: "אריזות" },
+  { value: "Alternum", label: "מספר אחר" },
 ];
 
 export const SERVER_NAME = "http://localhost:5000"

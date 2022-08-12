@@ -87,7 +87,9 @@ export const getProductsAPI = async (arr, validationModal) => {
 
 export const getMatrixIDAPI = async () => {
   try {
-    const key = await getKeyAPI();
+    // const key = await getKeyAPI();
+    const key = "1234"
+
     return key;
   } catch (e) {
     console.log("error in getMatrixIDAPI:", e);
@@ -95,10 +97,11 @@ export const getMatrixIDAPI = async () => {
 };
 
 export const sendTableAPI = async (tableData, matrixID, commentMatrix) => {
-  const { matrix, driverIDs, actionIDs, documentIDs } = tableData
+  const { matrix, driverIDs, actionIDs, documentIDs, acountKeys } = tableData
   const mainMatrix = {
     matrixesData: {
       matrixID: matrixID,
+      AcountKeys: acountKeys,
       DocumentID: documentIDs,
       DriverID: driverIDs,
       ActionID: actionIDs,

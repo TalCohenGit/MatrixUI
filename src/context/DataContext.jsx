@@ -31,6 +31,7 @@ const DataContextProvider = (props) => {
       customerElement ? customerElement : "-"
     );
   };
+
   return (
     <DataContext.Provider
       value={{
