@@ -123,3 +123,15 @@ export const sendTableAPI = async (tableData, matrixID, commentMatrix) => {
     console.log("error in sendTableAPI:", e);
   }
 };
+
+export const saveTablesAPI = (matrixID, UserID, matrixData, commentMatrix, drivers) => {
+  const matrixes = [JSON.stringify(matrixData), JSON.stringify(commentMatrix), JSON.stringify(drivers)]
+  //sending to server, need the new API
+}
+
+export const loadTablesAPI = (matrixID, UserID) => {
+  const matrixData = [["שם לקוח","מזהה","טלפון","הרנה 250 גרם","איסוף","מאושר","סוג מסמך","הערות למסמך",""],["גוגל google","7199","528124625",5,"6127",2,1,"הערה למסמך",0]]
+  const commentMatrix = [[[{"selectValue":"Quantity","inputValue":"1000"}],null,null,null,null]]
+  return {matrixData, commentMatrix}
+}
+

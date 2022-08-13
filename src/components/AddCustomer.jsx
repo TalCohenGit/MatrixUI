@@ -20,6 +20,7 @@ const AddCustomer = ({
     productsMap,
     matrixComments,
     products,
+    setMetrixID
   } = useContext(DataContext);
   const [customerValidationFailed, setCustomerValidationFailed] = useState("");
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -83,6 +84,9 @@ const AddCustomer = ({
     if (matrixData.length <= 1) {
       return;
     }
+    console.log("produceDoc matrixData", JSON.stringify(matrixData))
+    console.log("produceDoc matrixComments", JSON.stringify(matrixComments))
+
     const validatedData = handleMatrixData(
       matrixData,
       productsMap,
@@ -93,6 +97,7 @@ const AddCustomer = ({
     }
     setCustomerValidationFailed("");
     const matrixID = await getMatrixIDAPI();
+    setMetrixID(matrixID)
     const commentMatrixData = handleCommentMatrixData(
       matrixComments,
       validatedData["docComments"],
@@ -120,7 +125,7 @@ const AddCustomer = ({
           <SearchList />
         </div>
         <button className="addCustomer-button" onClick={addCustomerToTable}>
-          הוסף
+          הוספת לקוח
         </button>
         <div className="chooseProduct">
           <ReactMultiSelectCheckboxes
@@ -129,7 +134,7 @@ const AddCustomer = ({
             placeholderButtonLabel="מוצרים"
             getDropdownButtonLabel={getDropdownButtonLabel}
             value={selectedOptions}
-            placeholder={"חפש.."}
+            placeholder={"חיפוש"}
             setState={setSelectedOptions}
           />
         </div>
@@ -146,7 +151,7 @@ const AddCustomer = ({
             produceDoc(matrixData, productsMap, matrixComments, sendTableAPI)
           }
         >
-          הפק חשבונית
+          הפקת חשבונית
         </button>
       </div>
       {errorMessage?.length ? (

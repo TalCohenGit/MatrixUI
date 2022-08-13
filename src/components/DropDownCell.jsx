@@ -1,7 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Select from "react-select";
+import { DataContext } from "../context/DataContext";
 
-const DropDownCell = ({ dropdownOptions, rowIndex, colIndex,data,setData }) => {
+
+const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData }) => {
+  const [loadedKey, setLoadedKey] = useState("")
+  const { drivers } = useContext(DataContext);
+
+  useEffect(() => {
+    (async() => {
+    const dropDownValue = data[rowIndex][colIndex]
+    if(dropDownValue) {
+      const dropdownOption = dropdownOptions.find(e => e.key === dropDownValue)
+      if(dropdownOption) {
+        setLoadedKey(dropdownOption.name)
+      }
+    }
+  })()
+}, [drivers]);
 
   const customStyles={
     indicatorSeparator: (styles) => ({display:'none'}),
@@ -25,6 +41,7 @@ const DropDownCell = ({ dropdownOptions, rowIndex, colIndex,data,setData }) => {
       onChange={(e) => handleSelect(e)}
       options={options}
       styles={customStyles}
+      placeholder={loadedKey? loadedKey : "בחירה"}
     />
   );
 };
