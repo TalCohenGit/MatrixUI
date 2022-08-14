@@ -5,7 +5,6 @@ import { DataContext } from "../context/DataContext";
 
 const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData }) => {
   const [loadedKey, setLoadedKey] = useState("")
-  const { drivers } = useContext(DataContext);
 
   useEffect(() => {
     (async() => {
@@ -17,7 +16,7 @@ const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData }) =>
       }
     }
   })()
-}, [drivers]);
+}, []);
 
   const customStyles={
     indicatorSeparator: (styles) => ({display:'none'}),

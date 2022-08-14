@@ -115,7 +115,7 @@ function App() {
   };
 
   const dataDoubles = validationErrors.map((validation) => {
-    return <div>{validation["ערך "]}</div>;
+    return <div>{`תקלה בערך: ${validation["ערך "]} בשורות: ${validation["בשורות "]} בכותרת: ${validation["בכותרת "]}`}</div>
   });
 
   const calcProductsSum = (n) => {
@@ -180,7 +180,7 @@ function App() {
     return () => window.removeEventListener("beforeunload", onUnload);
   }, []);
 
-  return matrixData?.length ? (
+  return matrixData?.length && drivers?.length ? (
     <div className="app-container">
       <h1>גת אביגדור קופה רושמת</h1>
       <Modal
