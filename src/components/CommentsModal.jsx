@@ -6,16 +6,12 @@ import Select from "react-select";
 import { commentsOptions, numOfColBeforeProducts } from "../utils/constants";
 import { DataContext } from "../context/DataContext";
 
-const CommentsModal = ({ isOpen, toggleModal, rowIndex, colIndex, modalTitle }) => {
+const CommentsModal = ({ isOpen, toggleModal, rowIndex, colIndex, modalTitle, saveComments, comments, setComments, loadOldComments }) => {
   const intialValue = { selectValue: "", inputValue: "" };
-  const [comments, setComments] = useState([intialValue]);
   const { matrixComments, setMatrixComments} = useContext(DataContext)
 
   useEffect(() => {
-    const commentsInCell = matrixComments[rowIndex-1][colIndex-numOfColBeforeProducts]
-    if(commentsInCell){
-      setComments(commentsInCell) 
-    }
+    loadOldComments()
   }, []);
 
   const customStyles = {
@@ -91,10 +87,9 @@ const CommentsModal = ({ isOpen, toggleModal, rowIndex, colIndex, modalTitle }) 
         <button
           className="save-button"
           onClick={() => {
-            const newMatrixComments = [...matrixComments]
-            newMatrixComments[rowIndex-1][colIndex-numOfColBeforeProducts] = comments
-            setMatrixComments(newMatrixComments)
+            saveComments(comments)
             toggleModal(false);
+
           }}
         >
           שמור

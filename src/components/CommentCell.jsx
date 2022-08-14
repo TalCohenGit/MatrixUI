@@ -1,20 +1,56 @@
-import React, { useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
+import { DataContext } from "../context/DataContext";
+import CommentsModal from "./CommentsModal";
 
 const CommentCell = ({ rowIndex, colIndex, data, setData }) => {
-    const [comment, setComment] = useState("")
+  const [isOpen, toggleModal] = useState(false);
+  const intialValue = { selectValue: "", inputValue: "" };
+  const [comments, setComments] = useState([intialValue]);
+
+  const addComments = () => {
+    toggleModal(true);
+  };
+
+  const saveComments = (comments) => {
+    const newMatrixData = [...data];
+    newMatrixData[rowIndex][colIndex] = comments;
+    setData(newMatrixData);
+  };
+
+  const loadOldComments = () => {
+    const commentsInCell = data[rowIndex][colIndex]
+    if(commentsInCell){
+      setComments(commentsInCell) 
+    }
+  }
+
+  useEffect(() => {
+    const commentsInCell = data[rowIndex][colIndex];
+    if (commentsInCell) {
+      setComments(commentsInCell);
+    }
+  }, []);
+
   return (
     <div>
-        <input
-          type="text"
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          onBlur={() => {
-            const currentData = [...data];
-            currentData[rowIndex][colIndex] = comment;
-            setData(currentData);
-          }}/>
+      <button className="createInvoice-button" onClick={() => addComments()}>
+        הוספה
+      </button>
+      {isOpen && (
+        <CommentsModal
+          isOpen={isOpen}
+          toggleModal={toggleModal}
+          rowIndex={rowIndex}
+          colIndex={colIndex}
+          modalTitle={data[0][colIndex]}
+          saveComments={saveComments}
+          comments={comments}
+          setComments={setComments}
+          loadOldComments={loadOldComments}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default CommentCell
+export default CommentCell;

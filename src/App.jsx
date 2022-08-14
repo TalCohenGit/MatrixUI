@@ -8,13 +8,13 @@ import {
   getProductsAPI,
   sendTableAPI,
   saveTablesAPI,
-  loadTablesAPI
+  loadTablesAPI,
 } from "./api";
 import { DataContext } from "./context/DataContext";
 import {
   getProductsNameKeyMap,
   updateBalanceTable,
-  getUniqProducts
+  getUniqProducts,
 } from "./utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
@@ -41,7 +41,7 @@ function App() {
     products,
     setProducts,
     matrixID,
-    drivers
+    drivers,
   } = useContext(DataContext);
 
   const [isOpen, toggleModal] = useState(true);
@@ -50,7 +50,8 @@ function App() {
   const addCustomerToTable = () => {
     try {
       if (matrixData?.length) {
-        const productsNumber = matrixData[0].length - numOfColBeforeProducts;
+        const numOfColAfterCustomerData =
+          matrixData[0].length - numOfColBeforeProducts;
         const currentMatrixData = [...matrixData];
         const newCustomerData = getNewCustomerData();
         if (!newCustomerData) {
@@ -58,13 +59,17 @@ function App() {
         }
         currentMatrixData.push([
           ...newCustomerData,
-          ...Array(productsNumber).fill(0),
+          ...Array(numOfColAfterCustomerData).fill(0),
         ]);
         setMatrixData(currentMatrixData);
-        const commentsRow = Array(productsNumber).fill(null);
-        const newMatrixComment = [...matrixComments];
-        newMatrixComment.push(commentsRow);
-        setMatrixComments(newMatrixComment);
+        const productsNumber =
+          numOfColAfterCustomerData - numOfColAfterProducts;
+        if (productsNumber > 0) {
+          const commentsRow = Array().fill(null);
+          const newMatrixComment = [...matrixComments];
+          newMatrixComment.push(commentsRow);
+          setMatrixComments(newMatrixComment);
+        }
       }
       setCustomerName("");
     } catch (e) {
@@ -90,6 +95,13 @@ function App() {
             ...Array(selectedProductNames.length).fill(0),
             ...row.slice(columnIndxToAdd, currentMatrix[0].length),
           ];
+          const newMatrixComment = [...matrixComments];
+          if(newMatrixComment.length > 0) {
+            newMatrixComment[rowIndex-1].push(null); 
+          } else {
+            newMatrixComment[rowIndex-1] = [null]
+          }      
+          setMatrixComments(newMatrixComment) 
         }
       } else {
         newArr = [
@@ -115,7 +127,9 @@ function App() {
   };
 
   const dataDoubles = validationErrors.map((validation) => {
-    return <div>{`תקלה בערך: ${validation["ערך "]} בשורות: ${validation["בשורות "]} בכותרת: ${validation["בכותרת "]}`}</div>
+    return (
+      <div>{`תקלה בערך: ${validation["ערך "]} בשורות: ${validation["בשורות "]} בכותרת: ${validation["בכותרת "]}`}</div>
+    );
   });
 
   const calcProductsSum = (n) => {
@@ -135,10 +149,10 @@ function App() {
   useEffect(() => {
     (async () => {
       const savedData = loadTablesAPI();
-      if(savedData) {
-        const {matrixData, commentMatrix} = savedData
-        setMatrixData(matrixData)
-        setMatrixComments(commentMatrix)
+      if (savedData) {
+        const { matrixData, commentMatrix } = savedData;
+        setMatrixData(matrixData);
+        setMatrixComments(commentMatrix);
       } else {
         const tableTitle = [
           "שם לקוח",
@@ -166,11 +180,10 @@ function App() {
     })();
   }, []);
 
-
   useEffect(() => {
     const onUnload = () => {
       const userID = "1234";
-      if(matrixData.length > 0) {
+      if (matrixData.length > 0) {
         saveTablesAPI(matrixID, userID, matrixData, matrixComments, drivers);
       }
     };
