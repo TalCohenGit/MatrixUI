@@ -3,12 +3,15 @@ import "./App.scss";
 import "normalize.css";
 import AddCustomer from "./components/AddCustomer";
 import Table from "./components/Table";
+import Login from "./components/Login";
 import {
   getCustomersAPI,
   getProductsAPI,
   sendTableAPI,
   saveTablesAPI,
   loadTablesAPI,
+  getDriverList,
+  refreshTokenAPI
 } from "./api";
 import { DataContext } from "./context/DataContext";
 import {
@@ -22,12 +25,12 @@ import {
   numOfColAfterProducts,
 } from "./utils/constants";
 import Modal from "./common/components/Modal/Modal";
+import useAxiosPrivate from "./hooks/useAxiosPrivate";
 
 function App() {
   const {
     matrixData,
     setMatrixData,
-    handleFetchDrivers,
     setCustomers,
     customerName,
     setCustomerName,
@@ -42,10 +45,17 @@ function App() {
     setProducts,
     matrixID,
     drivers,
+    setDrivers,
+    accessToken,
+    setAccessToken
   } = useContext(DataContext);
 
   const [isOpen, toggleModal] = useState(true);
   const [validationErrors, setValidationError] = useState([]);
+  // const [token, setToken] = useState("")
+
+  const axiosPrivate = useAxiosPrivate()
+
 
   const addCustomerToTable = () => {
     try {
@@ -148,7 +158,7 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      const savedData = loadTablesAPI();
+      const savedData = loadTablesAPI(axiosPrivate);
       if (savedData) {
         const { matrixData, commentMatrix } = savedData;
         setMatrixData(matrixData);
@@ -168,15 +178,16 @@ function App() {
         currentMatrixData.push(tableTitle);
         setMatrixData(currentMatrixData);
       }
-      const productsData = await getProductsAPI(products, validationModal);
+      const productsData = await getProductsAPI(axiosPrivate, validationModal);
       const uniqProducts =
         productsData.length > 0 ? getUniqProducts(productsData) : undefined;
       setProducts(uniqProducts);
       const productsMap = getProductsNameKeyMap(uniqProducts);
       setProductsMap(productsMap);
-      const customerList = await getCustomersAPI(productsMap);
+      const customerList = await getCustomersAPI(axiosPrivate, productsMap);
       setCustomers(customerList);
-      handleFetchDrivers();
+      const driverList = await getDriverList(axiosPrivate);
+      setDrivers(driverList);    
     })();
   }, []);
 
@@ -193,7 +204,18 @@ function App() {
     return () => window.removeEventListener("beforeunload", onUnload);
   }, []);
 
-  return matrixData?.length && drivers?.length ? (
+  const haveRefreshToken = () => {
+    const refreshToken = localStorage.getItem("refreshToken");
+    if (refreshToken) {
+      const { accessToken } = refreshTokenAPI();
+      setAccessToken(accessToken)
+      return true
+    }
+    return false
+  }
+
+  return !accessToken && !haveRefreshToken() ? <Login/> :
+  matrixData?.length && drivers?.length ? (
     <div className="app-container">
       <h1>גת אביגדור קופה רושמת</h1>
       <Modal

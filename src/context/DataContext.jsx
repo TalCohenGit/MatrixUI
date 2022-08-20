@@ -15,11 +15,8 @@ const DataContextProvider = (props) => {
   const [productsMap, setProductsMap] = useState([])
   const [products, setProducts] = useState([])
   const [matrixID, setMetrixID] = useState("")
-  
-  const handleFetchDrivers = async () => {
-    const drivers = await getDriverList();
-    setDrivers(drivers);
-  };
+  const [accessToken, setAccessToken] = useState("")
+
 
   const getNewCustomerData = () => {
     const customerObject = customers.find(
@@ -39,7 +36,7 @@ const DataContextProvider = (props) => {
         matrixData,
         setMatrixData,
         drivers,
-        handleFetchDrivers,
+        setDrivers,
         customers,
         setCustomers,
         isListVisible,
@@ -58,7 +55,9 @@ const DataContextProvider = (props) => {
         products,
         setProducts,
         matrixID,
-        setMetrixID
+        setMetrixID,
+        accessToken,
+        setAccessToken
       }}
     >
       {props.children}
