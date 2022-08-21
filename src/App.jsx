@@ -11,7 +11,7 @@ import {
   saveTablesAPI,
   loadTablesAPI,
   getDriverList,
-  refreshTokenAPI
+  refreshTokenAPI,
 } from "./api";
 import { DataContext } from "./context/DataContext";
 import {
@@ -47,15 +47,16 @@ function App() {
     drivers,
     setDrivers,
     accessToken,
-    setAccessToken
+    setAccessToken,
+    timeLimit,
+    setTimelimit,
   } = useContext(DataContext);
 
   const [isOpen, toggleModal] = useState(true);
   const [validationErrors, setValidationError] = useState([]);
-  // const [token, setToken] = useState("")
-
-  const axiosPrivate = useAxiosPrivate()
-
+  const [seconds, setSeconds] = useState(0);
+  const axiosPrivate = useAxiosPrivate();
+  let interval;
 
   const addCustomerToTable = () => {
     try {
@@ -106,12 +107,12 @@ function App() {
             ...row.slice(columnIndxToAdd, currentMatrix[0].length),
           ];
           const newMatrixComment = [...matrixComments];
-          if(newMatrixComment.length > 0) {
-            newMatrixComment[rowIndex-1].push(null); 
+          if (newMatrixComment.length > 0) {
+            newMatrixComment[rowIndex - 1].push(null);
           } else {
-            newMatrixComment[rowIndex-1] = [null]
-          }      
-          setMatrixComments(newMatrixComment) 
+            newMatrixComment[rowIndex - 1] = [null];
+          }
+          setMatrixComments(newMatrixComment);
         }
       } else {
         newArr = [
@@ -157,6 +158,36 @@ function App() {
   };
 
   useEffect(() => {
+    if (haveRefreshToken()) {
+      interval = setInterval(() => {
+        setSeconds((prevSeconds) => prevSeconds + 1);
+      }, 1000);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [accessToken]);
+
+  useEffect(() => {
+    if (haveRefreshToken()) {
+      let currentTimeLimit = timeLimit;
+      if (!currentTimeLimit) {
+        currentTimeLimit = localStorage.getItem("timeLimit");
+      }
+      if (currentTimeLimit && seconds > currentTimeLimit) {
+        setAccessToken("");
+        clearInterval(interval);
+        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("timeLimit")
+      }
+    }
+  }, [seconds]);
+
+  useEffect(() => {
+    setSeconds(0);
+  }, [matrixData]);
+
+  useEffect(() => {
     (async () => {
       const savedData = loadTablesAPI(axiosPrivate);
       if (savedData) {
@@ -187,7 +218,7 @@ function App() {
       const customerList = await getCustomersAPI(axiosPrivate, productsMap);
       setCustomers(customerList);
       const driverList = await getDriverList(axiosPrivate);
-      setDrivers(driverList);    
+      setDrivers(driverList);
     })();
   }, []);
 
@@ -208,14 +239,15 @@ function App() {
     const refreshToken = localStorage.getItem("refreshToken");
     if (refreshToken) {
       const { accessToken } = refreshTokenAPI();
-      setAccessToken(accessToken)
-      return true
+      setAccessToken(accessToken);
+      return true;
     }
-    return false
-  }
+    return false;
+  };
 
-  return !accessToken && !haveRefreshToken() ? <Login/> :
-  matrixData?.length && drivers?.length ? (
+  return !accessToken && !haveRefreshToken() ? (
+    <Login setSeconds={setSeconds} />
+  ) : matrixData?.length && drivers?.length ? (
     <div className="app-container">
       <h1>גת אביגדור קופה רושמת</h1>
       <Modal

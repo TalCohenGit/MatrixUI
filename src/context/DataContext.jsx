@@ -16,6 +16,7 @@ const DataContextProvider = (props) => {
   const [products, setProducts] = useState([])
   const [matrixID, setMetrixID] = useState("")
   const [accessToken, setAccessToken] = useState("")
+  const [timeLimit, setTimelimit] = useState("")
 
 
   const getNewCustomerData = () => {
@@ -57,7 +58,9 @@ const DataContextProvider = (props) => {
         matrixID,
         setMetrixID,
         accessToken,
-        setAccessToken
+        setAccessToken,
+        timeLimit,
+        setTimelimit
       }}
     >
       {props.children}

@@ -141,7 +141,7 @@ export const loadTablesAPI = (axiosPrivate, matrixID, UserID) => {
 }
 
 export const loginUserAPI = (userName, password) => {
-  return {"accessToken": "1234", "refreshToken": "12345", "timeLimit": 3}
+  return {"accessToken": "1234", "refreshToken": "12345", "timeLimit": 20}
 }
 
 export const registerAPI = () => {
