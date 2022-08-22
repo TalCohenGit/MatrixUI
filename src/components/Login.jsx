@@ -43,7 +43,7 @@ const Login = ({setSeconds}) => {
     <div className="login-part">
       <h1>נא להכניס את הפרטים להזדהות</h1>
       <form onSubmit={handleSubmit}>
-        <div>
+        <div className="user-details">
           <label>דואר אלקטרוני</label>
           <input
             type="text"
@@ -58,7 +58,7 @@ const Login = ({setSeconds}) => {
           />
         </div>
         <div>
-          <button className="createInvoice-button" type="submit">
+          <button className="login-button" type="submit">
             התחבר
           </button>
         </div>

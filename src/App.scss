@@ -99,7 +99,7 @@
     height: 30px;
     justify-content: center;
     line-height: 1;
-    
+
     outline: none;
     // overflow: hidden;
     padding: 0 16px;
@@ -197,14 +197,12 @@
 
 html {
   direction: rtl;
- 
 }
 
 body {
   font-family: Helvetica, sans-serif;
-  background-color: #FFFAFA;
+  background-color: #fffafa;
 }
-
 
 .loader {
   position: absolute;
@@ -217,9 +215,14 @@ body {
   margin-left: 0;
 }
 
+.login-button {
+  @extend .addCustomer-button;
+  margin-top: 20px;
+}
+
 .chooseProduct {
   margin-left: auto;
-  margin-right: 20px
+  margin-right: 20px;
 }
 
 .docComment-button {
@@ -238,7 +241,6 @@ body {
   right: 0;
   top: 0;
   cursor: pointer;
-  
 }
 
 .count {
@@ -256,33 +258,30 @@ body {
   margin-top: 40px;
 
   &-row {
-      display: flex;
-      margin-bottom: 10px;
+    display: flex;
+    margin-bottom: 10px;
 
-      input {
-          width: 200px;
-          margin-left: 10px;
-          margin-right: 10px;
-          max-height: 40px;
-      }
+    input {
+      width: 200px;
+      margin-left: 10px;
+      margin-right: 10px;
+      max-height: 40px;
+    }
   }
-
 }
 
 .plus-button {
   cursor: pointer;
 }
 
-
 .save-button {
   @extend .addCustomer-button;
   margin-left: 10px;
 }
 
-
 .cancel-button {
   @extend .addCustomer-button;
-  color:#25292e;
+  color: #25292e;
   border: 1px solid #25292e;
   background-color: #fff;
   background-image: none;
@@ -293,7 +292,6 @@ body {
 .action-buttons {
   display: flex;
   margin-top: 10px;
-  
 }
 
 .valid {
@@ -330,5 +328,10 @@ body {
   align-items: center;
   justify-content: center;
   flex-direction: column;
+}
 
+.user-details {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
 }
