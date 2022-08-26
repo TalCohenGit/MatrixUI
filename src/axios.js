@@ -1,14 +1,21 @@
 import axios from "axios";
-import { SERVER_NAME } from "./utils/constants";
+
+const matrixServerURL =  process.env.REACT_APP_MATRIX_URL
+const authServerURL = process.env.REACT_APP_AUTH_URL
 
 const headers = {
-    "Content-Type": "application/json",
-    Authorization: "Bearer 1111",
-  };
+  "Content-Type": "application/json",
+  // Authorization: "Bearer 1111",
+};
 export const axiosPrivate = axios.create({
-    baseURL: SERVER_NAME,
-    headers
-    // withCredentials: true
-  });
+  baseURL: matrixServerURL,
+  headers,
+});
 
-  
+const authHeaders = {
+  "Content-Type": "application/json",
+};
+export const axiosAuth = axios.create({
+  baseURL: authServerURL,
+  authHeaders,
+});

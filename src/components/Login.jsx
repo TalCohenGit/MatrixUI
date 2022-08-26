@@ -22,8 +22,8 @@ const Login = ({setSeconds}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { accessToken, refreshToken, timeLimit } = loginUserAPI(userEmail, password);
-      setTimelimit(timeLimit)
+      const { accessToken, refreshToken, timeLimit } = await loginUserAPI(userEmail, password);
+      setTimelimit(50)
       setAccessToken(accessToken);
       localStorage.setItem("refreshToken", JSON.stringify(refreshToken));
       localStorage.setItem("timeLimit", timeLimit)

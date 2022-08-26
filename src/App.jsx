@@ -12,6 +12,7 @@ import {
   loadTablesAPI,
   getDriverList,
   refreshTokenAPI,
+  logoutAPI,
 } from "./api";
 import { DataContext } from "./context/DataContext";
 import {
@@ -26,6 +27,7 @@ import {
 } from "./utils/constants";
 import Modal from "./common/components/Modal/Modal";
 import useAxiosPrivate from "./hooks/useAxiosPrivate";
+import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 function App() {
   const {
@@ -55,6 +57,7 @@ function App() {
   const [isOpen, toggleModal] = useState(true);
   const [validationErrors, setValidationError] = useState([]);
   const [seconds, setSeconds] = useState(0);
+  const [refreshToken, setRefreshToken] = useState("")
   const axiosPrivate = useAxiosPrivate();
   let interval;
 
@@ -158,7 +161,7 @@ function App() {
   };
 
   useEffect(() => {
-    if (haveRefreshToken()) {
+    if (getRefreshToken()) {
       interval = setInterval(() => {
         setSeconds((prevSeconds) => prevSeconds + 1);
       }, 1000);
@@ -169,18 +172,24 @@ function App() {
   }, [accessToken]);
 
   useEffect(() => {
-    if (haveRefreshToken()) {
-      let currentTimeLimit = timeLimit;
-      if (!currentTimeLimit) {
-        currentTimeLimit = localStorage.getItem("timeLimit");
+    (async () => {
+      // console.log("process.env.NODE_ENV:", process.env.NODE_ENV)
+      // console.log("REACT_APP_API_ENDPOINT", process.env.REACT_APP_API_ENDPOINT)
+      if (getRefreshToken()) {
+        let currentTimeLimit = timeLimit;
+        if (!currentTimeLimit) {
+          currentTimeLimit = localStorage.getItem("timeLimit");
+        }
+        if (currentTimeLimit && seconds > currentTimeLimit) {
+          setAccessToken("");
+          setRefreshToken("")
+          clearInterval(interval);
+          localStorage.removeItem("refreshToken");
+          localStorage.removeItem("timeLimit");
+          await logoutAPI();
+        }
       }
-      if (currentTimeLimit && seconds > currentTimeLimit) {
-        setAccessToken("");
-        clearInterval(interval);
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("timeLimit")
-      }
-    }
+    })();
   }, [seconds]);
 
   useEffect(() => {
@@ -189,38 +198,51 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      const savedData = loadTablesAPI(axiosPrivate);
-      if (savedData) {
-        const { matrixData, commentMatrix } = savedData;
-        setMatrixData(matrixData);
-        setMatrixComments(commentMatrix);
-      } else {
-        const tableTitle = [
-          "שם לקוח",
-          "מזהה",
-          "טלפון",
-          "איסוף",
-          "מאושר",
-          "סוג מסמך",
-          "הערות למסמך",
-          "",
-        ];
-        const currentMatrixData = [...matrixData];
-        currentMatrixData.push(tableTitle);
-        setMatrixData(currentMatrixData);
+      if (refreshToken) {
+        const { accessToken } = await refreshTokenAPI(refreshToken);
+        setAccessToken(accessToken);
       }
-      const productsData = await getProductsAPI(axiosPrivate, validationModal);
-      const uniqProducts =
-        productsData.length > 0 ? getUniqProducts(productsData) : undefined;
-      setProducts(uniqProducts);
-      const productsMap = getProductsNameKeyMap(uniqProducts);
-      setProductsMap(productsMap);
-      const customerList = await getCustomersAPI(axiosPrivate, productsMap);
-      setCustomers(customerList);
-      const driverList = await getDriverList(axiosPrivate);
-      setDrivers(driverList);
+  })();
+  }, [refreshToken])
+
+  useEffect(() => {
+    (async () => {
+      if (refreshToken) {
+        const savedData = loadTablesAPI(axiosPrivate);
+        if (savedData) {
+          const { matrixData, commentMatrix } = savedData;
+          setMatrixData(matrixData);
+          setMatrixComments(commentMatrix);
+        } else {
+          const tableTitle = [
+            "שם לקוח",
+            "מזהה",
+            "טלפון",
+            "איסוף",
+            "מאושר",
+            "סוג מסמך",
+            "הערות למסמך",
+            "",
+          ];
+          const currentMatrixData = [...matrixData];
+          currentMatrixData.push(tableTitle);
+          setMatrixData(currentMatrixData);
+        }
+        const productsData = await getProductsAPI(
+          axiosPrivate,
+          validationModal
+        );
+        const uniqProducts = productsData.length > 0 ? getUniqProducts(productsData) : undefined;
+        setProducts(uniqProducts);
+        const productsMap = getProductsNameKeyMap(uniqProducts);
+        setProductsMap(productsMap);
+        const customerList = await getCustomersAPI(axiosPrivate, productsMap);
+        setCustomers(customerList);
+        const driverList = await getDriverList(axiosPrivate);
+        setDrivers(driverList);
+      }
     })();
-  }, []);
+  }, [refreshToken]);
 
   useEffect(() => {
     const onUnload = () => {
@@ -235,17 +257,17 @@ function App() {
     return () => window.removeEventListener("beforeunload", onUnload);
   }, []);
 
-  const haveRefreshToken = () => {
-    const refreshToken = localStorage.getItem("refreshToken");
+  const getRefreshToken = () => {
+    const refreshToken = localStorage.getItem("refreshToken")
     if (refreshToken) {
-      const { accessToken } = refreshTokenAPI();
-      setAccessToken(accessToken);
+      setRefreshToken(refreshToken)
       return true;
-    }
+    } 
     return false;
   };
 
-  return !accessToken && !haveRefreshToken() ? (
+
+  return !refreshToken ? (
     <Login setSeconds={setSeconds} />
   ) : matrixData?.length && drivers?.length ? (
     <div className="app-container">
@@ -268,6 +290,7 @@ function App() {
         addCustomerToTable={addCustomerToTable}
         sendTableAPI={sendTableAPI}
         addProductToTable={addProductToTable}
+        axiosPrivate={axiosPrivate}
       />
 
       <Table

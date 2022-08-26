@@ -1,19 +1,6 @@
-import axios from "axios";
-import { SERVER_NAME } from "./utils/constants";
-
-// axios.defaults.headers.common = {'Authorization': `Bearer ${1111}`}
-
+import { axiosAuth } from "./axios";
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
-  // const headers = {
-  //   "Content-Type": "application/json",
-  //   Authorization: "Bearer 1111",
-  // };
-  // const axiosTest = axios.create({
-  //   baseURL: SERVER_NAME,
-  //   headers,
-  // });
-
   return await axiosPrivate.post(
     "/api/getrecords",
     { TID, sortKey },
@@ -24,7 +11,7 @@ const getKeyAPI = async (axiosPrivate) => {
   // const headers = {
   //   "Content-Type": "application/json",
   // };
-  const keyObj = await axiosPrivate.get(SERVER_NAME + "/api/generatekey")
+  const keyObj = await axiosPrivate.get("/api/generatekey")
   return keyObj.data.key;
 }
 
@@ -34,7 +21,7 @@ const createDocAPI = async (axiosPrivate, body) => {
   };
 
   return await axiosPrivate.post(
-    SERVER_NAME + "/api/createdoc",
+    "/api/createdoc",
     { body },
     { headers }
   );
@@ -140,17 +127,41 @@ export const loadTablesAPI = (axiosPrivate, matrixID, UserID) => {
   // return {matrixData, commentMatrix}
 }
 
-export const loginUserAPI = (userName, password) => {
-  return {"accessToken": "1234", "refreshToken": "12345", "timeLimit": 20}
+export const loginUserAPI = async(userEmail, password) => {
+  const res = await axiosAuth.post(
+    "/api/login",
+    {Mail: userEmail, userPassword: password},
+  );
+  return res.data.data
 }
 
 export const registerAPI = () => {
   // return {}
 }
 
-export const refreshTokenAPI = () => {
-  const refreshToken = localStorage.getItem("refreshToken")
-  return {"accessToken": "1235"}
+export const refreshTokenAPI = async (refreshToken) => {
+  if (refreshToken) {
+    try {
+      return await axiosAuth.post(
+        "/api/login",
+        {token: refreshToken}
+      )
+    } catch (e){
+      console.log("error in refreshTokenAPI: ", e)
+    }
+  } else {
+    throw new Error("refreshTokenAPI: missing refreshToken")
+  }
+}
 
+export const logoutAPI = async () => {
+  const refreshToken = localStorage.getItem("refreshToken")
+  try{
+    return await axiosAuth.post(
+      "/api/logout",
+      {token: refreshToken})
+  } catch (e) {
+    console.log("error in logoutAPI: ", e)
+  }
 }
 

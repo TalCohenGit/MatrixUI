@@ -11,6 +11,7 @@ const AddCustomer = ({
   addCustomerToTable,
   sendTableAPI,
   addProductToTable,
+  axiosPrivate
 }) => {
   const {
     toggleList,
@@ -103,7 +104,7 @@ const AddCustomer = ({
       validatedData["docComments"],
       validatedData["metaData"]
     );
-    sendTableAPI(validatedData, matrixID, commentMatrixData);
+    sendTableAPI(axiosPrivate, validatedData, matrixID, commentMatrixData);
   };
 
   return (

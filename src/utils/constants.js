@@ -11,7 +11,8 @@ export const commentsOptions = [
   { value: "Alternum", label: "מספר אחר" },
 ];
 
-export const SERVER_NAME = "http://localhost:5000"
+export const MUDUL_SERVER_NAME = "http://localhost:4001"
+export const AUTH_SERVER_NAME = "http://localhost:4000"
 
 export const numOfColBeforeProducts = 3
 export const numOfColAfterProducts = 5
