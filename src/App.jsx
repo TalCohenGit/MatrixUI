@@ -57,33 +57,44 @@ function App() {
   const [isOpen, toggleModal] = useState(true);
   const [validationErrors, setValidationError] = useState([]);
   const [seconds, setSeconds] = useState(0);
-  const [refreshToken, setRefreshToken] = useState("")
+  const [refreshToken, setRefreshToken] = useState("");
   const axiosPrivate = useAxiosPrivate();
   let interval;
 
+  const getTableTitle = () => {
+    const tableTitle = [
+      "שם לקוח",
+      "מזהה",
+      "טלפון",
+      "איסוף",
+      "מאושר",
+      "סוג מסמך",
+      "הערות למסמך",
+      "",
+    ];
+    return tableTitle;
+  };
+
   const addCustomerToTable = () => {
     try {
-      if (matrixData?.length) {
-        const numOfColAfterCustomerData =
-          matrixData[0].length - numOfColBeforeProducts;
-        const currentMatrixData = [...matrixData];
-        const newCustomerData = getNewCustomerData();
-        if (!newCustomerData) {
-          setError("לקוח לא קיים");
-        }
-        currentMatrixData.push([
-          ...newCustomerData,
-          ...Array(numOfColAfterCustomerData).fill(0),
-        ]);
-        setMatrixData(currentMatrixData);
-        const productsNumber =
-          numOfColAfterCustomerData - numOfColAfterProducts;
-        if (productsNumber > 0) {
-          const commentsRow = Array().fill(null);
-          const newMatrixComment = [...matrixComments];
-          newMatrixComment.push(commentsRow);
-          setMatrixComments(newMatrixComment);
-        }
+      const currentMatrixData = [...matrixData];
+      if (!currentMatrixData.length) {
+        currentMatrixData.push(getTableTitle());
+      }
+      const numOfColAfterCustomerData =
+        currentMatrixData[0].length - numOfColBeforeProducts;
+      const newCustomerData = getNewCustomerData();
+      currentMatrixData.push([
+        ...newCustomerData,
+        ...Array(numOfColAfterCustomerData).fill(0),
+      ]);
+      setMatrixData(currentMatrixData);
+      const productsNumber = numOfColAfterCustomerData - numOfColAfterProducts;
+      if (productsNumber > 0) {
+        const commentsRow = Array().fill(null);
+        const newMatrixComment = [...matrixComments];
+        newMatrixComment.push(commentsRow);
+        setMatrixComments(newMatrixComment);
       }
       setCustomerName("");
     } catch (e) {
@@ -93,6 +104,9 @@ function App() {
 
   const addProductToTable = (selectedProductNames) => {
     const currentMatrix = matrixData;
+    if (!currentMatrix.length) {
+      currentMatrix.push(getTableTitle());
+    }
     const columnIndxToAdd = currentMatrix[0].length - numOfColAfterProducts;
     const arrayWithColumn = currentMatrix.map((row, rowIndex) => {
       let newArr;
@@ -173,16 +187,15 @@ function App() {
 
   useEffect(() => {
     (async () => {
-      // console.log("process.env.NODE_ENV:", process.env.NODE_ENV)
-      // console.log("REACT_APP_API_ENDPOINT", process.env.REACT_APP_API_ENDPOINT)
       if (getRefreshToken()) {
         let currentTimeLimit = timeLimit;
         if (!currentTimeLimit) {
           currentTimeLimit = localStorage.getItem("timeLimit");
+          setTimelimit(timeLimit);
         }
         if (currentTimeLimit && seconds > currentTimeLimit) {
           setAccessToken("");
-          setRefreshToken("")
+          setRefreshToken("");
           clearInterval(interval);
           localStorage.removeItem("refreshToken");
           localStorage.removeItem("timeLimit");
@@ -202,8 +215,8 @@ function App() {
         const { accessToken } = await refreshTokenAPI(refreshToken);
         setAccessToken(accessToken);
       }
-  })();
-  }, [refreshToken])
+    })();
+  }, [refreshToken]);
 
   useEffect(() => {
     (async () => {
@@ -213,26 +226,13 @@ function App() {
           const { matrixData, commentMatrix } = savedData;
           setMatrixData(matrixData);
           setMatrixComments(commentMatrix);
-        } else {
-          const tableTitle = [
-            "שם לקוח",
-            "מזהה",
-            "טלפון",
-            "איסוף",
-            "מאושר",
-            "סוג מסמך",
-            "הערות למסמך",
-            "",
-          ];
-          const currentMatrixData = [...matrixData];
-          currentMatrixData.push(tableTitle);
-          setMatrixData(currentMatrixData);
         }
         const productsData = await getProductsAPI(
           axiosPrivate,
           validationModal
         );
-        const uniqProducts = productsData.length > 0 ? getUniqProducts(productsData) : undefined;
+        const uniqProducts =
+          productsData.length > 0 ? getUniqProducts(productsData) : undefined;
         setProducts(uniqProducts);
         const productsMap = getProductsNameKeyMap(uniqProducts);
         setProductsMap(productsMap);
@@ -258,18 +258,17 @@ function App() {
   }, []);
 
   const getRefreshToken = () => {
-    const refreshToken = localStorage.getItem("refreshToken")
+    const refreshToken = localStorage.getItem("refreshToken");
     if (refreshToken) {
-      setRefreshToken(refreshToken)
+      setRefreshToken(refreshToken);
       return true;
-    } 
+    }
     return false;
   };
 
-
   return !refreshToken ? (
     <Login setSeconds={setSeconds} />
-  ) : matrixData?.length && drivers?.length ? (
+  ) : drivers?.length ? (
     <div className="app-container">
       <h1>גת אביגדור קופה רושמת</h1>
       <Modal
