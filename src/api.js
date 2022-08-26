@@ -46,6 +46,7 @@ export const getDriverList = async (axiosPrivate) => {
 };
 
 export const getCustomersAPI = async (axiosPrivate) => {
+  console.log("getCustomersAPI")
   try {
     const res = await getRecordsAPI(axiosPrivate, "2");
     const rawData = JSON.parse(res.data.data);

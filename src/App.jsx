@@ -227,19 +227,18 @@ function App() {
           setMatrixData(matrixData);
           setMatrixComments(commentMatrix);
         }
-        const productsData = await getProductsAPI(
-          axiosPrivate,
-          validationModal
-        );
+        const [productsData, customerList, driverList] = await Promise.all([
+          getProductsAPI(axiosPrivate, validationModal),
+          getCustomersAPI(axiosPrivate),
+          getDriverList(axiosPrivate),
+        ])
+        setCustomers(customerList);
         const uniqProducts =
           productsData.length > 0 ? getUniqProducts(productsData) : undefined;
         setProducts(uniqProducts);
+        setDrivers(driverList);
         const productsMap = getProductsNameKeyMap(uniqProducts);
         setProductsMap(productsMap);
-        const customerList = await getCustomersAPI(axiosPrivate, productsMap);
-        setCustomers(customerList);
-        const driverList = await getDriverList(axiosPrivate);
-        setDrivers(driverList);
       }
     })();
   }, [refreshToken]);
