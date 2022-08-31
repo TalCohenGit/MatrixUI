@@ -2,18 +2,20 @@ import { axiosPrivate } from "../axios";
 import { useContext, useEffect } from "react";
 import { DataContext } from "../context/DataContext";
 import { refreshTokenAPI } from "../api"
+import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 const useAxiosPrivate = () => {
     const { accessToken, setAccessToken } = useContext(DataContext);
 
     useEffect(() => {
-
+        console.log("useAxiosPrivate accessToken:", accessToken)
         const requestIntercept = axiosPrivate.interceptors.request.use(
             config => {
                 if (!config.headers['Authorization']) {
                     // config.headers['Authorization'] = `Bearer ${accessToken}`;
                     config.headers['Authorization'] = `Bearer 1111`;
                 }
+                console.log(" config.headers['Authorization']",  config.headers['Authorization'])
                 return config;
             }, (error) => Promise.reject(error)
         );
@@ -24,10 +26,14 @@ const useAxiosPrivate = () => {
                 const prevRequest = error?.config;
                 if (error?.response?.status === 403 && !prevRequest?.sent) {
                     prevRequest.sent = true;
-                    const { accessToken: newAccessToken } = await refreshTokenAPI();
+                    const refreshToken = localStorage.getItem("refreshToken")
+                    const token = await refreshTokenAPI(refreshToken);
                     prevRequest.headers['Authorization'] = `Bearer 1111`;
-                    // prevRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-                    setAccessToken(newAccessToken)
+                    // prevRequest.headers['Authorization'] = `Bearer ${token}`;
+                    setAccessToken(token)
+                    console.log("token", token)
+                    console.log("prevRequest", prevRequest)
+                    console.log("axiosPrivate(prevRequest)", axiosPrivate(prevRequest))
                     return axiosPrivate(prevRequest);
                 }
                 return Promise.reject(error);

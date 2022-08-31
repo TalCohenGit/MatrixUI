@@ -1,30 +1,12 @@
+import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 import { axiosAuth } from "./axios";
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
-  return await axiosPrivate.post(
-    "/api/getrecords",
-    { TID, sortKey },
-  );
+  return await axiosPrivate.post("/api/getrecords", { TID, sortKey });
 };
 
-const getKeyAPI = async (axiosPrivate) => {
-  // const headers = {
-  //   "Content-Type": "application/json",
-  // };
-  const keyObj = await axiosPrivate.get("/api/generatekey")
-  return keyObj.data.key;
-}
-
 const createDocAPI = async (axiosPrivate, body) => {
-  const headers = {
-    "Content-Type": "application/json",
-  };
-
-  return await axiosPrivate.post(
-    "/api/createdoc",
-    { body },
-    { headers }
-  );
+  return await axiosPrivate.post("/api/createdoc", { body });
 };
 
 export const getDriverList = async (axiosPrivate) => {
@@ -46,7 +28,7 @@ export const getDriverList = async (axiosPrivate) => {
 };
 
 export const getCustomersAPI = async (axiosPrivate) => {
-  console.log("getCustomersAPI")
+  console.log("getCustomersAPI");
   try {
     const res = await getRecordsAPI(axiosPrivate, "2");
     const rawData = JSON.parse(res.data.data);
@@ -69,8 +51,8 @@ export const getCustomersAPI = async (axiosPrivate) => {
 export const getProductsAPI = async (axiosPrivate, validationModal) => {
   try {
     const res = await getRecordsAPI(axiosPrivate, "1");
-    const validationErrors = res.data.validationError
-    validationModal(validationErrors)
+    const validationErrors = res.data.validationError;
+    validationModal(validationErrors);
     const elements = JSON.parse(res.data.data);
     return elements;
   } catch (e) {
@@ -78,23 +60,31 @@ export const getProductsAPI = async (axiosPrivate, validationModal) => {
   }
 };
 
-export const getMatrixIDAPI = async (axiosPrivate) => {
+export const getMatrixIDAPI = async (axiosPrivate, userEmail, userPassword) => {
   try {
-    // const key = await getKeyAPI(axiosPrivate);
-    const key = "1234"
-
-    return key;
+    const res = await axiosPrivate.post("/api/generatekey", {
+      Mail: userEmail,
+      userPassword: userPassword,
+    });
+    console.log("res:", res);
+    console.log(" res.data.ke", res.data.key);
+    return res.data.key;
   } catch (e) {
     console.log("error in getMatrixIDAPI:", e);
   }
 };
 
-export const sendTableAPI = async (axiosPrivate, tableData, matrixID, commentMatrix) => {
-  const { matrix, driverIDs, actionIDs, documentIDs, acountKeys } = tableData
+export const sendTableAPI = async (
+  axiosPrivate,
+  tableData,
+  matrixID,
+  commentMatrix
+) => {
+  const { matrix, driverIDs, actionIDs, documentIDs, acountKeys } = tableData;
   const mainMatrix = {
     matrixesData: {
       matrixID: matrixID,
-      AcountKeys: acountKeys,
+      AccountKey: acountKeys,
       DocumentID: documentIDs,
       DriverID: driverIDs,
       ActionID: actionIDs,
@@ -106,63 +96,126 @@ export const sendTableAPI = async (axiosPrivate, tableData, matrixID, commentMat
   const changedMatrix = {
     matrixConfig: null,
     matrixGlobalData: null,
-    data: commentMatrix
-  }
+    data: commentMatrix,
+  };
   try {
-    const dataToSend = {mainMatrix, changedMatrix}
-    console.log("dataToSend:", JSON.stringify(dataToSend))
+    const dataToSend = { mainMatrix, changedMatrix };
+    console.log("dataToSend:", JSON.stringify(dataToSend));
     await createDocAPI(axiosPrivate, dataToSend);
   } catch (e) {
     console.log("error in sendTableAPI:", e);
   }
 };
 
-export const saveTablesAPI = (axiosPrivate, matrixID, UserID, matrixData, commentMatrix, drivers) => {
-  const matrixes = [JSON.stringify(matrixData), JSON.stringify(commentMatrix), JSON.stringify(drivers)]
-  //sending to server, need the new API
-}
+export const saveTablesAPI = async (
+  axiosPrivate,
+  matrixID,
+  userID,
+  matrixData,
+  commentMatrix,
+) => {
+  const matrixes = [
+    JSON.stringify(matrixData),
+    JSON.stringify(commentMatrix)
+  ];
+  localStorage.setItem("userID", 
+  userID
+)
+localStorage.setItem("matrixID", 
+matrixID
+)
+  console.log("saveTablesAPI", matrixes);
+  localStorage.setItem("test3", JSON.stringify(matrixes))
+  try {
+    const res = await axiosPrivate.post("/api/savematrix", {
+      matrixID,
+      userID: userID,
+      matrixesData: matrixes,
+    });
+    return res;
+  } catch (e) {
+    console.log("error in saveTablesAPI: ", e);
+  }
+};
 
-export const loadTablesAPI = (axiosPrivate, matrixID, UserID) => {
-  // const matrixData = [["שם לקוח","מזהה","טלפון","הרנה 250 גרם","איסוף","מאושר","סוג מסמך","הערות למסמך",""],["גוגל google","7199","528124625",5,"6127",2,1,"הערה למסמך",0]]
-  // const commentMatrix = [[[{"selectValue":"Quantity","inputValue":"1000"}],null,null,null,null]]
-  // return {matrixData, commentMatrix}
-}
+export const loadTablesAPI = async (axiosPrivate, userID) => {
+  try {
+    console.log("loadTablesAPI userID: ", userID);
+    console.log("loadTablesAPI axiosPrivate: ", axiosPrivate);
 
-export const loginUserAPI = async(userEmail, password) => {
-  const res = await axiosAuth.post(
-    "/api/login",
-    {Mail: userEmail, userPassword: password},
-  );
-  return res.data.data
-}
+    const res = await axiosPrivate.post("/api/loadmatrixes", {
+      userID: userID,
+    });
+    console.log("loadTablesAPI res: ", res);
+    const loadArr = res.data.result.data;
+    console.log("loadTablesAPI loadArr: ", loadArr);
+    const length = loadArr?.length;
+    if (length) {
+      const lastLoad = loadArr[length - 1];
+      return {matrixesData: lastLoad.matrixesData, matrixID: lastLoad.matrixID};
+    }
+  } catch (e) {
+    console.log("error in loadTablesAPI: ", e);
+  }
+};
 
-export const registerAPI = () => {
-  // return {}
-}
+export const loginUserAPI = async (userEmail, password) => {
+  try {
+    const res = await axiosAuth.post("/api/login", {
+      Mail: userEmail,
+      userPassword: password,
+    });
+    return res.data.data;
+  } catch (e) {
+    console.log("error in loginUserAPI: ", e);
+  }
+};
+
+export const registerAPI = async (
+  firstName,
+  lastName,
+  phone,
+  email,
+  userPassword,
+  accountName
+) => {
+  try {
+    const res = await axiosAuth.post("/api/register", {
+      FirstName: firstName,
+      LastName: lastName,
+      Phone: phone,
+      Mail: email,
+      userPassword: userPassword,
+      Accountname: accountName,
+    });
+    return res;
+  } catch (e) {
+    console.log("error in registerAPI: ", e);
+  }
+};
 
 export const refreshTokenAPI = async (refreshToken) => {
   if (refreshToken) {
     try {
-      return await axiosAuth.post(
-        "/api/login",
-        {token: refreshToken}
-      )
-    } catch (e){
-      console.log("error in refreshTokenAPI: ", e)
+      const res = await axiosAuth.post("/api/refreshtoken", { token: refreshToken });
+      console.log("refreshTokenAPI res:", res)
+      const data = res.data
+      console.log("refreshTokenAPI data:", data)
+      console.log("refreshTokenAPI accessToken:", data.accessToken)
+      return data.accessToken;
+    } catch (e) {
+      console.log("error in refreshTokenAPI: ", e);
     }
   } else {
-    throw new Error("refreshTokenAPI: missing refreshToken")
+    throw new Error("refreshTokenAPI: missing refreshToken");
   }
-}
+};
 
 export const logoutAPI = async () => {
-  const refreshToken = localStorage.getItem("refreshToken")
-  try{
-    return await axiosAuth.post(
-      "/api/logout",
-      {token: refreshToken})
+  const refreshToken = localStorage.getItem("refreshToken");
+  try {
+    return await axiosAuth.post("/api/logout", { token: refreshToken });
   } catch (e) {
-    console.log("error in logoutAPI: ", e)
+    console.log("error in logoutAPI: ", e);
   }
-}
-
+};

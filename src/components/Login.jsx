@@ -1,15 +1,16 @@
 import { set } from "lodash";
+import jwt from 'jwt-decode'
 import React, { useContext, useEffect, useState } from "react";
-import { loginUserAPI, refreshTokenAPI} from "../api";
+import { loginUserAPI } from "../api";
 import { DataContext } from "../context/DataContext";
 import Register from "./Register";
 
-const Login = ({setSeconds}) => {
+const Login = ({setSeconds, setRefreshToken}) => {
   const [userEmail, setUserEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [password, setUserPass] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [needToRegister, setNeedToRegister] = useState(false);
-  const { setAccessToken, setTimelimit } = useContext(DataContext);
+  const { setAccessToken, setTimelimit, setUserID, setEmail, setPassword } = useContext(DataContext);
 
   useEffect(() => {
     setErrMsg("");
@@ -23,10 +24,17 @@ const Login = ({setSeconds}) => {
     e.preventDefault();
     try {
       const { accessToken, refreshToken, timeLimit } = await loginUserAPI(userEmail, password);
-      setTimelimit(50)
-      setAccessToken(accessToken);
-      localStorage.setItem("refreshToken", JSON.stringify(refreshToken));
+      setEmail(userEmail)
+      setPassword(password)
+      const userID = jwt(accessToken).fetchedData.userID
+      console.log("jwt(refreshToken)", jwt(refreshToken))
+      console.log("Login, accessToken is : ", accessToken)
+      setUserID(userID)
+      localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("timeLimit", timeLimit)
+      setRefreshToken(refreshToken)
+      setTimelimit(timeLimit)
+      setAccessToken(accessToken)
     } catch (e) {
       console.log("error in handleSubmit: ", e);
       setErrMsg(e);
@@ -54,7 +62,7 @@ const Login = ({setSeconds}) => {
           <input
             type="password"
             id="password"
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => setUserPass(e.target.value)}
           />
         </div>
         <div>

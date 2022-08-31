@@ -2,8 +2,8 @@ import React, { useContext, useState } from "react";
 import { DataContext } from "../context/DataContext";
 import SearchList from "./SearchList";
 import { handleMatrixData, handleCommentMatrixData } from "../utils/utils";
-import { getMatrixIDAPI } from "../api";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
+import { getMatrixIDAPI } from "../api";
 
 const AddCustomer = ({
   customerName,
@@ -11,7 +11,7 @@ const AddCustomer = ({
   addCustomerToTable,
   sendTableAPI,
   addProductToTable,
-  axiosPrivate
+  axiosPrivate,
 }) => {
   const {
     toggleList,
@@ -21,7 +21,9 @@ const AddCustomer = ({
     productsMap,
     matrixComments,
     products,
-    setMetrixID
+    matrixID,
+    email,
+    password,
   } = useContext(DataContext);
   const [customerValidationFailed, setCustomerValidationFailed] = useState("");
   const [selectedOptions, setSelectedOptions] = useState([]);
@@ -85,8 +87,8 @@ const AddCustomer = ({
     if (matrixData.length <= 1) {
       return;
     }
-    console.log("produceDoc matrixData", JSON.stringify(matrixData))
-    console.log("produceDoc matrixComments", JSON.stringify(matrixComments))
+    console.log("produceDoc matrixData", JSON.stringify(matrixData));
+    console.log("produceDoc matrixComments", JSON.stringify(matrixComments));
 
     const validatedData = handleMatrixData(
       matrixData,
@@ -97,14 +99,16 @@ const AddCustomer = ({
       return;
     }
     setCustomerValidationFailed("");
-    const matrixID = await getMatrixIDAPI();
-    setMetrixID(matrixID)
     const commentMatrixData = handleCommentMatrixData(
       matrixComments,
       validatedData["docComments"],
       validatedData["metaData"]
     );
-    sendTableAPI(axiosPrivate, validatedData, matrixID, commentMatrixData);
+    let newMatrixId = matrixID
+    if (!newMatrixId) {
+      newMatrixId = getMatrixIDAPI(axiosPrivate, email, password);
+    }
+    sendTableAPI(axiosPrivate, validatedData, newMatrixId, commentMatrixData);
   };
 
   return (

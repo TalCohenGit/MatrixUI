@@ -12,12 +12,14 @@ const DataContextProvider = (props) => {
   const [customerName, setCustomerName] = useState("");
   const [errorMessage, setError] = useState("");
   const [balanceTableData, setBalanceTableData] = useState([]);
-  const [productsMap, setProductsMap] = useState([])
-  const [products, setProducts] = useState([])
-  const [matrixID, setMetrixID] = useState("")
-  const [accessToken, setAccessToken] = useState("")
-  const [timeLimit, setTimelimit] = useState("")
-
+  const [productsMap, setProductsMap] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [matrixID, setMatrixID] = useState("");
+  const [accessToken, setAccessToken] = useState("");
+  const [timeLimit, setTimelimit] = useState("");
+  const [userID, setUserID] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const getNewCustomerData = () => {
     const customerObject = customers.find(
@@ -56,11 +58,17 @@ const DataContextProvider = (props) => {
         products,
         setProducts,
         matrixID,
-        setMetrixID,
+        setMatrixID,
         accessToken,
         setAccessToken,
         timeLimit,
-        setTimelimit
+        setTimelimit,
+        userID,
+        setUserID,
+        email,
+        setEmail,
+        password,
+        setPassword
       }}
     >
       {props.children}

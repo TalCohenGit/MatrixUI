@@ -5,6 +5,7 @@ import {
   faInfoCircle,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { registerAPI } from "../api";
 
 const USER_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -15,7 +16,7 @@ const Register = ({ setNeedToRegister }) => {
   const [validUser, setValidUser] = useState(false);
   const [userFocus, setUserFocus] = useState(false);
 
-  const [password, setPassword] = useState("");
+  const [userPass, setPassword] = useState("");
   const [validPwd, setValidPwd] = useState(false);
   const [pwdFocus, setPwdFocus] = useState(false);
 
@@ -29,6 +30,8 @@ const Register = ({ setNeedToRegister }) => {
   const [lastName, setLastName] = useState("");
   const [validLastName, setValidLastName] = useState(false);
 
+  const [accountName, setAccountName] = useState("");
+
   const [phone, setPhone] = useState("");
 
   const [errMsg, setErrMsg] = useState("");
@@ -40,25 +43,30 @@ const Register = ({ setNeedToRegister }) => {
   }, [userEmail]);
 
   useEffect(() => {
-    setValidPwd(PWD_REGEX.test(password));
-    setValidMatch(matchPwd === password);
+    setValidPwd(PWD_REGEX.test(userPass));
+    setValidMatch(matchPwd === userPass);
     console.log("validMatch", validMatch);
-  }, [password, matchPwd]);
+  }, [userPass, matchPwd]);
 
   useEffect(() => {
     setErrMsg("");
-  }, [userEmail, password, matchPwd]);
+  }, [userEmail, userPass, matchPwd]);
 
   const handleField = (value, setState, setValidation) => {
     setState(value);
     value ? setValidation(true) : setValidation(false);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     try {
-      //register API
+      await registerAPI(
+        firstName,
+        lastName,
+        phone,
+        userEmail,
+        userPass,
+        accountName
+      );
       setSuccess(true);
     } catch (e) {
       console.log("error in handleSubmit: ", e);
@@ -67,13 +75,12 @@ const Register = ({ setNeedToRegister }) => {
   };
 
   const disableRegistration = () => {
-    return (
-      !validUser ||
-      !validPwd ||
-      !validMatch ||
-      !validFirstName ||
-      !validLastName
-    );
+    const validation =  !validUser ||
+    !validPwd ||
+    !validMatch ||
+    !validFirstName ||
+    !validLastName
+    return validation
   };
 
   return success ? (
@@ -86,7 +93,8 @@ const Register = ({ setNeedToRegister }) => {
   ) : (
     <div className="login-part">
       <h1>נא להכניס את הפרטים לרישום למערכת</h1>
-      <form onSubmit={handleSubmit}>
+      {/* <form onSubmit={handleSubmit}> */}
+      <form>
         <div className="user-details">
           <label>שם פרטי</label>
           <input
@@ -101,7 +109,7 @@ const Register = ({ setNeedToRegister }) => {
             type="text"
             id="userName"
             onChange={(e) =>
-              handleField(e.target.value, setFirstName, setValidFirstName)
+              handleField(e.target.value, setLastName, setValidLastName)
             }
           />
           <label>טלפון</label>
@@ -128,6 +136,12 @@ const Register = ({ setNeedToRegister }) => {
             onFocus={() => setUserFocus(true)}
             onBlur={() => setUserFocus(false)}
           />
+          <label>שם משתמש</label>
+          <input
+            type="text"
+            id="accountName"
+            onChange={(e) => setAccountName(e.target.value)}
+          />
           <label>
             סיסמה
             <FontAwesomeIcon
@@ -136,67 +150,67 @@ const Register = ({ setNeedToRegister }) => {
             />
             <FontAwesomeIcon
               icon={faTimes}
-              className={validPwd || !password ? "hide" : "invalid"}
+              className={validPwd || !userPass ? "hide" : "invalid"}
             />
           </label>
-        <p
-          className={
-            pwdFocus && password && !validPwd
-              ? "instructions"
-              : "hide-instructions"
-          }
-        >
-          <FontAwesomeIcon icon={faInfoCircle} />
-          4-24 אותיות
-          <br />
-          חייבים להתחיל באותיות.
-          <br />
-          יש לשים אותיות גדולות, קטנות, מספרים וסימנים.
-          <br />
-          אפשר לשים אותיות, מספרים, מקף ומקף תחתון.
-        </p>
-        <input
-          type="password"
-          id="password"
-          onChange={(e) => setPassword(e.target.value)}
-          onFocus={() => setPwdFocus(true)}
-          onBlur={() => setPwdFocus(false)}
-        />
-        <label>
-          אימות סיסמה
-          <FontAwesomeIcon
-            icon={faCheck}
-            className={validMatch && matchPwd ? "valid" : "hide"}
+          <p
+            className={
+              pwdFocus && userPass && !validPwd
+                ? "instructions"
+                : "hide-instructions"
+            }
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            4-24 אותיות
+            <br />
+            חייבים להתחיל באותיות.
+            <br />
+            יש לשים אותיות גדולות, קטנות, מספרים וסימנים.
+            <br />
+            אפשר לשים אותיות, מספרים, מקף ומקף תחתון.
+          </p>
+          <input
+            type="password"
+            id="password"
+            onChange={(e) => setPassword(e.target.value)}
+            onFocus={() => setPwdFocus(true)}
+            onBlur={() => setPwdFocus(false)}
           />
-          <FontAwesomeIcon
-            icon={faTimes}
-            className={validMatch || !matchPwd ? "hide" : "invalid"}
+          <label>
+            אימות סיסמה
+            <FontAwesomeIcon
+              icon={faCheck}
+              className={validMatch && matchPwd ? "valid" : "hide"}
+            />
+            <FontAwesomeIcon
+              icon={faTimes}
+              className={validMatch || !matchPwd ? "hide" : "invalid"}
+            />
+          </label>
+          <input
+            type="password"
+            id="matchPwd"
+            onChange={(e) => setMatchPwd(e.target.value)}
+            onFocus={() => setMatchFocus(true)}
+            onBlur={() => setMatchFocus(false)}
           />
-        </label>
-        <input
-          type="password"
-          id="matchPwd"
-          onChange={(e) => setMatchPwd(e.target.value)}
-          onFocus={() => setMatchFocus(true)}
-          onBlur={() => setMatchFocus(false)}
-        />
-        <p
-          className={
-            matchFocus && matchPwd && !matchPwd
-              ? "instructions"
-              : "hide-instructions"
-          }
-        >
-          <FontAwesomeIcon icon={faInfoCircle} />
-          יש לחזור על הסיסמה הקודמת.
-        </p>
+          <p
+            className={
+              matchFocus && matchPwd && !matchPwd
+                ? "instructions"
+                : "hide-instructions"
+            }
+          >
+            <FontAwesomeIcon icon={faInfoCircle} />
+            יש לחזור על הסיסמה הקודמת.
+          </p>
         </div>
 
         <div>
           <button
-            disabled={disableRegistration ? true : false}
+            disabled={disableRegistration() ? true : false}
             className="login-button"
-            type="submit"
+            onClick={() => handleSubmit()}
           >
             הירשם
           </button>

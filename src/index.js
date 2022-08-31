@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
+import MatrixPage from "./components/MatrixPage"
 import reportWebVitals from "./reportWebVitals";
 import DataContextProvider from "./context/DataContext";
 import Modal from "./common/components/Modal/Modal";
