@@ -14,6 +14,38 @@ export const mapTable = (data, key) =>
     }
   });
 
+export const addProductsToBalanceTable = (
+  currentTableData,
+  data,
+  numCurrentProducts
+) => {
+  if (!data.length) {
+    return;
+  }
+  const newBalanceTable = [];
+  let fieldsToMap = [
+    { rowHeader: "פריט", rowKey: "מפתח פריט אב" },
+    { rowHeader: "במלאי", rowKey: "יתרה כמותית במלאי" },
+    { rowHeader: "בהזמנה", rowKey: "מערך מאופס" },
+    { rowHeader: "נותר", rowKey: "יתרה כמותית במלאי" },
+  ];
+  fieldsToMap.forEach((field, rowIndx) => {
+    const tableData = mapTable(data, field.rowKey);
+    const newRow = [
+      ...currentTableData[rowIndx].slice(
+        0,
+        numCurrentProducts + numOfColBeforeProducts
+      ),
+      ...tableData,
+      ...currentTableData[rowIndx].slice(
+        numCurrentProducts + numOfColBeforeProducts
+      ),
+    ];
+    newBalanceTable.push(newRow);
+  });
+  return newBalanceTable;
+};
+
 export const createBalanceTable = (data) => {
   if (!data.length) {
     return;
@@ -43,11 +75,46 @@ export const createBalanceTable = (data) => {
   return currentBalanceData;
 };
 
-export const updateBalanceTable = (productsNames, productsData) => {
+export const updateBalanceTable = (
+  currentTableData,
+  productsToAdd,
+  productsData,
+  numCurrentProducts
+) => {
   const selectedProducts = productsData.filter((product) =>
-    productsNames.includes(product["שם פריט"])
+    productsToAdd.includes(product["שם פריט"])
   );
-  return createBalanceTable(selectedProducts);
+  if (currentTableData.length === 0) {
+    return createBalanceTable(selectedProducts);
+  } else {
+    return addProductsToBalanceTable(
+      currentTableData,
+      selectedProducts,
+      numCurrentProducts
+    );
+  }
+};
+
+export const removeFromBalanceTable = (
+  currentBalanceTable,
+  productsData,
+  productName
+) => {
+  const selectedProduct = productsData.filter(
+    (product) => productName === product["שם פריט"]
+  )[0]
+  let colIndexToRemove = 0;
+  return currentBalanceTable.map((row, rowIndx) => {
+    let newArr;
+    if (rowIndx === 0) {
+      colIndexToRemove = row.indexOf(selectedProduct["מפתח פריט אב"]);
+    }
+    newArr = [
+      ...row.slice(0, colIndexToRemove),
+      ...row.slice(colIndexToRemove + 1, row.length),
+    ];
+    return newArr
+  });
 };
 
 export const getUniqProducts = (productsData) => {
@@ -118,7 +185,7 @@ const handleComments = (comments) => {
   comments.forEach(
     (comment) => (commentsObj[comment["selectValue"]] = comment["inputValue"])
   );
-  return commentsObj
+  return commentsObj;
 };
 
 export const handleCommentMatrixData = (
@@ -143,7 +210,6 @@ export const handleCommentMatrixData = (
       //   (comment) => (docData[comment["selectValue"]] = comment["inputValue"])
       // );
       docData = handleComments(docComments[index]);
-
     }
     const matrixCommentRow = { cellsData: cellsData, docData: docData };
     if (metaData[index]) {

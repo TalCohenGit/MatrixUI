@@ -20,6 +20,7 @@ const DataContextProvider = (props) => {
   const [userID, setUserID] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [selectedProducts, setSelectedProducts] = useState([])
 
   const getNewCustomerData = () => {
     const customerObject = customers.find(
@@ -68,7 +69,9 @@ const DataContextProvider = (props) => {
         email,
         setEmail,
         password,
-        setPassword
+        setPassword,
+        selectedProducts,
+        setSelectedProducts
       }}
     >
       {props.children}

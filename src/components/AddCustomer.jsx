@@ -24,9 +24,10 @@ const AddCustomer = ({
     matrixID,
     email,
     password,
+    selectedProducts,
+    setSelectedProducts
   } = useContext(DataContext);
   const [customerValidationFailed, setCustomerValidationFailed] = useState("");
-  const [selectedOptions, setSelectedOptions] = useState([]);
 
   const productsOptions = [];
   products.forEach((element) => {
@@ -52,29 +53,33 @@ const AddCustomer = ({
   const handleProductsSelect = (value, event) => {
     let selectedValues = [];
     if (event.action === "select-option" && event.option.value === "*") {
-      setSelectedOptions(options);
+      setSelectedProducts(options);
       selectedValues = productsOptions.map((element) => element.value);
     } else if (
       event.action === "deselect-option" &&
       event.option.value === "*"
     ) {
-      setSelectedOptions([]);
+      setSelectedProducts([]);
     } else if (event.action === "deselect-option") {
       const values = value.filter((o) => o.value !== "*");
-      setSelectedOptions(values);
+      setSelectedProducts(values);
       selectedValues = values.map((element) => element.value);
     } else {
-      setSelectedOptions(value);
+      setSelectedProducts(value);
       selectedValues = value.map((element) => element.value);
     }
-    addProductToTable(selectedValues);
+    addProductToTable(selectedValues, event);
   };
 
   const getDropdownButtonLabel = ({ placeholderButtonLabel, value }) => {
-    if (value && value.some((o) => o.value === "*")) {
-      return `${placeholderButtonLabel}: הכל`;
+    if (value) {
+      if (value.some((o) => o.value === "*")) {
+        return `${placeholderButtonLabel}: הכל`;
+      } else {
+        return `${placeholderButtonLabel}: ${value.length} נבחרו`;
+      }
     } else {
-      return `${placeholderButtonLabel}: ${value.length} נבחרו`;
+      return `${placeholderButtonLabel}: 0 נבחרו`
     }
   };
 
@@ -138,9 +143,9 @@ const AddCustomer = ({
             onChange={handleProductsSelect}
             placeholderButtonLabel="מוצרים"
             getDropdownButtonLabel={getDropdownButtonLabel}
-            value={selectedOptions}
+            value={selectedProducts}
             placeholder={"חיפוש"}
-            setState={setSelectedOptions}
+            setState={setSelectedProducts}
           />
         </div>
         {customerValidationFailed ? (

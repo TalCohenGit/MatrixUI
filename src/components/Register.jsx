@@ -39,13 +39,11 @@ const Register = ({ setNeedToRegister }) => {
 
   useEffect(() => {
     setValidUser(USER_REGEX.test(userEmail));
-    console.log("validName:", USER_REGEX.test(userEmail));
   }, [userEmail]);
 
   useEffect(() => {
     setValidPwd(PWD_REGEX.test(userPass));
     setValidMatch(matchPwd === userPass);
-    console.log("validMatch", validMatch);
   }, [userPass, matchPwd]);
 
   useEffect(() => {

@@ -18,12 +18,14 @@ import { DataContext } from "../context/DataContext";
 import {
   getProductsNameKeyMap,
   updateBalanceTable,
+  removeFromBalanceTable,
   getUniqProducts,
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
   numOfColBeforeProducts,
   numOfColAfterProducts,
+  titleWithoutProduct,
 } from "../utils/constants";
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
@@ -55,6 +57,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     setMatrixID,
     email,
     password,
+    selectedProducts,
+    setSelectedProducts,
   } = useContext(DataContext);
 
   const [isOpen, toggleModal] = useState(true);
@@ -103,49 +107,130 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     }
   };
 
-  const addProductToTable = (selectedProductNames) => {
-    const currentMatrix = matrixData;
-    if (!currentMatrix.length) {
-      currentMatrix.push(getTableTitle());
-    }
-    const columnIndxToAdd = currentMatrix[0].length - numOfColAfterProducts;
-    const arrayWithColumn = currentMatrix.map((row, rowIndex) => {
+  const addProducts = (productsToAdd, currentMatrix, numCurrentProducts) => {
+    const newMatrixComment = [...matrixComments];
+    return currentMatrix.map((row, rowIndex) => {
       let newArr;
-      if (selectedProductNames.length > 0) {
-        if (rowIndex == 0) {
-          newArr = [
-            ...row.slice(0, 3),
-            ...selectedProductNames,
-            ...row.slice(columnIndxToAdd, currentMatrix[0].length),
-          ];
-        } else {
-          newArr = [
-            ...row.slice(0, 3),
-            ...Array(selectedProductNames.length).fill(0),
-            ...row.slice(columnIndxToAdd, currentMatrix[0].length),
-          ];
-          const newMatrixComment = [...matrixComments];
-          if (newMatrixComment.length > 0) {
-            newMatrixComment[rowIndex - 1].push(null);
-          } else {
-            newMatrixComment[rowIndex - 1] = [null];
-          }
-          setMatrixComments(newMatrixComment);
-        }
+      if (rowIndex == 0) {
+        newArr = [
+          ...row.slice(0, numOfColBeforeProducts + numCurrentProducts),
+          ...productsToAdd,
+          ...row.slice(
+            numOfColBeforeProducts + numCurrentProducts,
+            currentMatrix[0].length
+          ),
+        ];
       } else {
         newArr = [
-          ...row.slice(0, 3),
-          ...row.slice(columnIndxToAdd, currentMatrix[0].length),
+          ...row.slice(0, numOfColBeforeProducts + numCurrentProducts),
+          ...Array(productsToAdd.length).fill(0),
+          ...row.slice(
+            numOfColBeforeProducts + numCurrentProducts,
+            currentMatrix[0].length
+          ),
         ];
+        if (newMatrixComment.length > 0) {
+          newMatrixComment[rowIndex - 1].push(
+            ...Array(productsToAdd.length).fill(null)
+          );
+        } else {
+          newMatrixComment[rowIndex - 1] = [
+            ...Array(productsToAdd.length).fill(null),
+          ];
+        }
+        setMatrixComments(newMatrixComment);
       }
       return newArr;
     });
-    setMatrixData(arrayWithColumn);
-    const currentBalanceData = updateBalanceTable(
-      selectedProductNames,
-      products
-    );
-    setBalanceTableData(currentBalanceData);
+  };
+
+  const removeProduct = (productName, currentMatrix) => {
+    let productIndx;
+    return currentMatrix.map((row, rowIndex) => {
+      let newArr;
+      if (rowIndex === 0) {
+        productIndx = row.indexOf(productName);
+      }
+      newArr = [
+        ...row.slice(0, productIndx),
+        ...row.slice(productIndx + 1, currentMatrix[0].length),
+      ];
+      const newMatrixComment = [...matrixComments];
+      if (newMatrixComment?.length > 0  && rowIndex > 0) {
+        newMatrixComment[rowIndex - 1].pop();
+    
+          setMatrixComments(newMatrixComment);
+      }
+      return newArr;
+    });
+  };
+
+  const removeAllProducts = (currentMatrix, numCurrentProducts) => {
+    const newMatrix = currentMatrix.map((row, rowIndex) => {
+      let newArr;
+      newArr = [
+        ...row.slice(0, numOfColBeforeProducts),
+        ...row.slice(
+          numOfColBeforeProducts + numCurrentProducts,
+          currentMatrix[0].length
+        ),
+      ];
+      return newArr;
+    });
+    setMatrixComments([]);
+    return newMatrix;
+  };
+
+  const addProductToTable = (selectedProductNames, event) => {
+    const currentMatrix = matrixData;
+    const currentBalanceTable = [...balanceTableData];
+    let newBalanceTable = []
+    if (!currentMatrix.length) {
+      currentMatrix.push(getTableTitle());
+    }
+    let newMatrix = currentMatrix;
+    const numCurrentProducts = currentMatrix[0].length - titleWithoutProduct;
+    if (event.action === "select-option") {
+      let productsToAdd = selectedProductNames;
+      if (event.option.value === "*") {
+        if (numCurrentProducts > 0) {
+          const currentProducts = currentMatrix[0].slice(
+            numOfColBeforeProducts,
+            numOfColBeforeProducts + numCurrentProducts
+          );
+          productsToAdd = selectedProductNames.filter(
+            (product) => !currentProducts.includes(product)
+          );
+        }
+        newMatrix = addProducts(
+          productsToAdd,
+          currentMatrix,
+          numCurrentProducts
+        );
+        newBalanceTable = updateBalanceTable(currentBalanceTable, productsToAdd, products, numCurrentProducts);
+      } else {
+        newMatrix = addProducts(
+          [event.option.value],
+          currentMatrix,
+          numCurrentProducts
+        );
+        newBalanceTable = updateBalanceTable(currentBalanceTable, [event.option.value], products, numCurrentProducts);
+      }
+    } else if (event.action === "deselect-option") {
+      if (event.option.value === "*") {
+        newMatrix = removeAllProducts(currentMatrix, numCurrentProducts);
+      } else {
+        newMatrix = removeProduct(event.option.value, currentMatrix);
+        newBalanceTable = removeFromBalanceTable(
+            currentBalanceTable,
+            products,
+            event.option.value
+          );  
+      }
+    }
+
+    setMatrixData(newMatrix);
+    setBalanceTableData(newBalanceTable);
   };
 
   const validationModal = (validationErrors) => {
@@ -224,7 +309,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         matrixID,
         userID,
         matrixData,
-        matrixComments
+        matrixComments,
+        selectedProducts
       );
     }
   };
@@ -234,24 +320,26 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return jwt(refreshToken).userID;
   };
 
+  const loadData = (savedData, stateToChange, index) => {
+    const loadedMatrix = savedData.matrixesData[index];
+    if (loadedMatrix) {
+      //   stateToChange(JSON.parse(loadedMatrix));
+      stateToChange([]);
+    }
+  };
+
   useEffect(() => {
     (async () => {
       let currentUserID = userID;
       if (!currentUserID) {
         currentUserID = getUserId();
       }
-      console.log("MatrixPage currentUserID", currentUserID)
       const savedData = await loadTablesAPI(axiosPrivate, currentUserID);
       console.log("savedData", savedData);
       if (savedData) {
-        const loadedMatrix = savedData.matrixesData[0];
-        if (loadedMatrix) {
-          setMatrixData(JSON.parse(loadedMatrix));
-        }
-        const commentMatrix = savedData.matrixesData[1];
-        if (commentMatrix) {
-          setMatrixComments(JSON.parse(commentMatrix));
-        }
+        loadData(savedData, setMatrixData, 0);
+        loadData(savedData, setMatrixComments, 1);
+        loadData(savedData, setSelectedProducts, 2);
         setMatrixID(savedData.matrixID);
       }
       const [productsData, customerList, driverList] = await Promise.all([
@@ -270,8 +358,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   }, []);
 
   useEffect(() => {
-    console.log("1234");
-
     window.addEventListener("beforeunload", onUnload);
     return () => window.removeEventListener("beforeunload", onUnload);
   }, [matrixData, matrixComments]);

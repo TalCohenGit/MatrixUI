@@ -8,7 +8,6 @@ const useAxiosPrivate = () => {
     const { accessToken, setAccessToken } = useContext(DataContext);
 
     useEffect(() => {
-        console.log("useAxiosPrivate accessToken:", accessToken)
         const requestIntercept = axiosPrivate.interceptors.request.use(
             config => {
                 if (!config.headers['Authorization']) {
@@ -31,9 +30,6 @@ const useAxiosPrivate = () => {
                     prevRequest.headers['Authorization'] = `Bearer 1111`;
                     // prevRequest.headers['Authorization'] = `Bearer ${token}`;
                     setAccessToken(token)
-                    console.log("token", token)
-                    console.log("prevRequest", prevRequest)
-                    console.log("axiosPrivate(prevRequest)", axiosPrivate(prevRequest))
                     return axiosPrivate(prevRequest);
                 }
                 return Promise.reject(error);

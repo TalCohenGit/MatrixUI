@@ -28,7 +28,6 @@ export const getDriverList = async (axiosPrivate) => {
 };
 
 export const getCustomersAPI = async (axiosPrivate) => {
-  console.log("getCustomersAPI");
   try {
     const res = await getRecordsAPI(axiosPrivate, "2");
     const rawData = JSON.parse(res.data.data);
@@ -66,8 +65,6 @@ export const getMatrixIDAPI = async (axiosPrivate, userEmail, userPassword) => {
       Mail: userEmail,
       userPassword: userPassword,
     });
-    console.log("res:", res);
-    console.log(" res.data.ke", res.data.key);
     return res.data.key;
   } catch (e) {
     console.log("error in getMatrixIDAPI:", e);
@@ -113,19 +110,19 @@ export const saveTablesAPI = async (
   userID,
   matrixData,
   commentMatrix,
+  selectedProducts
 ) => {
   const matrixes = [
     JSON.stringify(matrixData),
-    JSON.stringify(commentMatrix)
+    JSON.stringify(commentMatrix),
+    JSON.stringify(selectedProducts)
   ];
-  localStorage.setItem("userID", 
-  userID
+  localStorage.setItem("selectedProducts", 
+  selectedProducts
 )
 localStorage.setItem("matrixID", 
 matrixID
 )
-  console.log("saveTablesAPI", matrixes);
-  localStorage.setItem("test3", JSON.stringify(matrixes))
   try {
     const res = await axiosPrivate.post("/api/savematrix", {
       matrixID,
@@ -140,15 +137,10 @@ matrixID
 
 export const loadTablesAPI = async (axiosPrivate, userID) => {
   try {
-    console.log("loadTablesAPI userID: ", userID);
-    console.log("loadTablesAPI axiosPrivate: ", axiosPrivate);
-
     const res = await axiosPrivate.post("/api/loadmatrixes", {
       userID: userID,
     });
-    console.log("loadTablesAPI res: ", res);
     const loadArr = res.data.result.data;
-    console.log("loadTablesAPI loadArr: ", loadArr);
     const length = loadArr?.length;
     if (length) {
       const lastLoad = loadArr[length - 1];
@@ -198,10 +190,7 @@ export const refreshTokenAPI = async (refreshToken) => {
   if (refreshToken) {
     try {
       const res = await axiosAuth.post("/api/refreshtoken", { token: refreshToken });
-      console.log("refreshTokenAPI res:", res)
       const data = res.data
-      console.log("refreshTokenAPI data:", data)
-      console.log("refreshTokenAPI accessToken:", data.accessToken)
       return data.accessToken;
     } catch (e) {
       console.log("error in refreshTokenAPI: ", e);

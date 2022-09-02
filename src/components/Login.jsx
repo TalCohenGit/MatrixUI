@@ -27,8 +27,6 @@ const Login = ({setSeconds, setRefreshToken}) => {
       setEmail(userEmail)
       setPassword(password)
       const userID = jwt(accessToken).fetchedData.userID
-      console.log("jwt(refreshToken)", jwt(refreshToken))
-      console.log("Login, accessToken is : ", accessToken)
       setUserID(userID)
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("timeLimit", timeLimit)
