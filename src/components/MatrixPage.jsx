@@ -156,10 +156,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         ...row.slice(productIndx + 1, currentMatrix[0].length),
       ];
       const newMatrixComment = [...matrixComments];
-      if (newMatrixComment?.length > 0  && rowIndex > 0) {
+      if (newMatrixComment?.length > 0 && rowIndex > 0) {
         newMatrixComment[rowIndex - 1].pop();
-    
-          setMatrixComments(newMatrixComment);
+
+        setMatrixComments(newMatrixComment);
       }
       return newArr;
     });
@@ -184,7 +184,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const addProductToTable = (selectedProductNames, event) => {
     const currentMatrix = matrixData;
     const currentBalanceTable = [...balanceTableData];
-    let newBalanceTable = []
+    let newBalanceTable = [];
     if (!currentMatrix.length) {
       currentMatrix.push(getTableTitle());
     }
@@ -207,14 +207,24 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
           currentMatrix,
           numCurrentProducts
         );
-        newBalanceTable = updateBalanceTable(currentBalanceTable, productsToAdd, products, numCurrentProducts);
+        newBalanceTable = updateBalanceTable(
+          currentBalanceTable,
+          productsToAdd,
+          products,
+          numCurrentProducts
+        );
       } else {
         newMatrix = addProducts(
           [event.option.value],
           currentMatrix,
           numCurrentProducts
         );
-        newBalanceTable = updateBalanceTable(currentBalanceTable, [event.option.value], products, numCurrentProducts);
+        newBalanceTable = updateBalanceTable(
+          currentBalanceTable,
+          [event.option.value],
+          products,
+          numCurrentProducts
+        );
       }
     } else if (event.action === "deselect-option") {
       if (event.option.value === "*") {
@@ -222,10 +232,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       } else {
         newMatrix = removeProduct(event.option.value, currentMatrix);
         newBalanceTable = removeFromBalanceTable(
-            currentBalanceTable,
-            products,
-            event.option.value
-          );  
+          currentBalanceTable,
+          products,
+          event.option.value
+        );
       }
     }
 
@@ -300,46 +310,51 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   //     })();
   //   }, [refreshToken]);
 
-  const onUnload = async (e) => {
-    // e.preventDefault();
-    const matrixID = await getMatrixIDAPI(axiosPrivate, email, password);
-    if (matrixData?.length > 1) {
-      await saveTablesAPI(
-        axiosPrivate,
-        matrixID,
-        userID,
-        matrixData,
-        matrixComments,
-        selectedProducts
-      );
+  const getUserId = () => {
+    let currentUserID = userID;
+    if (!currentUserID) {
+        const refreshToken = localStorage.getItem("refreshToken");
+        return jwt(refreshToken).userID;
     }
+    return currentUserID
   };
 
-  const getUserId = () => {
-    const refreshToken = localStorage.getItem("refreshToken");
-    return jwt(refreshToken).userID;
+  const onUnload = async (e) => {
+    // e.preventDefault();
+    if (matrixData?.length > 1) {
+      const matrixID = await getMatrixIDAPI(axiosPrivate, email, password);
+      const currentUserID = getUserId()
+      localStorage.setItem("userID", JSON.stringify(currentUserID));
+      localStorage.setItem("matrixData", JSON.stringify(matrixData));
+      const matrixes = [
+        JSON.stringify(matrixData),
+        JSON.stringify(matrixComments),
+        JSON.stringify(selectedProducts),
+        JSON.stringify(balanceTableData),
+      ];
+      await saveTablesAPI(axiosPrivate, matrixID, currentUserID, matrixes);
+    }
   };
 
   const loadData = (savedData, stateToChange, index) => {
     const loadedMatrix = savedData.matrixesData[index];
+    console.log("loadedMatrix", loadedMatrix);
     if (loadedMatrix) {
-      //   stateToChange(JSON.parse(loadedMatrix));
-      stateToChange([]);
+      stateToChange(JSON.parse(loadedMatrix));
+      //   stateToChange([]);
     }
   };
 
   useEffect(() => {
     (async () => {
-      let currentUserID = userID;
-      if (!currentUserID) {
-        currentUserID = getUserId();
-      }
+      const currentUserID = getUserId()
       const savedData = await loadTablesAPI(axiosPrivate, currentUserID);
       console.log("savedData", savedData);
       if (savedData) {
         loadData(savedData, setMatrixData, 0);
         loadData(savedData, setMatrixComments, 1);
         loadData(savedData, setSelectedProducts, 2);
+        loadData(savedData, setBalanceTableData, 3);
         setMatrixID(savedData.matrixID);
       }
       const [productsData, customerList, driverList] = await Promise.all([

@@ -108,25 +108,15 @@ export const saveTablesAPI = async (
   axiosPrivate,
   matrixID,
   userID,
-  matrixData,
-  commentMatrix,
-  selectedProducts
+  matrixes
 ) => {
-  const matrixes = [
-    JSON.stringify(matrixData),
-    JSON.stringify(commentMatrix),
-    JSON.stringify(selectedProducts)
-  ];
-  localStorage.setItem("selectedProducts", 
-  selectedProducts
-)
-localStorage.setItem("matrixID", 
-matrixID
+localStorage.setItem("userID", 
+JSON.stringify(userID)
 )
   try {
     const res = await axiosPrivate.post("/api/savematrix", {
       matrixID,
-      userID: userID,
+      userID,
       matrixesData: matrixes,
     });
     return res;

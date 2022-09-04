@@ -230,10 +230,17 @@ body {
   margin-right: 30px;
 }
 
-.count-wrapper {
-  position: relative;
-  width: 100%;
-  height: 100%;
+.count {
+  position: absolute;
+  top: 25%;
+
+  &-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+  }
 }
 
 .comment {
@@ -241,11 +248,6 @@ body {
   right: 0;
   top: 0;
   cursor: pointer;
-}
-
-.count {
-  position: absolute;
-  top: 25%;
 }
 
 .validationComment {

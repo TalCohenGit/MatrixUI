@@ -15,7 +15,11 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb }) => {
   const intialValue = { selectValue: "", inputValue: "" };
   const [comments, setComments] = useState([intialValue]);
 
-  useClickOutside(clickRef, () => setFocus(false));
+  useClickOutside(clickRef, () => {
+    if(isFocus){
+      setFocus(false)
+    }
+  });
 
   const {matrixComments, setMatrixComments} = useContext(DataContext)
 
@@ -41,6 +45,7 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb }) => {
       {" "}
       {isFocus ? (
         <input
+          dir="ltr"
           type="number"
           min="0"
           value={count}
@@ -52,16 +57,19 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb }) => {
             setData(currentData);
             setFocus(false);
           }}
+          autoFocus
+
         />
       ) : (
         <div
+          dir="ltr"
+          ref={clickRef}
           className="count-wrapper"
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
           onClick={() => {
             setFocus(true);
-          }}
-          ref={clickRef}
+          }} 
         >
           {isHovered && (
             <span
