@@ -5,7 +5,7 @@ const authServerURL = process.env.REACT_APP_AUTH_URL
 
 const headers = {
   "Content-Type": "application/json",
-  // Authorization: "Bearer 1111",
+  Authorization: "Bearer 1111",
 };
 export const axiosPrivate = axios.create({
   baseURL: matrixServerURL,

@@ -53,7 +53,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     timeLimit,
     setTimelimit,
     userID,
-    matrixID,
+    setUserID,
     setMatrixID,
     email,
     password,
@@ -96,9 +96,13 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       setMatrixData(currentMatrixData);
       const productsNumber = numOfColAfterCustomerData - numOfColAfterProducts;
       if (productsNumber > 0) {
-        const commentsRow = Array().fill(null);
-        const newMatrixComment = [...matrixComments];
-        newMatrixComment.push(commentsRow);
+        let newMatrixComment = [...matrixComments];
+        const commentsRow = Array(productsNumber).fill(null);
+        if (newMatrixComment.length > 0) {
+          newMatrixComment.push(commentsRow);
+        } else {
+          newMatrixComment = [commentsRow];
+        }
         setMatrixComments(newMatrixComment);
       }
       setCustomerName("");
@@ -109,7 +113,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   const addProducts = (productsToAdd, currentMatrix, numCurrentProducts) => {
     const newMatrixComment = [...matrixComments];
-    return currentMatrix.map((row, rowIndex) => {
+    const matrixWithProduct = currentMatrix.map((row, rowIndex) => {
       let newArr;
       if (rowIndex == 0) {
         newArr = [
@@ -129,19 +133,20 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
             currentMatrix[0].length
           ),
         ];
-        if (newMatrixComment.length > 0) {
+
+        if (newMatrixComment[rowIndex - 1] && newMatrixComment[rowIndex - 1].length > 0) {
           newMatrixComment[rowIndex - 1].push(
             ...Array(productsToAdd.length).fill(null)
           );
         } else {
-          newMatrixComment[rowIndex - 1] = [
-            ...Array(productsToAdd.length).fill(null),
-          ];
+          const arrToAdd = Array(productsToAdd.length).fill(null);
+          newMatrixComment[rowIndex - 1] = arrToAdd;
         }
-        setMatrixComments(newMatrixComment);
       }
       return newArr;
     });
+    setMatrixComments(newMatrixComment);
+    return matrixWithProduct;
   };
 
   const removeProduct = (productName, currentMatrix) => {
@@ -313,19 +318,18 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const getUserId = () => {
     let currentUserID = userID;
     if (!currentUserID) {
-        const refreshToken = localStorage.getItem("refreshToken");
-        return jwt(refreshToken).userID;
+      const refreshToken = localStorage.getItem("refreshToken");
+      currentUserID = jwt(refreshToken).userID;
+      setUserID(currentUserID)
     }
-    return currentUserID
+    return currentUserID;
   };
 
   const onUnload = async (e) => {
     // e.preventDefault();
     if (matrixData?.length > 1) {
       const matrixID = await getMatrixIDAPI(axiosPrivate, email, password);
-      const currentUserID = getUserId()
-      localStorage.setItem("userID", JSON.stringify(currentUserID));
-      localStorage.setItem("matrixData", JSON.stringify(matrixData));
+      const currentUserID = getUserId();
       const matrixes = [
         JSON.stringify(matrixData),
         JSON.stringify(matrixComments),
@@ -338,18 +342,17 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   const loadData = (savedData, stateToChange, index) => {
     const loadedMatrix = savedData.matrixesData[index];
-    console.log("loadedMatrix", loadedMatrix);
     if (loadedMatrix) {
-      stateToChange(JSON.parse(loadedMatrix));
-      //   stateToChange([]);
+      //   stateToChange(JSON.parse(loadedMatrix));
+      stateToChange([]);
     }
   };
 
   useEffect(() => {
     (async () => {
-      const currentUserID = getUserId()
+      const currentUserID = getUserId();
+      console.log("currentUserID", currentUserID)
       const savedData = await loadTablesAPI(axiosPrivate, currentUserID);
-      console.log("savedData", savedData);
       if (savedData) {
         loadData(savedData, setMatrixData, 0);
         loadData(savedData, setMatrixComments, 1);
@@ -396,9 +399,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         customerName={customerName}
         setCustomerName={setCustomerName}
         addCustomerToTable={addCustomerToTable}
-        sendTableAPI={sendTableAPI}
         addProductToTable={addProductToTable}
         axiosPrivate={axiosPrivate}
+        userID={userID}
       />
 
       <Table

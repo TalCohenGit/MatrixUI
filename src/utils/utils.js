@@ -156,7 +156,7 @@ export const handleMatrixData = (
       return;
     }
     driverIDs.push(driverID);
-    return [rowData.slice(3)];
+    return rowData.slice(3);
   });
 
   if (!driverIDs.length) {
@@ -193,17 +193,20 @@ export const handleCommentMatrixData = (
   docComments,
   metaData
 ) => {
-  const matrixCommentToSend = [];
+  const cellsData = [];
+  const docCommentsToSend = [];
+  const metaDataToSend = [];
   matrixComments.forEach((commentsRow, index) => {
-    let cellsData = [];
+    let rowData = [];
     commentsRow.forEach((comments) => {
       if (!comments) {
-        cellsData.push(null);
+        rowData.push(null);
       } else {
         const commentsObj = handleComments(comments);
-        cellsData.push(commentsObj);
+        rowData.push(commentsObj);
       }
     });
+    cellsData.push(rowData)
     let docData = null;
     if (docComments[index]) {
       // docComments[index].forEach(
@@ -211,13 +214,14 @@ export const handleCommentMatrixData = (
       // );
       docData = handleComments(docComments[index]);
     }
-    const matrixCommentRow = { cellsData: cellsData, docData: docData };
+    docCommentsToSend.push(docData)
     if (metaData[index]) {
-      matrixCommentRow["metaData"] = { Details: metaData[index] };
+      metaDataToSend.push({ Details: metaData[index] });
+    } else {
+      metaDataToSend.push(null)
     }
-    matrixCommentToSend.push(matrixCommentRow);
   });
-  return matrixCommentToSend;
+  return {cellsData, docCommentsToSend, metaDataToSend};
 };
 
 export const getProductsNameKeyMap = (products) => {

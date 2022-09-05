@@ -3,15 +3,17 @@ import { DataContext } from "../context/DataContext";
 import SearchList from "./SearchList";
 import { handleMatrixData, handleCommentMatrixData } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
-import { getMatrixIDAPI } from "../api";
+import { getMatrixIDAPI, getUrlsAPI, sendTableAPI } from "../api";
+import Modal from "../common/components/Modal/Modal";
+
 
 const AddCustomer = ({
   customerName,
   setCustomerName,
   addCustomerToTable,
-  sendTableAPI,
   addProductToTable,
   axiosPrivate,
+  userID
 }) => {
   const {
     toggleList,
@@ -28,6 +30,9 @@ const AddCustomer = ({
     setSelectedProducts
   } = useContext(DataContext);
   const [customerValidationFailed, setCustomerValidationFailed] = useState("");
+  const [isOpen, toggleModal] = useState(false)
+  const [producedUrls, setProducedUrls] = useState("")
+  const [disableProduction, setDisableProduction] = useState(false)
 
   const productsOptions = [];
   products.forEach((element) => {
@@ -84,17 +89,11 @@ const AddCustomer = ({
   };
 
   const produceDoc = async (
-    matrixData,
     productsMap,
-    matrixComments,
-    sendTableAPI
-  ) => {
+    ) => {
     if (matrixData.length <= 1) {
       return;
     }
-    console.log("produceDoc matrixData", JSON.stringify(matrixData));
-    console.log("produceDoc matrixComments", JSON.stringify(matrixComments));
-
     const validatedData = handleMatrixData(
       matrixData,
       productsMap,
@@ -104,7 +103,7 @@ const AddCustomer = ({
       return;
     }
     setCustomerValidationFailed("");
-    const commentMatrixData = handleCommentMatrixData(
+    const {cellsData, docCommentsToSend, metaDataToSend} = handleCommentMatrixData(
       matrixComments,
       validatedData["docComments"],
       validatedData["metaData"]
@@ -113,13 +112,39 @@ const AddCustomer = ({
     if (!newMatrixId) {
       newMatrixId = getMatrixIDAPI(axiosPrivate, email, password);
     }
-    sendTableAPI(axiosPrivate, validatedData, newMatrixId, commentMatrixData);
+    try{
+      setDisableProduction(true)
+      const sendTableRes = await sendTableAPI(axiosPrivate, validatedData, newMatrixId, cellsData, docCommentsToSend, metaDataToSend)
+      console.log("sedTableRes", sendTableRes)
+      const urls = await getUrlsAPI(userID)
+      setProducedUrls(urls)
+      toggleModal(true)
+      setDisableProduction(false)
+    }catch(e) {
+      console.log("error in produceDoc:", e)
+    }
   };
+
+  const getUrls = producedUrls && producedUrls.map((url) => {
+    return (
+      <div>
+      <a href={url}>{url}</a><br/>
+      </div>
+    );
+  });
 
   return (
     <>
       <div className="addCustomer-wrapper">
         <div className="addCustomer-input-wrapper">
+        <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader="מסמכים שהופקו">
+          <div>{getUrls}</div>
+          <div className="action-buttons">
+          <button className="cancel-button" onClick={() => toggleModal(false)}>
+            בטל
+          </button>
+        </div>
+        </Modal>
           <input
             type="text"
             value={customerName}
@@ -155,10 +180,19 @@ const AddCustomer = ({
             {customerValidationFailed}
           </p>
         ) : null}
+          <button
+          className="createInvoice-button"
+          // onClick={() =>
+          //   saveData(productsMap, matrixComments)
+          // }
+        >
+          שמירה
+        </button>
         <button
           className="createInvoice-button"
+          disabled={disableProduction}
           onClick={() =>
-            produceDoc(matrixData, productsMap, matrixComments, sendTableAPI)
+            produceDoc(productsMap)
           }
         >
           הפקת חשבונית
