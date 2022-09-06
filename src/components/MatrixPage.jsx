@@ -341,11 +341,15 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const loadData = (savedData, stateToChange, index) => {
-    const loadedMatrix = savedData.matrixesData[index];
-    if (loadedMatrix) {
-      //   stateToChange(JSON.parse(loadedMatrix));
-      stateToChange([]);
-    }
+     const matrixesData = savedData.matrixesData
+     if (matrixesData) {
+        const loadedMatrix = matrixesData[index];
+        if (loadedMatrix) {
+            stateToChange(JSON.parse(loadedMatrix));
+        //   stateToChange([]);
+        }
+     }
+
   };
 
   useEffect(() => {

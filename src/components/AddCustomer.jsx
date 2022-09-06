@@ -3,7 +3,7 @@ import { DataContext } from "../context/DataContext";
 import SearchList from "./SearchList";
 import { handleMatrixData, handleCommentMatrixData } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
-import { getMatrixIDAPI, getUrlsAPI, sendTableAPI } from "../api";
+import { getMatrixIDAPI, getUrlsAPI, saveTablesAPI, sendTableAPI } from "../api";
 import Modal from "../common/components/Modal/Modal";
 
 
@@ -33,6 +33,7 @@ const AddCustomer = ({
   const [isOpen, toggleModal] = useState(false)
   const [producedUrls, setProducedUrls] = useState("")
   const [disableProduction, setDisableProduction] = useState(false)
+  const [toPeekDate, toggleToPeekDate] = useState(false)
 
   const productsOptions = [];
   products.forEach((element) => {
@@ -110,7 +111,7 @@ const AddCustomer = ({
     );
     let newMatrixId = matrixID
     if (!newMatrixId) {
-      newMatrixId = getMatrixIDAPI(axiosPrivate, email, password);
+      newMatrixId = await getMatrixIDAPI(axiosPrivate, email, password);
     }
     try{
       setDisableProduction(true)
@@ -133,6 +134,23 @@ const AddCustomer = ({
     );
   });
 
+  const saveData = () => {
+
+  }
+
+  const handleSaving = async() => {
+    const newMatrixId = await getMatrixIDAPI(axiosPrivate, email, password);
+    const matrixes = [
+      JSON.stringify(matrixData),
+      JSON.stringify(matrixComments)
+    ];    
+    await saveTablesAPI(axiosPrivate,
+      newMatrixId,
+      userID,
+      matrixes)
+    toggleToPeekDate(false)
+  }
+
   return (
     <>
       <div className="addCustomer-wrapper">
@@ -141,6 +159,17 @@ const AddCustomer = ({
           <div>{getUrls}</div>
           <div className="action-buttons">
           <button className="cancel-button" onClick={() => toggleModal(false)}>
+            בטל
+          </button>
+        </div>
+        </Modal>
+        <Modal isOpen={toPeekDate} toggleModal={toggleToPeekDate} modalHeader="בחר תאריך להפקת המסמכים">
+          <div></div>
+          <div className="action-buttons">
+          <button className="cancel-button" onClick={() => handleSaving()}>
+            שמירת טבלה
+          </button>
+          <button className="cancel-button" onClick={() => toggleToPeekDate(false)}>
             בטל
           </button>
         </div>
@@ -180,14 +209,14 @@ const AddCustomer = ({
             {customerValidationFailed}
           </p>
         ) : null}
-          <button
+          {/* <button
           className="createInvoice-button"
-          // onClick={() =>
-          //   saveData(productsMap, matrixComments)
-          // }
+          onClick={() =>
+            saveData()
+          }
         >
           שמירה
-        </button>
+        </button> */}
         <button
           className="createInvoice-button"
           disabled={disableProduction}

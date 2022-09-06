@@ -2,6 +2,7 @@ import axios from "axios";
 
 const matrixServerURL =  process.env.REACT_APP_MATRIX_URL
 const authServerURL = process.env.REACT_APP_AUTH_URL
+console.log("authServerURL", authServerURL)
 
 const headers = {
   "Content-Type": "application/json",
