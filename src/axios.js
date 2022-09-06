@@ -19,4 +19,5 @@ const authHeaders = {
 export const axiosAuth = axios.create({
   baseURL: authServerURL,
   authHeaders,
+  mode:'no-cors'
 });
