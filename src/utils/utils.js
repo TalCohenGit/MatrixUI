@@ -1,4 +1,5 @@
 import { numOfColBeforeProducts, numOfColAfterProducts } from "./constants";
+import { getMatrixIDAPI } from "../api"
 import _ from "lodash";
 
 export const filterCustomers = (parsedName, input) => {
@@ -127,6 +128,26 @@ const validateValueExist = (valueToCheck, setComment) => {
   }
 };
 
+export const getMatrixesData = async(axiosPrivate, email, password, matrixData, productsMap, matrixComments, setCustomerValidationFailed) => {
+   const newMatrixId = await getMatrixIDAPI(axiosPrivate, email, password);
+    const validatedData = handleMatrixData(
+      matrixData,
+      productsMap,
+      setCustomerValidationFailed
+    );
+    if (!validatedData) {
+      return;
+    }
+    const {cellsData, docCommentsToSend, metaDataToSend} = handleCommentMatrixData(
+      matrixComments,
+      validatedData["docComments"],
+      validatedData["metaData"]
+    );
+    return {newMatrixId, validatedData, cellsData, docCommentsToSend, metaDataToSend}
+}
+
+
+
 export const handleMatrixData = (
   tableData,
   productsMap,
@@ -135,12 +156,14 @@ export const handleMatrixData = (
   let matrix = JSON.parse(JSON.stringify(tableData));
   const titleLength = matrix[0].length;
   let tableDetails = matrix.slice(1);
+
   const acountKeys = [];
   const metaData = [];
   const documentIDs = [];
   const actionIDs = [];
   const driverIDs = [];
   const docComments = [];
+
   tableDetails = tableDetails.map((rowData) => {
     acountKeys.push(rowData[1]);
     metaData.push(rowData.pop());
@@ -152,7 +175,9 @@ export const handleMatrixData = (
     const driverID = rowData.pop();
     if (!driverID || !actionID || !docId) {
       const customerName = rowData[0];
-      setCustomerValidationFailed(customerName);
+      if (setCustomerValidationFailed) {
+        setCustomerValidationFailed(customerName);
+      }
       return;
     }
     driverIDs.push(driverID);

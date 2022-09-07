@@ -20,6 +20,7 @@ import {
   updateBalanceTable,
   removeFromBalanceTable,
   getUniqProducts,
+  getMatrixesData,
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
@@ -59,6 +60,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     password,
     selectedProducts,
     setSelectedProducts,
+    productsMap,
   } = useContext(DataContext);
 
   const [isOpen, toggleModal] = useState(true);
@@ -134,7 +136,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
           ),
         ];
 
-        if (newMatrixComment[rowIndex - 1] && newMatrixComment[rowIndex - 1].length > 0) {
+        if (
+          newMatrixComment[rowIndex - 1] &&
+          newMatrixComment[rowIndex - 1].length > 0
+        ) {
           newMatrixComment[rowIndex - 1].push(
             ...Array(productsToAdd.length).fill(null)
           );
@@ -320,42 +325,70 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     if (!currentUserID) {
       const refreshToken = localStorage.getItem("refreshToken");
       currentUserID = jwt(refreshToken).userID;
-      setUserID(currentUserID)
+      setUserID(currentUserID);
     }
     return currentUserID;
   };
 
+  const saveTables = async (isBI) => {
+    const {
+      newMatrixId,
+      validatedData,
+      cellsData,
+      docCommentsToSend,
+      metaDataToSend,
+    } = await getMatrixesData(
+      axiosPrivate,
+      email,
+      password,
+      matrixData,
+      productsMap,
+      matrixComments
+    );
+    const matrixesUiData = JSON.stringify([
+      matrixData,
+      matrixComments,
+      selectedProducts,
+      balanceTableData
+    ]);
+    const currentUserID = getUserId();
+    localStorage.setItem("matrixesUiData", JSON.stringify(matrixesUiData));
+
+    await saveTablesAPI(
+      axiosPrivate,
+      newMatrixId,
+      currentUserID,
+      validatedData,
+      matrixesUiData,
+      cellsData,
+      docCommentsToSend,
+      metaDataToSend,
+      isBI
+    );
+  };
+
   const onUnload = async (e) => {
-    // e.preventDefault();
     if (matrixData?.length > 1) {
-      const matrixID = await getMatrixIDAPI(axiosPrivate, email, password);
-      const currentUserID = getUserId();
-      const matrixes = [
-        JSON.stringify(matrixData),
-        JSON.stringify(matrixComments),
-        JSON.stringify(selectedProducts),
-        JSON.stringify(balanceTableData),
-      ];
-      await saveTablesAPI(axiosPrivate, matrixID, currentUserID, matrixes);
+      const isBI = false;
+      await saveTables(isBI);
     }
   };
 
   const loadData = (savedData, stateToChange, index) => {
-     const matrixesData = savedData.matrixesData
-     if (matrixesData) {
-        const loadedMatrix = matrixesData[index];
-        if (loadedMatrix) {
-            stateToChange(JSON.parse(loadedMatrix));
-        //   stateToChange([]);
-        }
-     }
-
+    const matrixesUiData = savedData.matrixesUiData;
+    if (matrixesUiData) {
+      const loadedMatrix = matrixesUiData[index];
+      if (loadedMatrix) {
+        stateToChange(loadedMatrix);
+        // stateToChange([]);
+      }
+    }
   };
 
   useEffect(() => {
     (async () => {
       const currentUserID = getUserId();
-      console.log("currentUserID", currentUserID)
+      console.log("currentUserID", currentUserID);
       const savedData = await loadTablesAPI(axiosPrivate, currentUserID);
       if (savedData) {
         loadData(savedData, setMatrixData, 0);
@@ -406,6 +439,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         addProductToTable={addProductToTable}
         axiosPrivate={axiosPrivate}
         userID={userID}
+        saveTables={saveTables}
       />
 
       <Table

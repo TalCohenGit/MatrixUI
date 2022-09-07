@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { DataContext } from "../context/DataContext";
 import SearchList from "./SearchList";
-import { handleMatrixData, handleCommentMatrixData } from "../utils/utils";
+import { handleMatrixData, handleCommentMatrixData, getMatrixesData } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import { getMatrixIDAPI, getUrlsAPI, saveTablesAPI, sendTableAPI } from "../api";
 import Modal from "../common/components/Modal/Modal";
@@ -13,7 +13,8 @@ const AddCustomer = ({
   addCustomerToTable,
   addProductToTable,
   axiosPrivate,
-  userID
+  userID,
+  saveTables
 }) => {
   const {
     toggleList,
@@ -27,13 +28,13 @@ const AddCustomer = ({
     email,
     password,
     selectedProducts,
-    setSelectedProducts
+    setSelectedProducts,
   } = useContext(DataContext);
   const [customerValidationFailed, setCustomerValidationFailed] = useState("");
   const [isOpen, toggleModal] = useState(false)
   const [producedUrls, setProducedUrls] = useState("")
   const [disableProduction, setDisableProduction] = useState(false)
-  const [toPeekDate, toggleToPeekDate] = useState(false)
+  const [toSaveDataModal, toggleToSaveDataModal] = useState(false)
 
   const productsOptions = [];
   products.forEach((element) => {
@@ -116,7 +117,7 @@ const AddCustomer = ({
     try{
       setDisableProduction(true)
       const sendTableRes = await sendTableAPI(axiosPrivate, validatedData, newMatrixId, cellsData, docCommentsToSend, metaDataToSend)
-      console.log("sedTableRes", sendTableRes)
+      console.log("sendTableRes", sendTableRes)
       const urls = await getUrlsAPI(userID)
       setProducedUrls(urls)
       toggleModal(true)
@@ -135,20 +136,13 @@ const AddCustomer = ({
   });
 
   const saveData = () => {
-
+    toggleToSaveDataModal(true)
   }
 
   const handleSaving = async() => {
-    const newMatrixId = await getMatrixIDAPI(axiosPrivate, email, password);
-    const matrixes = [
-      JSON.stringify(matrixData),
-      JSON.stringify(matrixComments)
-    ];    
-    await saveTablesAPI(axiosPrivate,
-      newMatrixId,
-      userID,
-      matrixes)
-    toggleToPeekDate(false)
+    const isBI = true;
+    await saveTables(isBI)
+    toggleToSaveDataModal(false)
   }
 
   return (
@@ -163,13 +157,13 @@ const AddCustomer = ({
           </button>
         </div>
         </Modal>
-        <Modal isOpen={toPeekDate} toggleModal={toggleToPeekDate} modalHeader="בחר תאריך להפקת המסמכים">
+        <Modal isOpen={toSaveDataModal} toggleModal={toggleToSaveDataModal} modalHeader="בחר תאריך להפקת המסמכים">
           <div></div>
           <div className="action-buttons">
           <button className="cancel-button" onClick={() => handleSaving()}>
             שמירת טבלה
           </button>
-          <button className="cancel-button" onClick={() => toggleToPeekDate(false)}>
+          <button className="cancel-button" onClick={() => toggleToSaveDataModal(false)}>
             בטל
           </button>
         </div>
@@ -209,17 +203,18 @@ const AddCustomer = ({
             {customerValidationFailed}
           </p>
         ) : null}
-          {/* <button
-          className="createInvoice-button"
+          <button
+          className="save-tables"
+          disabled={matrixData.length === 0}
           onClick={() =>
             saveData()
           }
         >
           שמירה
-        </button> */}
+        </button>
         <button
           className="createInvoice-button"
-          disabled={disableProduction}
+          disabled={matrixData.length === 0 || disableProduction}
           onClick={() =>
             produceDoc(productsMap)
           }

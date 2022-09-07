@@ -72,22 +72,22 @@ export const getMatrixIDAPI = async (axiosPrivate, userEmail, userPassword) => {
   }
 };
 
-export const sendTableAPI = async (
-  axiosPrivate,
-  tableData,
+const getMatrixesDataObj = (
   matrixID,
+  tableData,
   cellsData,
   docData,
   metaData
 ) => {
   const { matrix, driverIDs, actionIDs, documentIDs, acountKeys } = tableData;
-  const actionAutho = []
-  const documentIDsMock = []
-  for(var i=0; i<driverIDs.length; i++) {
-    actionAutho.push("Default")
-    documentIDsMock.push(1)
+  const actionAutho = [];
+  const documentIDsMock = [];
+  for (var i = 0; i < driverIDs.length; i++) {
+    actionAutho.push("Default");
+    documentIDsMock.push(1);
   }
-    const matrixesData = {
+
+  return {
     mainMatrix: {
       matrixID: matrixID,
       ActionID: 1,
@@ -103,11 +103,27 @@ export const sendTableAPI = async (
       matrixGlobalData: null,
       cellsData,
       docData,
-      metaData
+      metaData,
     },
   };
+};
 
+export const sendTableAPI = async (
+  axiosPrivate,
+  tableData,
+  matrixID,
+  cellsData,
+  docData,
+  metaData
+) => {
   try {
+    const matrixesData = getMatrixesDataObj(
+      matrixID,
+      tableData,
+      cellsData,
+      docData,
+      metaData
+    );
     const dataToSend = { matrixesData };
     console.log("dataToSend:", JSON.stringify(dataToSend));
     const headers = {
@@ -119,7 +135,7 @@ export const sendTableAPI = async (
       baseURL: "http://localhost:4001",
       headers,
     });
-    return await axiosPrivate.post("/api/createdoc", { matrixesData })
+    return await axiosPrivate.post("/api/createdoc", { matrixesData });
   } catch (e) {
     console.log("error in sendTableAPI:", e);
   }
@@ -129,15 +145,34 @@ export const saveTablesAPI = async (
   axiosPrivate,
   matrixID,
   userID,
-  matrixes
+  tableData,
+  matrixesUiData,
+  cellsData,
+  docData,
+  metaData,
+  isBI,
+  date
 ) => {
-  // localStorage.setItem("matrixes", JSON.stringify(matrixes));
+  localStorage.setItem("tableData", JSON.stringify(tableData));
+  localStorage.setItem("matrixesUiData", JSON.stringify(matrixesUiData));
 
+  const matrixesData = getMatrixesDataObj(
+    matrixID,
+    tableData,
+    cellsData,
+    docData,
+    metaData
+  );
+  console.log("matrixesData is: ", matrixesData)
   try {
     const res = await axiosPrivate.post("/api/savematrix", {
       matrixID,
+      matrixName: "מטריצה",
       userID,
-      matrixesData: matrixes,
+      matrixesData,
+      matrixesUiData,
+      Date: date,
+      isBI,
     });
     return res;
   } catch (e) {
@@ -155,8 +190,8 @@ export const loadTablesAPI = async (axiosPrivate, userID) => {
     if (length) {
       const lastLoad = loadArr[length - 1];
       return {
-        matrixesData: lastLoad.matrixesData,
         matrixID: lastLoad.matrixID,
+        matrixesUiData: JSON.parse(JSON.parse(lastLoad.matrixesUiData))
       };
     }
   } catch (e) {
@@ -235,11 +270,11 @@ export const getUrlsAPI = async (userID) => {
       baseURL: "http://localhost:4001",
       headers,
     });
-    const res = await axiosPrivate.post("/api/loadDocUrls", { UserID: userID })
+    const res = await axiosPrivate.post("/api/loadDocUrls", { UserID: userID });
     const data = res.data.result.data;
-    const urls = data.map((element) => element["DocUrl"])
-    return urls.slice(urls.length - 10, urls.length)
+    const urls = data.map((element) => element["DocUrl"]);
+    return urls.slice(urls.length - 10, urls.length);
   } catch (e) {
     console.log("error in sendTableAPI:", e);
   }
-}
+};

@@ -215,6 +215,11 @@ body {
   margin-left: 0;
 }
 
+.save-tables {
+  @extend .addCustomer-button;
+  margin-left: 10px;
+}
+
 .login-button {
   @extend .addCustomer-button;
   margin-top: 20px;
