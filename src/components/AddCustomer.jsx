@@ -1,10 +1,11 @@
 import React, { useContext, useState } from "react";
 import { DataContext } from "../context/DataContext";
 import SearchList from "./SearchList";
-import { handleMatrixData, handleCommentMatrixData, getMatrixesData } from "../utils/utils";
+import { handleMatrixData, handleCommentMatrixData } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
-import { getMatrixIDAPI, getUrlsAPI, saveTablesAPI, sendTableAPI } from "../api";
+import { getMatrixIDAPI, getUrlsAPI, sendTableAPI } from "../api";
 import Modal from "../common/components/Modal/Modal";
+import DatePiker from "./DatePiker"
 
 
 const AddCustomer = ({
@@ -35,6 +36,7 @@ const AddCustomer = ({
   const [producedUrls, setProducedUrls] = useState("")
   const [disableProduction, setDisableProduction] = useState(false)
   const [toSaveDataModal, toggleToSaveDataModal] = useState(false)
+  const [dateValue, setDateValue] = useState("");
 
   const productsOptions = [];
   products.forEach((element) => {
@@ -141,9 +143,10 @@ const AddCustomer = ({
 
   const handleSaving = async() => {
     const isBI = true;
-    await saveTables(isBI)
+    await saveTables(isBI, dateValue)
     toggleToSaveDataModal(false)
   }
+
 
   return (
     <>
@@ -158,7 +161,9 @@ const AddCustomer = ({
         </div>
         </Modal>
         <Modal isOpen={toSaveDataModal} toggleModal={toggleToSaveDataModal} modalHeader="בחר תאריך להפקת המסמכים">
-          <div></div>
+          <div>
+          <DatePiker dateValue={dateValue} setDateValue={setDateValue}/>
+          </div>
           <div className="action-buttons">
           <button className="cancel-button" onClick={() => handleSaving()}>
             שמירת טבלה

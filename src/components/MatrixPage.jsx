@@ -330,7 +330,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return currentUserID;
   };
 
-  const saveTables = async (isBI) => {
+  const saveTables = async (isBI, dataValue) => {
     const {
       newMatrixId,
       validatedData,
@@ -363,7 +363,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       cellsData,
       docCommentsToSend,
       metaDataToSend,
-      isBI
+      isBI,
+      dataValue
     );
   };
 
