@@ -3,36 +3,81 @@ import AmountCell from "./AmountCell";
 import DropDownCell from "./DropDownCell";
 import CommentCell from "./CommentCell";
 import DocCommentCell from "./DocCommentCell.jsx";
-
+import HeaderDropDown from "./HeaderDropdown";
 
 import { DataContext } from "../context/DataContext";
 
 const TableCell = (props) => {
-  const { rowLength, colIndex, cellValue, rowIndex, data, setData,disabled,bgColor } = props;
+  const {
+    rowLength,
+    colIndex,
+    cellValue,
+    rowIndex,
+    data,
+    setData,
+    disabled,
+    bgColor,
+  } = props;
   const { drivers } = useContext(DataContext);
 
   let cellType;
-
-  if (colIndex < 3 || rowIndex === 0) {
-    cellType = cellValue
-  } else if(colIndex === rowLength - 1) {
-    cellType = <DocCommentCell rowIndex={rowIndex} colIndex={colIndex} data={data} setData={setData}/>
-  } else if (colIndex === rowLength - 2) {
-    cellType = <CommentCell rowIndex={rowIndex} colIndex={colIndex} data={data} setData={setData}/>
-  } else if (colIndex === rowLength - 3) {
+  if (rowIndex === 0) {
+    if (colIndex < 3 || (rowLength > 7 && colIndex > rowLength - 6)) {
+      cellType = cellValue;
+    } else {
       cellType = (
-        <DropDownCell
-          dropdownOptions={[{name: "חשבונית מס", key: 1}, {name: "חשבונית מס זיכוי", key: 3}, {name: "הזמנה", key: 6}]}
-          rowIndex={rowIndex}
-          colIndex={colIndex}
+        <HeaderDropDown
+          headerText={cellValue}
           data={data}
           setData={setData}
+          colIndex={colIndex}
+          rowIndex={rowIndex}
         />
       );
+    }
+    console.log(rowIndex, rowLength);
+  } else if (colIndex < 3) {
+    cellType = cellValue;
+  } else if (colIndex === rowLength - 1) {
+    cellType = (
+      <DocCommentCell
+        rowIndex={rowIndex}
+        colIndex={colIndex}
+        data={data}
+        setData={setData}
+      />
+    );
+  } else if (colIndex === rowLength - 2) {
+    cellType = (
+      <CommentCell
+        rowIndex={rowIndex}
+        colIndex={colIndex}
+        data={data}
+        setData={setData}
+      />
+    );
+  } else if (colIndex === rowLength - 3) {
+    cellType = (
+      <DropDownCell
+        dropdownOptions={[
+          { name: "חשבונית מס", key: 1 },
+          { name: "חשבונית מס זיכוי", key: 3 },
+          { name: "הזמנה", key: 6 },
+        ]}
+        rowIndex={rowIndex}
+        colIndex={colIndex}
+        data={data}
+        setData={setData}
+      />
+    );
   } else if (colIndex === rowLength - 4) {
     cellType = (
       <DropDownCell
-        dropdownOptions={[{name: "להפקה", key: 1}, {name: "ללא", key: 2}, {name: "מיוחד", key: 3}]}
+        dropdownOptions={[
+          { name: "להפקה", key: 1 },
+          { name: "ללא", key: 2 },
+          { name: "מיוחד", key: 3 },
+        ]}
         rowIndex={rowIndex}
         colIndex={colIndex}
         data={data}
@@ -56,10 +101,10 @@ const TableCell = (props) => {
     <div
       className="table-cell"
       style={{
-        opacity: cellValue  === null ? "0" : "1",
+        opacity: cellValue === null ? "0" : "1",
         pointerEvents: disabled ? "none" : "auto",
-        backgroundColor: cellValue === "" ? 'none' : bgColor,
-        border: colIndex === rowLength - 1 ? "0" : "1px solid #a9a9a9"
+        backgroundColor: cellValue === "" ? "none" : bgColor,
+        border: colIndex === rowLength - 1 ? "0" : "1px solid #a9a9a9",
       }}
     >
       {cellType}

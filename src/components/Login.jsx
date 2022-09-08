@@ -26,6 +26,7 @@ const Login = ({setSeconds, setRefreshToken}) => {
       const { accessToken, refreshToken, timeLimit } = await loginUserAPI(userEmail, password);
       setEmail(userEmail)
       setPassword(password)
+      console.log("************* jwt(accessToken)", jwt(accessToken))
       const userID = jwt(accessToken).fetchedData.userID
       setUserID(userID)
       localStorage.setItem("refreshToken", refreshToken);

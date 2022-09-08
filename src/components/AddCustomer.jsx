@@ -5,7 +5,7 @@ import { handleMatrixData, handleCommentMatrixData } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import { getMatrixIDAPI, getUrlsAPI, sendTableAPI } from "../api";
 import Modal from "../common/components/Modal/Modal";
-import DatePiker from "./DatePiker"
+import DatePicker from "./DatePicker"
 
 
 const AddCustomer = ({
@@ -120,7 +120,7 @@ const AddCustomer = ({
       setDisableProduction(true)
       const sendTableRes = await sendTableAPI(axiosPrivate, validatedData, newMatrixId, cellsData, docCommentsToSend, metaDataToSend)
       console.log("sendTableRes", sendTableRes)
-      const urls = await getUrlsAPI(userID)
+      const urls = await getUrlsAPI(axiosPrivate, userID)
       setProducedUrls(urls)
       toggleModal(true)
       setDisableProduction(false)
@@ -147,6 +147,14 @@ const AddCustomer = ({
     toggleToSaveDataModal(false)
   }
 
+  const customStyles = {
+    option: () => ({
+      display: 'flex',
+      flexDirection: 'row-reverse',
+      alignItems:'center'
+    })
+  }
+
 
   return (
     <>
@@ -162,7 +170,7 @@ const AddCustomer = ({
         </Modal>
         <Modal isOpen={toSaveDataModal} toggleModal={toggleToSaveDataModal} modalHeader="בחר תאריך להפקת המסמכים">
           <div>
-          <DatePiker dateValue={dateValue} setDateValue={setDateValue}/>
+          <DatePicker dateValue={dateValue} setDateValue={setDateValue}/>
           </div>
           <div className="action-buttons">
           <button className="cancel-button" onClick={() => handleSaving()}>
@@ -199,6 +207,7 @@ const AddCustomer = ({
             value={selectedProducts}
             placeholder={"חיפוש"}
             setState={setSelectedProducts}
+            styles={customStyles}
           />
         </div>
         {customerValidationFailed ? (

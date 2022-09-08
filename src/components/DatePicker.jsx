@@ -4,7 +4,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import TextField from '@mui/material/TextField';
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 
-const DatePiker = ({dateValue, setDateValue}) => {
+const DatePicker = ({dateValue, setDateValue}) => {
 
   const handleChange = (newValue) => {
     setDateValue(newValue);
@@ -24,4 +24,4 @@ const DatePiker = ({dateValue, setDateValue}) => {
   );
 };
 
-export default DatePiker;
+export default DatePicker;

@@ -330,7 +330,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return currentUserID;
   };
 
-  const saveTables = async (isBI, dataValue) => {
+  const saveTables = async (isBI, dateValue) => {
+    const date = dateValue.format("MM/DD/YYYY");
     const {
       newMatrixId,
       validatedData,
@@ -349,7 +350,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       matrixData,
       matrixComments,
       selectedProducts,
-      balanceTableData
+      balanceTableData,
     ]);
     const currentUserID = getUserId();
     localStorage.setItem("matrixesUiData", JSON.stringify(matrixesUiData));
@@ -364,7 +365,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       docCommentsToSend,
       metaDataToSend,
       isBI,
-      dataValue
+      date
     );
   };
 
