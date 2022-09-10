@@ -18,8 +18,6 @@ const DataContextProvider = (props) => {
   const [accessToken, setAccessToken] = useState("");
   const [timeLimit, setTimelimit] = useState("");
   const [userID, setUserID] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [selectedProducts, setSelectedProducts] = useState([])
 
   const getNewCustomerData = () => {
@@ -66,10 +64,6 @@ const DataContextProvider = (props) => {
         setTimelimit,
         userID,
         setUserID,
-        email,
-        setEmail,
-        password,
-        setPassword,
         selectedProducts,
         setSelectedProducts
       }}

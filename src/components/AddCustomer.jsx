@@ -26,8 +26,6 @@ const AddCustomer = ({
     matrixComments,
     products,
     matrixID,
-    email,
-    password,
     selectedProducts,
     setSelectedProducts,
   } = useContext(DataContext);
@@ -114,7 +112,7 @@ const AddCustomer = ({
     );
     let newMatrixId = matrixID
     if (!newMatrixId) {
-      newMatrixId = await getMatrixIDAPI(axiosPrivate, email, password);
+      newMatrixId = await getMatrixIDAPI(axiosPrivate);
     }
     try{
       setDisableProduction(true)

@@ -7,12 +7,11 @@ import Table from "../components/Table";
 import {
   getCustomersAPI,
   getProductsAPI,
-  sendTableAPI,
   saveTablesAPI,
   loadTablesAPI,
   getDriverList,
   logoutAPI,
-  getMatrixIDAPI,
+  refreshTokenAPI,
 } from "../api";
 import { DataContext } from "../context/DataContext";
 import {
@@ -20,6 +19,7 @@ import {
   updateBalanceTable,
   removeFromBalanceTable,
   getUniqProducts,
+  getRefreshToken,
   getMatrixesData,
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -39,7 +39,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     customerName,
     setCustomerName,
     getNewCustomerData,
-    setError,
     setBalanceTableData,
     balanceTableData,
     setProductsMap,
@@ -56,8 +55,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     userID,
     setUserID,
     setMatrixID,
-    email,
-    password,
     selectedProducts,
     setSelectedProducts,
     productsMap,
@@ -254,7 +251,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const validationModal = (validationErrors) => {
-    if (validationErrors.length > 0) {
+    if (validationErrors?.length > 0) {
       setValidationError(validationErrors);
       toggleModal(true);
     }
@@ -311,19 +308,21 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     setSeconds(0);
   }, [matrixData]);
 
-  //   useEffect(() => {
-  //     (async () => {
-  //       if (!refreshToken) {
-  //         const { accessToken } = await refreshTokenAPI(refreshToken);
-  //         setAccessToken(accessToken);
-  //       }
-  //     })();
-  //   }, [refreshToken]);
+  useEffect(() => {
+    (async () => {
+      if (!accessToken) {
+        const refreshToken = getRefreshToken();
+        const { accessToken } = await refreshTokenAPI(refreshToken);
+        console.log("MatrixPage accessToken", accessToken);
+        setAccessToken(accessToken);
+      }
+    })();
+  }, []);
 
   const getUserId = () => {
     let currentUserID = userID;
     if (!currentUserID) {
-      const refreshToken = localStorage.getItem("refreshToken");
+      const refreshToken = getRefreshToken();
       currentUserID = jwt(refreshToken).userID;
       setUserID(currentUserID);
     }
@@ -331,7 +330,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const saveTables = async (isBI, dateValue) => {
-    const date = dateValue.format("MM/DD/YYYY");
+    let date = null;
+    if (dateValue) {
+      date = dateValue.format("MM/DD/YYYY");
+    }
     const {
       newMatrixId,
       validatedData,
@@ -340,8 +342,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       metaDataToSend,
     } = await getMatrixesData(
       axiosPrivate,
-      email,
-      password,
       matrixData,
       productsMap,
       matrixComments
@@ -406,10 +406,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       ]);
       setCustomers(customerList);
       const uniqProducts =
-        productsData.length > 0 ? getUniqProducts(productsData) : undefined;
+        productsData?.length > 0 ? getUniqProducts(productsData) : undefined;
       setProducts(uniqProducts);
       setDrivers(driverList);
-      const productsMap = getProductsNameKeyMap(uniqProducts);
+      const productsMap = uniqProducts? getProductsNameKeyMap(uniqProducts) : undefined;
       setProductsMap(productsMap);
     })();
   }, []);

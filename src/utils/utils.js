@@ -128,8 +128,8 @@ const validateValueExist = (valueToCheck, setComment) => {
   }
 };
 
-export const getMatrixesData = async(axiosPrivate, email, password, matrixData, productsMap, matrixComments, setCustomerValidationFailed) => {
-   const newMatrixId = await getMatrixIDAPI(axiosPrivate, email, password);
+export const getMatrixesData = async(axiosPrivate, matrixData, productsMap, matrixComments, setCustomerValidationFailed) => {
+   const newMatrixId = await getMatrixIDAPI(axiosPrivate);
     const validatedData = handleMatrixData(
       matrixData,
       productsMap,
@@ -146,7 +146,10 @@ export const getMatrixesData = async(axiosPrivate, email, password, matrixData, 
     return {newMatrixId, validatedData, cellsData, docCommentsToSend, metaDataToSend}
 }
 
-
+export const getRefreshToken = () => {
+  // if(!refreshToken)
+  return localStorage.getItem("refreshToken");
+}  
 
 export const handleMatrixData = (
   tableData,

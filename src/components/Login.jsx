@@ -10,7 +10,7 @@ const Login = ({setSeconds, setRefreshToken}) => {
   const [password, setUserPass] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [needToRegister, setNeedToRegister] = useState(false);
-  const { setAccessToken, setTimelimit, setUserID, setEmail, setPassword } = useContext(DataContext);
+  const { setAccessToken, setTimelimit, setUserID } = useContext(DataContext);
 
   useEffect(() => {
     setErrMsg("");
@@ -24,9 +24,6 @@ const Login = ({setSeconds, setRefreshToken}) => {
     e.preventDefault();
     try {
       const { accessToken, refreshToken, timeLimit } = await loginUserAPI(userEmail, password);
-      setEmail(userEmail)
-      setPassword(password)
-      console.log("************* jwt(accessToken)", jwt(accessToken))
       const userID = jwt(accessToken).fetchedData.userID
       setUserID(userID)
       localStorage.setItem("refreshToken", refreshToken);

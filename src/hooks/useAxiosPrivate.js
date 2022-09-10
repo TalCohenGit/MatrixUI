@@ -2,6 +2,7 @@ import { axiosPrivate } from "../axios";
 import { useContext, useEffect } from "react";
 import { DataContext } from "../context/DataContext";
 import { refreshTokenAPI } from "../api"
+import { getRefreshToken } from "../utils/utils";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 const useAxiosPrivate = () => {
@@ -9,13 +10,20 @@ const useAxiosPrivate = () => {
 
     useEffect(() => {
         const requestIntercept = axiosPrivate.interceptors.request.use(
-            config => {
+            config =>  (async () => {
+                console.log("************accessToken", accessToken)
                 if (!config.headers['Authorization']) {
-                    // config.headers['Authorization'] = `Bearer ${accessToken}`;
-                    config.headers['Authorization'] = `Bearer 1111`;
+                    let validAccessToken = accessToken
+                    if (!validAccessToken) {
+                        const refreshToken = getRefreshToken()      
+                        validAccessToken = await refreshTokenAPI(refreshToken);
+                        console.log("MatrixPage validAccessToken", validAccessToken)
+                      }
+                    config.headers['Authorization'] = `Bearer ${validAccessToken}`;
+                    setAccessToken(validAccessToken);
                 }
                 return config;
-            }, (error) => Promise.reject(error)
+            })(), (error) => Promise.reject(error)
         );
 
         const responseIntercept = axiosPrivate.interceptors.response.use(
@@ -26,8 +34,8 @@ const useAxiosPrivate = () => {
                     prevRequest.sent = true;
                     const refreshToken = localStorage.getItem("refreshToken")
                     const token = await refreshTokenAPI(refreshToken);
-                    prevRequest.headers['Authorization'] = `Bearer 1111`;
-                    // prevRequest.headers['Authorization'] = `Bearer ${token}`;
+                    prevRequest.headers['Authorization'] = `Bearer ${token}`;
+                    console.log("new token!!!: ", token)
                     setAccessToken(token)
                     return axiosPrivate(prevRequest);
                 }

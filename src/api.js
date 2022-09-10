@@ -6,10 +6,6 @@ const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
   return await axiosPrivate.post("/api/getrecords", { TID, sortKey });
 };
 
-const createDocAPI = async (axiosPrivate, body) => {
-  return await axiosPrivate.post("/api/createdoc", { body });
-};
-
 export const getDriverList = async (axiosPrivate) => {
   try {
     const res = await getRecordsAPI(axiosPrivate, "2", { "קוד מיון": "690" });
@@ -60,12 +56,9 @@ export const getProductsAPI = async (axiosPrivate, validationModal) => {
   }
 };
 
-export const getMatrixIDAPI = async (axiosPrivate, userEmail, userPassword) => {
+export const getMatrixIDAPI = async (axiosPrivate) => {
   try {
-    const res = await axiosPrivate.post("/api/generatekey", {
-      Mail: userEmail,
-      userPassword: userPassword,
-    });
+    const res = await axiosPrivate.post("/api/generatekey");
     return res.data.key;
   } catch (e) {
     console.log("error in getMatrixIDAPI:", e);
@@ -126,15 +119,15 @@ export const sendTableAPI = async (
     );
     const dataToSend = { matrixesData };
     console.log("dataToSend:", JSON.stringify(dataToSend));
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization:
-        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmZXRjaGVkRGF0YSI6eyJzdGF0dXMiOiJ5ZXMiLCJjb25maWdPYmoiOnsidXNzZXJJRCI6eyJyZXF1aXJlZCI6dHJ1ZX0sIkRlZmF1bHREcml2ZXIiOnsiaXNEZWZhdWx0IjpmYWxzZX0sIkRvY3VtZW50RGVmIjp7ImlzRGVmYXVsdCI6dHJ1ZSwiRG9jdW1lbnREZWYiOjEsImlzRmlyc3QiOmZhbHNlfSwiUHJlbWlzc2lvbk10eCI6eyJkb2NMaW1pdCI6eyJpc0xpbWl0ZWQiOnRydWUsIkFtb3VudCI6NTB9LCJzdW1MaW1pdCI6eyJpc0xpbWl0ZWQiOnRydWUsIkFtb3VudCI6MjAwMDB9LCJ0YXhEb2NzIjp0cnVlLCJSZWZ1bmQiOnsiaXNBbGxvdyI6ZmFsc2V9LCJEaXNjb3VudCI6eyJpc0FsbG93Ijp0cnVlLCJpc0xpbWl0ZWQiOmZhbHNlfSwiT2JsaWdvUGFzcyI6eyJpc0FsbG93IjpmYWxzZX0sIkZsYWdlZENhc3R1bWVycyI6eyJpc0FsbG93IjpmYWxzZX19fSwidXNlcklEIjoiNjJmZDBjZWVlZGJjODdiYWYzOTc5NzU3In0sImlhdCI6MTY2MjAyMjU1OX0.eACq69czOOlYd0Y8yDNszPylA-uHdsuujJU1A-KUmp4",
-    };
-    const axiosPrivate = axios.create({
-      baseURL: "http://localhost:4001",
-      headers,
-    });
+    // const headers = {
+    //   "Content-Type": "application/json",
+    //   Authorization:
+    //     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmZXRjaGVkRGF0YSI6eyJzdGF0dXMiOiJ5ZXMiLCJjb25maWdPYmoiOnsidXNzZXJJRCI6eyJyZXF1aXJlZCI6dHJ1ZX0sIkRlZmF1bHREcml2ZXIiOnsiaXNEZWZhdWx0IjpmYWxzZX0sIkRvY3VtZW50RGVmIjp7ImlzRGVmYXVsdCI6dHJ1ZSwiRG9jdW1lbnREZWYiOjEsImlzRmlyc3QiOmZhbHNlfSwiUHJlbWlzc2lvbk10eCI6eyJkb2NMaW1pdCI6eyJpc0xpbWl0ZWQiOnRydWUsIkFtb3VudCI6NTB9LCJzdW1MaW1pdCI6eyJpc0xpbWl0ZWQiOnRydWUsIkFtb3VudCI6MjAwMDB9LCJ0YXhEb2NzIjp0cnVlLCJSZWZ1bmQiOnsiaXNBbGxvdyI6ZmFsc2V9LCJEaXNjb3VudCI6eyJpc0FsbG93Ijp0cnVlLCJpc0xpbWl0ZWQiOmZhbHNlfSwiT2JsaWdvUGFzcyI6eyJpc0FsbG93IjpmYWxzZX0sIkZsYWdlZENhc3R1bWVycyI6eyJpc0FsbG93IjpmYWxzZX19fSwidXNlcklEIjoiNjJmZDBjZWVlZGJjODdiYWYzOTc5NzU3In0sImlhdCI6MTY2MjAyMjU1OX0.eACq69czOOlYd0Y8yDNszPylA-uHdsuujJU1A-KUmp4",
+    // };
+    // const axiosPrivate = axios.create({
+    //   baseURL: "http://localhost:4001",
+    //   headers,
+    // });
     return await axiosPrivate.post("/api/createdoc", { matrixesData });
   } catch (e) {
     console.log("error in sendTableAPI:", e);
@@ -241,6 +234,7 @@ export const refreshTokenAPI = async (refreshToken) => {
         token: refreshToken,
       });
       const data = res.data;
+      console.log("refreshtoken data", data)
       return data.accessToken;
     } catch (e) {
       console.log("error in refreshTokenAPI: ", e);
@@ -261,15 +255,6 @@ export const logoutAPI = async () => {
 
 export const getUrlsAPI = async (axiosPrivate, userID) => {
   try {
-    // const headers = {
-    //   "Content-Type": "application/json",
-    //   Authorization:
-    //     "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmZXRjaGVkRGF0YSI6eyJzdGF0dXMiOiJ5ZXMiLCJjb25maWdPYmoiOnsidXNzZXJJRCI6eyJyZXF1aXJlZCI6dHJ1ZX0sIkRlZmF1bHREcml2ZXIiOnsiaXNEZWZhdWx0IjpmYWxzZX0sIkRvY3VtZW50RGVmIjp7ImlzRGVmYXVsdCI6dHJ1ZSwiRG9jdW1lbnREZWYiOjEsImlzRmlyc3QiOmZhbHNlfSwiUHJlbWlzc2lvbk10eCI6eyJkb2NMaW1pdCI6eyJpc0xpbWl0ZWQiOnRydWUsIkFtb3VudCI6NTB9LCJzdW1MaW1pdCI6eyJpc0xpbWl0ZWQiOnRydWUsIkFtb3VudCI6MjAwMDB9LCJ0YXhEb2NzIjp0cnVlLCJSZWZ1bmQiOnsiaXNBbGxvdyI6ZmFsc2V9LCJEaXNjb3VudCI6eyJpc0FsbG93Ijp0cnVlLCJpc0xpbWl0ZWQiOmZhbHNlfSwiT2JsaWdvUGFzcyI6eyJpc0FsbG93IjpmYWxzZX0sIkZsYWdlZENhc3R1bWVycyI6eyJpc0FsbG93IjpmYWxzZX19fSwidXNlcklEIjoiNjJmZDBjZWVlZGJjODdiYWYzOTc5NzU3In0sImlhdCI6MTY2MjAyMjU1OX0.eACq69czOOlYd0Y8yDNszPylA-uHdsuujJU1A-KUmp4",
-    // };
-    // const axiosPrivate = axios.create({
-    //   baseURL: "http://localhost:4001",
-    //   headers,
-    // });
     const res = await axiosPrivate.post("/api/loadDocUrls", { UserID: userID });
     const data = res.data.result.data;
     const urls = data.map((element) => element["DocUrl"]);

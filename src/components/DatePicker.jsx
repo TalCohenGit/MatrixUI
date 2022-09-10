@@ -5,7 +5,6 @@ import TextField from '@mui/material/TextField';
 import { DesktopDatePicker } from "@mui/x-date-pickers/DesktopDatePicker";
 
 const DatePicker = ({dateValue, setDateValue}) => {
-
   const handleChange = (newValue) => {
     setDateValue(newValue);
   };
