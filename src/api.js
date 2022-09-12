@@ -1,5 +1,5 @@
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
-import { axiosAuth } from "./axios";
+import { axiosAuth, axiosPrivate } from "./axios";
 import axios from "axios";
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
@@ -144,11 +144,9 @@ export const saveTablesAPI = async (
   docData,
   metaData,
   isBI,
-  date
+  date,
+  matrixName
 ) => {
-  localStorage.setItem("tableData", JSON.stringify(tableData));
-  localStorage.setItem("matrixesUiData", JSON.stringify(matrixesUiData));
-
   const matrixesData = getMatrixesDataObj(
     matrixID,
     tableData,
@@ -160,7 +158,7 @@ export const saveTablesAPI = async (
   try {
     const res = await axiosPrivate.post("/api/savematrix", {
       matrixID,
-      matrixName: "מטריצה",
+      matrixName,
       userID,
       matrixesData,
       matrixesUiData,
@@ -263,3 +261,43 @@ export const getUrlsAPI = async (axiosPrivate, userID) => {
     console.log("error in sendTableAPI:", e);
   }
 };
+
+export const loadTablesByDatesAPI = async(axiosPrivate, fromDate, toDate) => {
+  try {
+    let dates = {"Date": {
+      "$gte": fromDate,
+      "$lte": toDate
+    }}
+    
+    if (fromDate=== toDate) {
+      dates = {"Date": toDate}
+    }
+
+    const res = await axiosPrivate.post("/api/getdata", 
+    { collection: "MtxLog", "searchParams": dates});
+    
+    const data = res.data.result.data;
+    if (data?.length) {
+      return data.map((element) => {
+        return {
+          matrixID: element.matrixID,
+          matrixName: element.matrixName
+        };
+      })
+    }
+  } catch (e) {
+    console.log("error in loadAllTablesAPI:", e);
+  }
+}
+
+export const loadAllTablesAPI = async (axiosPrivate, matrixID) => {
+  try {
+    const res = await axiosPrivate.post("/api/getdata", { collection: "MtxLog", "searchParams": {"matrixID": matrixID} });
+    const data = res.data.result.data;
+    if (data?.length) {
+      return JSON.parse(JSON.parse(data[0]["matrixesUiData"]))
+    }
+  } catch (e) {
+    console.log("error in loadAllTablesAPI:", e);
+  }
+}

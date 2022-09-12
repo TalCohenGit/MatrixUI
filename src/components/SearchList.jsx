@@ -21,10 +21,10 @@ const SearchList = () => {
     toggleList(false);
   };
 
-  const filteredCustomers = customers.filter(({ userName }) =>
+  const filteredCustomers = customers && customers.filter(({ userName }) =>
     filterCustomers(userName, customerName)
   );
-  const customersList = filteredCustomers.map(({ userName }, index) => (
+  const customersList = filteredCustomers && filteredCustomers.map(({ userName }, index) => (
     <li key={index} onClick={() => handleCustomerClick(userName)}>
       <p>{userName}</p>
     </li>

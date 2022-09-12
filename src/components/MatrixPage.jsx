@@ -12,6 +12,8 @@ import {
   getDriverList,
   logoutAPI,
   refreshTokenAPI,
+  loadAllTablesAPI,
+  loadTablesByDatesAPI
 } from "../api";
 import { DataContext } from "../context/DataContext";
 import {
@@ -329,7 +331,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return currentUserID;
   };
 
-  const saveTables = async (isBI, dateValue) => {
+  const saveTables = async (isBI, dateValue, matrixName) => {
     let date = null;
     if (dateValue) {
       date = dateValue.format("MM/DD/YYYY");
@@ -365,9 +367,22 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       docCommentsToSend,
       metaDataToSend,
       isBI,
-      date
+      date,
+      matrixName
     );
   };
+
+  const loadTables = async (matrixID) => {
+        
+    //   const matrixID = "55fc21b42a0eeda60de39ef02b27398794d6d612412c318921ac2052882ba6ae"
+    const matrixesUiData = await loadAllTablesAPI(axiosPrivate, matrixID)
+    if (matrixesUiData) {
+        loadData(matrixesUiData, setMatrixData, 0);
+        loadData(matrixesUiData, setMatrixComments, 1);
+        loadData(matrixesUiData, setSelectedProducts, 2);
+        loadData(matrixesUiData, setBalanceTableData, 3);
+      }
+  }
 
   const onUnload = async (e) => {
     if (matrixData?.length > 1) {
@@ -376,8 +391,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     }
   };
 
-  const loadData = (savedData, stateToChange, index) => {
-    const matrixesUiData = savedData.matrixesUiData;
+  const loadData = (matrixesUiData, stateToChange, index) => {
     if (matrixesUiData) {
       const loadedMatrix = matrixesUiData[index];
       if (loadedMatrix) {
@@ -393,10 +407,11 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       console.log("currentUserID", currentUserID);
       const savedData = await loadTablesAPI(axiosPrivate, currentUserID);
       if (savedData) {
-        loadData(savedData, setMatrixData, 0);
-        loadData(savedData, setMatrixComments, 1);
-        loadData(savedData, setSelectedProducts, 2);
-        loadData(savedData, setBalanceTableData, 3);
+        const matrixesUiData = savedData.matrixesUiData
+        loadData(matrixesUiData, setMatrixData, 0);
+        loadData(matrixesUiData, setMatrixComments, 1);
+        loadData(matrixesUiData, setSelectedProducts, 2);
+        loadData(matrixesUiData, setBalanceTableData, 3);
         setMatrixID(savedData.matrixID);
       }
       const [productsData, customerList, driverList] = await Promise.all([
@@ -442,6 +457,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         axiosPrivate={axiosPrivate}
         userID={userID}
         saveTables={saveTables}
+        loadTables={loadTables}
       />
 
       <Table
