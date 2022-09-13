@@ -137,7 +137,6 @@ export const sendTableAPI = async (
 export const saveTablesAPI = async (
   axiosPrivate,
   matrixID,
-  userID,
   tableData,
   matrixesUiData,
   cellsData,
@@ -159,7 +158,6 @@ export const saveTablesAPI = async (
     const res = await axiosPrivate.post("/api/savematrix", {
       matrixID,
       matrixName,
-      userID,
       matrixesData,
       matrixesUiData,
       Date: date,

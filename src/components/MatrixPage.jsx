@@ -29,6 +29,7 @@ import {
   numOfColBeforeProducts,
   numOfColAfterProducts,
   titleWithoutProduct,
+  dateFormat
 } from "../utils/constants";
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
@@ -334,7 +335,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const saveTables = async (isBI, dateValue, matrixName) => {
     let date = null;
     if (dateValue) {
-      date = dateValue.format("MM/DD/YYYY");
+      date = dateValue.format(dateFormat);
     }
     const {
       newMatrixId,
@@ -354,13 +355,11 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       selectedProducts,
       balanceTableData,
     ]);
-    const currentUserID = getUserId();
     localStorage.setItem("matrixesUiData", JSON.stringify(matrixesUiData));
 
     await saveTablesAPI(
       axiosPrivate,
       newMatrixId,
-      currentUserID,
       validatedData,
       matrixesUiData,
       cellsData,
@@ -436,7 +435,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   return drivers?.length ? (
     <div className="app-container">
-      <h1>גת אביגדור קופה רושמת</h1>
+      <h1>גת אביגדור</h1>
       <Modal
         isOpen={isOpen}
         toggleModal={toggleModal}

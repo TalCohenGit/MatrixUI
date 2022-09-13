@@ -18,4 +18,4 @@ export const numOfColBeforeProducts = 3
 export const numOfColAfterProducts = 5
 export const titleWithoutProduct = numOfColBeforeProducts + numOfColAfterProducts
 
-
+export const dateFormat = "MM/DD/YYYY"

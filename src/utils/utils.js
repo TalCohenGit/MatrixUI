@@ -1,5 +1,5 @@
 import { numOfColBeforeProducts, numOfColAfterProducts } from "./constants";
-import { getMatrixIDAPI } from "../api"
+import { getMatrixIDAPI } from "../api";
 import _ from "lodash";
 
 export const filterCustomers = (parsedName, input) => {
@@ -103,7 +103,7 @@ export const removeFromBalanceTable = (
 ) => {
   const selectedProduct = productsData.filter(
     (product) => productName === product["שם פריט"]
-  )[0]
+  )[0];
   let colIndexToRemove = 0;
   return currentBalanceTable.map((row, rowIndx) => {
     let newArr;
@@ -114,7 +114,7 @@ export const removeFromBalanceTable = (
       ...row.slice(0, colIndexToRemove),
       ...row.slice(colIndexToRemove + 1, row.length),
     ];
-    return newArr
+    return newArr;
   });
 };
 
@@ -128,28 +128,51 @@ const validateValueExist = (valueToCheck, setComment) => {
   }
 };
 
-export const getMatrixesData = async(axiosPrivate, matrixData, productsMap, matrixComments, setCustomerValidationFailed) => {
-   const newMatrixId = await getMatrixIDAPI(axiosPrivate);
-    const validatedData = handleMatrixData(
-      matrixData,
-      productsMap,
-      setCustomerValidationFailed
-    );
-    if (!validatedData) {
-      return;
-    }
-    const {cellsData, docCommentsToSend, metaDataToSend} = handleCommentMatrixData(
+export const getMatrixesData = async (
+  axiosPrivate,
+  matrixData,
+  productsMap,
+  matrixComments,
+  setCustomerValidationFailed
+) => {
+  const newMatrixId = await getMatrixIDAPI(axiosPrivate);
+  const validatedData = handleMatrixData(
+    matrixData,
+    productsMap,
+    setCustomerValidationFailed
+  );
+  if (!validatedData) {
+    return;
+  }
+  const { cellsData, docCommentsToSend, metaDataToSend } =
+    handleCommentMatrixData(
       matrixComments,
       validatedData["docComments"],
       validatedData["metaData"]
     );
-    return {newMatrixId, validatedData, cellsData, docCommentsToSend, metaDataToSend}
-}
+  return {
+    newMatrixId,
+    validatedData,
+    cellsData,
+    docCommentsToSend,
+    metaDataToSend,
+  };
+};
 
 export const getRefreshToken = () => {
   // if(!refreshToken)
   return localStorage.getItem("refreshToken");
-}  
+};
+
+const setError = (setCustomerValidationFailed, errorMsg, customerName) => {
+  if (setCustomerValidationFailed) {
+    setCustomerValidationFailed({
+      failure: true,
+      error: "חסרות שדות עבור הלקוח",
+      customerName,
+    });
+  }
+};
 
 export const handleMatrixData = (
   tableData,
@@ -159,15 +182,17 @@ export const handleMatrixData = (
   let matrix = JSON.parse(JSON.stringify(tableData));
   const titleLength = matrix[0].length;
   let tableDetails = matrix.slice(1);
-
+  const newTableDetails = []
   const acountKeys = [];
   const metaData = [];
   const documentIDs = [];
   const actionIDs = [];
   const driverIDs = [];
   const docComments = [];
+  let validationFailed = false;
 
-  tableDetails = tableDetails.map((rowData) => {
+  // tableDetails = tableDetails.map((rowData) => {
+  for (let rowData of tableDetails) {
     acountKeys.push(rowData[1]);
     metaData.push(rowData.pop());
     docComments.push(rowData.pop());
@@ -176,18 +201,33 @@ export const handleMatrixData = (
     const actionID = rowData.pop();
     actionIDs.push(actionID);
     const driverID = rowData.pop();
+    const validRow = rowData
+      .slice(numOfColBeforeProducts)
+      .find((element) => element !== 0);
+    console.log("***** validRow", validRow);
+    if (!validRow) {
+      setError(
+        setCustomerValidationFailed,
+        "שדות ריקים עבור הלקוח: ",
+        rowData[0]
+      );
+      validationFailed = true
+      break;
+    }
     if (!driverID || !actionID || !docId) {
-      const customerName = rowData[0];
-      if (setCustomerValidationFailed) {
-        setCustomerValidationFailed(customerName);
-      }
-      return;
+      setError(
+        setCustomerValidationFailed,
+        ":לא נבחרו כל השדות עבור הלקוח",
+        rowData[0]
+      );
+      validationFailed = true
+      break;
     }
     driverIDs.push(driverID);
-    return rowData.slice(3);
-  });
+    newTableDetails.push(rowData.slice(3));
+  }
 
-  if (!driverIDs.length) {
+  if (validationFailed) {
     return;
   }
 
@@ -196,7 +236,7 @@ export const handleMatrixData = (
     titleLength - numOfColAfterProducts
   );
   const productsWithKeys = products.map((element) => productsMap[element]);
-  matrix = [productsWithKeys, ...tableDetails];
+  matrix = [productsWithKeys, ...newTableDetails];
   return {
     matrix,
     driverIDs,
@@ -234,7 +274,7 @@ export const handleCommentMatrixData = (
         rowData.push(commentsObj);
       }
     });
-    cellsData.push(rowData)
+    cellsData.push(rowData);
     let docData = null;
     if (docComments[index]) {
       // docComments[index].forEach(
@@ -242,14 +282,14 @@ export const handleCommentMatrixData = (
       // );
       docData = handleComments(docComments[index]);
     }
-    docCommentsToSend.push(docData)
+    docCommentsToSend.push(docData);
     if (metaData[index]) {
       metaDataToSend.push({ Details: metaData[index] });
     } else {
-      metaDataToSend.push(null)
+      metaDataToSend.push(null);
     }
   });
-  return {cellsData, docCommentsToSend, metaDataToSend};
+  return { cellsData, docCommentsToSend, metaDataToSend };
 };
 
 export const getProductsNameKeyMap = (products) => {

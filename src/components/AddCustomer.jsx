@@ -38,7 +38,10 @@ const AddCustomer = ({
     selectedProducts,
     setSelectedProducts,
   } = useContext(DataContext);
-  const [customerValidationFailed, setCustomerValidationFailed] = useState("");
+  const [customerValidationFailed, setCustomerValidationFailed] = useState({
+    failure: false,
+    error: "",
+  });
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
   const [producedUrls, setProducedUrls] = useState("");
   const [disableProduction, setDisableProduction] = useState(false);
@@ -58,17 +61,18 @@ const AddCustomer = ({
       endDate: addDays(new Date(), 7),
       key: "selection",
     },
-  ]
+  ];
   const [dateRanges, setDateRanges] = useState(intialRangeState);
 
   const productsOptions = [];
-  
-  products && products.forEach((element) => {
-    productsOptions.push({
-      value: element["שם פריט"],
-      label: element["שם פריט"],
+
+  products &&
+    products.forEach((element) => {
+      productsOptions.push({
+        value: element["שם פריט"],
+        label: element["שם פריט"],
+      });
     });
-  });
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
   const handleChange = (value) => {
@@ -207,7 +211,6 @@ const AddCustomer = ({
   };
 
   const loadTablesByID = async (matrixID) => {
-    // const matrixID = matrixDetails["matrixID"]
     await loadTables(matrixID);
     cancleLoading();
   };
@@ -302,9 +305,24 @@ const AddCustomer = ({
   const customStyles = {
     option: () => ({
       display: "flex",
-      flexDirection: "row-reverse",
       alignItems: "center",
+      justifyContent: "space-between",
+      padding: "10px",
+      marginLeft:"10px",
+      marginRight:"10px",
+      "&:hover" : {
+        backgroundColor:"#d3d3d3",
+        cursor:"pointer"
+      }
     }),
+    menu: () => ({
+     direction:"ltr",
+    }),
+    input: () => ({
+      fontSize:"40px"
+    })
+   
+
   };
 
   return (
@@ -329,10 +347,7 @@ const AddCustomer = ({
             handleSaving,
             "שמירה"
           )}
-          {loadModal(
-            toLoadDataModal,
-            toggleToLoadDataModal
-          )}
+          {loadModal(toLoadDataModal, toggleToLoadDataModal)}
           <input
             type="text"
             value={customerName}
@@ -362,11 +377,11 @@ const AddCustomer = ({
             styles={customStyles}
           />
         </div>
-        {customerValidationFailed ? (
+        {customerValidationFailed.failure ? (
           <p className="validationComment">
             {" "}
-            הפקת חשבונית לא בוצעה! חסרות שדות עבור הלקוח{" "}
-            {customerValidationFailed}
+            הפקת חשבונית לא בוצעה! {customerValidationFailed.error}  {" "}
+            {customerValidationFailed.customerName}
           </p>
         ) : null}
         <button
@@ -378,7 +393,6 @@ const AddCustomer = ({
         </button>
         <button
           className="save-tables"
-          disabled={matrixData.length === 0}
           onClick={() => loadData()}
         >
           טעינה
