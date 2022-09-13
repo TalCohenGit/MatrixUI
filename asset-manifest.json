@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/MatrixUI/static/css/main.0825bf43.css",
-    "main.js": "/MatrixUI/static/js/main.44c03152.js",
+    "main.js": "/MatrixUI/static/js/main.75034dbe.js",
     "static/js/787.4e614f49.chunk.js": "/MatrixUI/static/js/787.4e614f49.chunk.js",
     "index.html": "/MatrixUI/index.html",
     "main.0825bf43.css.map": "/MatrixUI/static/css/main.0825bf43.css.map",
-    "main.44c03152.js.map": "/MatrixUI/static/js/main.44c03152.js.map",
+    "main.75034dbe.js.map": "/MatrixUI/static/js/main.75034dbe.js.map",
     "787.4e614f49.chunk.js.map": "/MatrixUI/static/js/787.4e614f49.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.0825bf43.css",
-    "static/js/main.44c03152.js"
+    "static/js/main.75034dbe.js"
   ]
 }
