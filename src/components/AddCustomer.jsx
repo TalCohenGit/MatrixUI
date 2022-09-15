@@ -14,7 +14,6 @@ import DropDownMatrixNames from "../components/DropDownMatrixNames";
 import DatePicker from "./DatePicker";
 import DateRangePickerToLoad from "./DateRangePickerToLoad";
 import { addDays } from "date-fns";
-import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 const AddCustomer = ({
   customerName,

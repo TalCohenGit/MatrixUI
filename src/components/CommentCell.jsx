@@ -1,5 +1,4 @@
-import React, { useContext, useState, useEffect } from "react";
-import { DataContext } from "../context/DataContext";
+import React, { useState, useEffect } from "react";
 import CommentsModal from "./CommentsModal";
 
 const CommentCell = ({ rowIndex, colIndex, data, setData }) => {

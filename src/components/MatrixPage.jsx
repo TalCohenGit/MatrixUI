@@ -19,16 +19,16 @@ import { DataContext } from "../context/DataContext";
 import {
   getProductsNameKeyMap,
   updateBalanceTable,
-  removeFromBalanceTable,
+  removeColFromBalanceTable,
   getUniqProducts,
   getRefreshToken,
   getMatrixesData,
+  numOfProducts
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
   numOfColBeforeProducts,
   numOfColAfterProducts,
-  titleWithoutProduct,
   dateFormat
 } from "../utils/constants";
 import Modal from "../common/components/Modal/Modal";
@@ -73,9 +73,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       "שם לקוח",
       "מזהה",
       "טלפון",
+      "סוג מסמך",
       "איסוף",
       "מאושר",
-      "סוג מסמך",
       "הערות למסמך",
       "",
     ];
@@ -198,7 +198,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       currentMatrix.push(getTableTitle());
     }
     let newMatrix = currentMatrix;
-    const numCurrentProducts = currentMatrix[0].length - titleWithoutProduct;
+    const numCurrentProducts = numOfProducts(currentMatrix[0].length)
     if (event.action === "select-option") {
       let productsToAdd = selectedProductNames;
       if (event.option.value === "*") {
@@ -240,7 +240,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         newMatrix = removeAllProducts(currentMatrix, numCurrentProducts);
       } else {
         newMatrix = removeProduct(event.option.value, currentMatrix);
-        newBalanceTable = removeFromBalanceTable(
+        newBalanceTable = removeColFromBalanceTable(
           currentBalanceTable,
           products,
           event.option.value
@@ -383,10 +383,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   }
 
   const onUnload = async (e) => {
-    if (matrixData?.length > 1) {
+    // if (matrixData?.length > 1) {
       const isBI = false;
       await saveTables(isBI);
-    }
+    // }
   };
 
   const loadData = (matrixesUiData, stateToChange, index) => {
@@ -427,6 +427,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   }, []);
 
   useEffect(() => {
+      console.log("!!!!!!!!render new table")
     window.addEventListener("beforeunload", onUnload);
     return () => window.removeEventListener("beforeunload", onUnload);
   }, [matrixData, matrixComments]);
@@ -460,14 +461,14 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       <Table
         data={matrixData}
         setData={setMatrixData}
-        tableName="matrix"
+        tableName="main"
         cb={calcProductsSum}
         bgColor="#F5FFFA"
       />
       <Table
         data={balanceTableData}
         setData={setBalanceTableData}
-        tableName="prototype"
+        tableName="balance"
         disabled
         bgColor="#F0FFFF"
       />

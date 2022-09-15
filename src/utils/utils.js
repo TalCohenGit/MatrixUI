@@ -1,4 +1,4 @@
-import { numOfColBeforeProducts, numOfColAfterProducts } from "./constants";
+import { numOfColBeforeProducts, numOfColAfterProducts, titleWithoutProduct } from "./constants";
 import { getMatrixIDAPI } from "../api";
 import _ from "lodash";
 
@@ -96,7 +96,7 @@ export const updateBalanceTable = (
   }
 };
 
-export const removeFromBalanceTable = (
+export const removeColFromBalanceTable = (
   currentBalanceTable,
   productsData,
   productName
@@ -117,6 +117,19 @@ export const removeFromBalanceTable = (
     return newArr;
   });
 };
+export const numOfProducts = (matrixLength) => matrixLength - titleWithoutProduct;
+
+export const removeRowFromBalanceTable = (balanceTableData, tableRowToRemove) => {
+  const newBalanceTable = [...balanceTableData]
+  const productsNum = numOfProducts(tableRowToRemove.length)
+  const inOrderRow = 2
+  const leftRow = 3
+  for (let i= numOfColBeforeProducts; i<= numOfColBeforeProducts + productsNum; i++) {
+    newBalanceTable[inOrderRow][i] = newBalanceTable[inOrderRow][i] - tableRowToRemove[i]
+    newBalanceTable[leftRow][i] = newBalanceTable[leftRow][i] + tableRowToRemove[i]
+  }
+  return newBalanceTable
+}
 
 export const getUniqProducts = (productsData) => {
   return _.uniqBy(productsData, "שם פריט");
@@ -186,8 +199,8 @@ export const handleMatrixData = (
   const acountKeys = [];
   const metaData = [];
   const documentIDs = [];
-  const actionIDs = [];
   const driverIDs = [];
+  const actionIDs = [];
   const docComments = [];
   let validationFailed = false;
 
@@ -196,11 +209,11 @@ export const handleMatrixData = (
     acountKeys.push(rowData[1]);
     metaData.push(rowData.pop());
     docComments.push(rowData.pop());
-    const docId = rowData.pop();
-    documentIDs.push(docId);
     const actionID = rowData.pop();
     actionIDs.push(actionID);
     const driverID = rowData.pop();
+    const docId = rowData.pop();
+    documentIDs.push(docId);
     const validRow = rowData
       .slice(numOfColBeforeProducts)
       .find((element) => element !== 0);

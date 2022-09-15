@@ -144,7 +144,6 @@ export const saveTablesAPI = async (
     docData,
     metaData
   );
-  console.log("matrixesData is: ", matrixesData)
   try {
     const res = await axiosPrivate.post("/api/savematrix", {
       matrixID,
@@ -241,6 +240,7 @@ export const logoutAPI = async () => {
 
 export const getUrlsAPI = async (axiosPrivate, userID) => {
   try {
+    console.log("*********axiosPrivate",axiosPrivate)
     const res = await axiosPrivate.post("/api/loadDocUrls", { UserID: userID });
     const data = res.data.result.data;
     const urls = data.map((element) => element["DocUrl"]);

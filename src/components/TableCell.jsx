@@ -60,20 +60,6 @@ const TableCell = (props) => {
     cellType = (
       <DropDownCell
         dropdownOptions={[
-          { name: "חשבונית מס", key: 1 },
-          { name: "חשבונית מס זיכוי", key: 3 },
-          { name: "הזמנה", key: 6 },
-        ]}
-        rowIndex={rowIndex}
-        colIndex={colIndex}
-        data={data}
-        setData={setData}
-      />
-    );
-  } else if (colIndex === rowLength - 4) {
-    cellType = (
-      <DropDownCell
-        dropdownOptions={[
           { name: "להפקה", key: 1 },
           { name: "ללא", key: 2 },
           { name: "מיוחד", key: 3 },
@@ -84,10 +70,24 @@ const TableCell = (props) => {
         setData={setData}
       />
     );
-  } else if (colIndex === rowLength - 5) {
+  } else if (colIndex === rowLength - 4) {
     cellType = (
       <DropDownCell
         dropdownOptions={drivers}
+        rowIndex={rowIndex}
+        colIndex={colIndex}
+        data={data}
+        setData={setData}
+      />
+    );
+  } else if (colIndex === rowLength - 5) {
+    cellType = (
+      <DropDownCell
+        dropdownOptions={[
+          { name: "חשבונית מס", key: 1 },
+          { name: "חשבונית מס זיכוי", key: 3 },
+          { name: "הזמנה", key: 6 },
+        ]}
         rowIndex={rowIndex}
         colIndex={colIndex}
         data={data}
