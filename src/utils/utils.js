@@ -204,7 +204,6 @@ export const handleMatrixData = (
     const validRow = rowData
       .slice(numOfColBeforeProducts)
       .find((element) => element !== 0);
-    console.log("***** validRow", validRow);
     if (!validRow) {
       setError(
         setCustomerValidationFailed,

@@ -33,6 +33,7 @@ import {
 } from "../utils/constants";
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const {
@@ -67,7 +68,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const [validationErrors, setValidationError] = useState([]);
   const axiosPrivate = useAxiosPrivate();
   let interval;
-
   const getTableTitle = () => {
     const tableTitle = [
       "שם לקוח",
@@ -135,7 +135,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
             currentMatrix[0].length
           ),
         ];
-
         if (
           newMatrixComment[rowIndex - 1] &&
           newMatrixComment[rowIndex - 1].length > 0
@@ -192,7 +191,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const addProductToTable = (selectedProductNames, event) => {
-    const currentMatrix = matrixData;
+    const currentMatrix = [...matrixData];
     const currentBalanceTable = [...balanceTableData];
     let newBalanceTable = [];
     if (!currentMatrix.length) {
@@ -281,15 +280,16 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   useEffect(() => {
-    interval = setInterval(() => {
-      setSeconds((prevSeconds) => prevSeconds + 1);
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
+    // interval = setInterval(() => {
+    //   setSeconds((prevSeconds) => prevSeconds + 1);
+    // }, 1000);
+    // return () => {
+    //   clearInterval(interval);
+    // };
   }, [accessToken]);
 
   useEffect(() => {
+    
     (async () => {
       let currentTimeLimit = timeLimit;
       if (!currentTimeLimit) {
@@ -305,7 +305,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         await logoutAPI();
       }
     })();
-  }, [seconds]);
+  }, []);
 
   useEffect(() => {
     setSeconds(0);
@@ -316,7 +316,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       if (!accessToken) {
         const refreshToken = getRefreshToken();
         const { accessToken } = await refreshTokenAPI(refreshToken);
-        console.log("MatrixPage accessToken", accessToken);
         setAccessToken(accessToken);
       }
     })();
@@ -403,7 +402,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   useEffect(() => {
     (async () => {
       const currentUserID = getUserId();
-      console.log("currentUserID", currentUserID);
       const savedData = await loadTablesAPI(axiosPrivate, currentUserID);
       if (savedData) {
         const matrixesUiData = savedData.matrixesUiData
@@ -435,7 +433,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   return drivers?.length ? (
     <div className="app-container">
-      <h1>גת אביגדור</h1>
+      <h1> MatrixUi </h1>
       <Modal
         isOpen={isOpen}
         toggleModal={toggleModal}

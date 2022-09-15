@@ -11,13 +11,11 @@ const useAxiosPrivate = () => {
     useEffect(() => {
         const requestIntercept = axiosPrivate.interceptors.request.use(
             config =>  (async () => {
-                console.log("************accessToken", accessToken)
                 if (!config.headers['Authorization']) {
                     let validAccessToken = accessToken
                     if (!validAccessToken) {
                         const refreshToken = getRefreshToken()      
                         validAccessToken = await refreshTokenAPI(refreshToken);
-                        console.log("MatrixPage validAccessToken", validAccessToken)
                       }
                     config.headers['Authorization'] = `Bearer ${validAccessToken}`;
                     setAccessToken(validAccessToken);
@@ -35,7 +33,6 @@ const useAxiosPrivate = () => {
                     const refreshToken = localStorage.getItem("refreshToken")
                     const token = await refreshTokenAPI(refreshToken);
                     prevRequest.headers['Authorization'] = `Bearer ${token}`;
-                    console.log("new token!!!: ", token)
                     setAccessToken(token)
                     return axiosPrivate(prevRequest);
                 }

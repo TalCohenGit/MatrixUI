@@ -1,15 +1,9 @@
-import React, {useState} from 'react'
-// import TextField from '@mui/material/TextField';
-// import Box from '@mui/material/Box';
-// import { LocalizationProvider } from '@mui/x-date-pickers-pro';
-// import { AdapterDayjs } from '@mui/x-date-pickers-pro/AdapterDayjs';
-// import { DateRangePicker } from '@mui/x-date-pickers-pro/DateRangePicker';
+import React from 'react'
 import { DateRangePicker } from 'react-date-range';
-import 'react-date-range/dist/styles.css'; // main css file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+import 'react-date-range/dist/styles.css'; 
+import 'react-date-range/dist/theme/default.css';
 
 const DateRangePickerToLoad = ({dateRanges, setDateRanges}) => {
-  console.log("dateRanges",dateRanges)
   
     return (
       <DateRangePicker

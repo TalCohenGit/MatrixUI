@@ -5,7 +5,6 @@ import { DataContext } from "../context/DataContext";
 
 const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData }) => {
   const [loadedKey, setLoadedKey] = useState("")
-
   useEffect(() => {
     (async() => {
     const dropDownValue = data[rowIndex][colIndex]
@@ -16,7 +15,7 @@ const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData }) =>
       }
     }
   })()
-}, []);
+}, [data]);
 
   const customStyles={
     indicatorSeparator: (styles) => ({display:'none'}),

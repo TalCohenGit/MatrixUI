@@ -47,14 +47,10 @@ const AddCustomer = ({
   const [disableProduction, setDisableProduction] = useState(false);
   const [toSaveDataModal, toggleToSaveDataModal] = useState(false);
   const [dateValue, setDateValue] = useState("");
-  // const [fromDateValue, setFromDateValue] = useState("");
-  // const [toDateValue, setToDateValue] = useState("");
   const [savedMatrixName, setSavedMatrixName] = useState("");
   const [toLoadDataModal, toggleToLoadDataModal] = useState(false);
   const [isMatrixNames, toggleMatrixNames] = useState(false);
-  const [selectedMatrix, setSelectedMatrix] = useState({});
   const [matrixesDetails, setMatrixesDetails] = useState([]);
-  // const [dateRanges, setDateRanges] = useState([]);
   const intialRangeState = [
     {
       startDate: new Date(),
@@ -153,7 +149,7 @@ const AddCustomer = ({
         docCommentsToSend,
         metaDataToSend
       );
-      console.log("sendTableRes", sendTableRes);
+      // console.log("sendTableRes", sendTableRes);
       const urls = await getUrlsAPI(axiosPrivate, userID);
       setProducedUrls(urls);
       toggleUrlsModal(true);

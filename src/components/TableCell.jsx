@@ -20,7 +20,8 @@ const TableCell = (props) => {
   } = props;
   const { drivers } = useContext(DataContext);
 
-  let cellType;
+  let cellType
+
   if (rowIndex === 0) {
     if (colIndex < 3 || (rowLength > 7 && colIndex > rowLength - 6)) {
       cellType = cellValue;
@@ -35,7 +36,6 @@ const TableCell = (props) => {
         />
       );
     }
-    console.log(rowIndex, rowLength);
   } else if (colIndex < 3) {
     cellType = cellValue;
   } else if (colIndex === rowLength - 1) {
