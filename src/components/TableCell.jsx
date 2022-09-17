@@ -24,7 +24,7 @@ const TableCell = (props) => {
 
   if (rowIndex === 0) {
     if (colIndex < 3 || (rowLength > 7 && colIndex > rowLength - 6)) {
-      cellType = cellValue;
+      cellType = <b>{cellValue}</b>;
     } else {
       cellType = (
         <HeaderDropDown

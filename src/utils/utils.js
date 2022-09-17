@@ -119,6 +119,8 @@ export const removeColFromBalanceTable = (
 };
 export const numOfProducts = (matrixLength) => matrixLength - titleWithoutProduct;
 
+export const customerNumbers = (matrixData) => matrixData.length - 1
+
 export const removeRowFromBalanceTable = (balanceTableData, tableRowToRemove) => {
   const newBalanceTable = [...balanceTableData]
   const productsNum = numOfProducts(tableRowToRemove.length)

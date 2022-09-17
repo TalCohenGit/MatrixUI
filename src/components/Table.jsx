@@ -6,7 +6,7 @@ import { DataContext } from "../context/DataContext";
 import { removeRowFromBalanceTable } from "../utils/utils"
 
 const Table = ({ data, setData, tableName, disabled = false, cb, bgColor }) => {
-  const {balanceTableData, setBalanceTableData} = useContext(DataContext)
+  const {balanceTableData, setBalanceTableData, setSelectedProducts} = useContext(DataContext)
 
 
   const showRemoveRow = (rowIndex) => {
@@ -21,6 +21,7 @@ const Table = ({ data, setData, tableName, disabled = false, cb, bgColor }) => {
     if(currentTable.length === 2) {
       setData([])
       setBalanceTableData([])
+      setSelectedProducts([])
       return;
     } 
     const tableRowToRemove = currentTable[rowIndex]

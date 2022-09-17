@@ -1,8 +1,13 @@
 import React, { useContext, useState } from "react";
 import { DataContext } from "../context/DataContext";
 import SearchList from "./SearchList";
-import { handleMatrixData, handleCommentMatrixData } from "../utils/utils";
+import {
+  handleMatrixData,
+  handleCommentMatrixData,
+  customerNumbers,
+} from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
+import CircularProgress from "@mui/material/CircularProgress";
 import {
   getMatrixIDAPI,
   getUrlsAPI,
@@ -14,6 +19,8 @@ import DropDownMatrixNames from "../components/DropDownMatrixNames";
 import DatePicker from "./DatePicker";
 import DateRangePickerToLoad from "./DateRangePickerToLoad";
 import { addDays } from "date-fns";
+import UrlCheckboxes from "./UrlCheckboxes/UrlCheckboxes";
+import LoaderContainer from "./LoaderContainer/LoaderContainer";
 
 const AddCustomer = ({
   customerName,
@@ -58,6 +65,7 @@ const AddCustomer = ({
     },
   ];
   const [dateRanges, setDateRanges] = useState(intialRangeState);
+  const [checked, setChecked] = useState([]);
 
   const productsOptions = [];
 
@@ -116,6 +124,7 @@ const AddCustomer = ({
   };
 
   const produceDoc = async (productsMap) => {
+   
     if (matrixData.length <= 1) {
       return;
     }
@@ -150,7 +159,11 @@ const AddCustomer = ({
       );
       // console.log("sendTableRes", sendTableRes);
       const urls = await getUrlsAPI(axiosPrivate, userID);
-      setProducedUrls(urls);
+      const relavantUrls = urls.slice(
+        urls.length - customerNumbers(matrixData),
+        urls.length
+      );
+      setProducedUrls(relavantUrls);
       toggleUrlsModal(true);
       setDisableProduction(false);
     } catch (e) {
@@ -158,16 +171,11 @@ const AddCustomer = ({
     }
   };
 
-  const getUrls =
-    producedUrls &&
-    producedUrls.map((url) => {
-      return (
-        <div>
-          <a href={url}>{url}</a>
-          <br />
-        </div>
-      );
-    });
+  const handleChecked = (urlIndex) => {
+    const currentChecked = [...checked];
+    currentChecked[urlIndex] = !currentChecked[urlIndex];
+    setChecked(currentChecked);
+  };
 
   const saveData = () => {
     toggleToSaveDataModal(true);
@@ -284,16 +292,29 @@ const AddCustomer = ({
     );
   };
 
-  const listModal = (isOpen, toggleModal, header, dataToShow) => {
+  const ListModal = ({ isOpen, toggleModal, header }) => {
     return (
-      <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={header}>
-        <div>{dataToShow}</div>
-        <div className="action-buttons">
-          <button className="cancel-button" onClick={() => toggleModal(false)}>
-            בטל
-          </button>
-        </div>
-      </Modal>
+      isOpen &&
+      (producedUrls?.length ? (
+        <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={header}>
+          {/* <div>{dataToShow}</div> */}
+          <React.Fragment>
+            <UrlCheckboxes
+              producedUrls={producedUrls}
+            />
+            <div className="action-buttons">
+              <button
+                className="cancel-button"
+                onClick={() => toggleModal(false)}
+              >
+                בטל
+              </button>
+            </div>
+          </React.Fragment>
+        </Modal>
+      ) : (
+        <LoaderContainer />
+      ))
     );
   };
 
@@ -303,39 +324,32 @@ const AddCustomer = ({
       alignItems: "center",
       justifyContent: "space-between",
       padding: "10px",
-      marginLeft:"10px",
-      marginRight:"10px",
-      "&:hover" : {
-        backgroundColor:"#d3d3d3",
-        cursor:"pointer"
-      }
+      marginLeft: "10px",
+      marginRight: "10px",
+      "&:hover": {
+        backgroundColor: "#d3d3d3",
+        cursor: "pointer",
+      },
     }),
     menu: () => ({
-     direction:"ltr",
+      direction: "ltr",
     }),
     input: () => ({
-      fontSize:"40px"
-    })
-   
-
+      fontSize: "40px",
+    }),
   };
 
   return (
     <>
       <div className="addCustomer-wrapper">
         <div className="addCustomer-input-wrapper">
-          {listModal(
-            isUrlsModalOpen,
-            toggleUrlsModal,
-            "מסמכים שהופקו",
-            getUrls
-          )}
-          {listModal(
-            isUrlsModalOpen,
-            toggleUrlsModal,
-            "מסמכים שהופקו",
-            getUrls
-          )}
+          {
+            <ListModal
+              isOpen={isUrlsModalOpen}
+              toggleModal={toggleUrlsModal}
+              header={"מסמכים שהופקו"}
+            />
+          }
           {saveModal(
             toSaveDataModal,
             toggleToSaveDataModal,
@@ -375,7 +389,7 @@ const AddCustomer = ({
         {customerValidationFailed.failure ? (
           <p className="validationComment">
             {" "}
-            הפקת חשבונית לא בוצעה! {customerValidationFailed.error}  {" "}
+            הפקת חשבונית לא בוצעה! {customerValidationFailed.error}{" "}
             {customerValidationFailed.customerName}
           </p>
         ) : null}
@@ -386,10 +400,7 @@ const AddCustomer = ({
         >
           שמירה
         </button>
-        <button
-          className="save-tables"
-          onClick={() => loadData()}
-        >
+        <button className="save-tables" onClick={() => loadData()}>
           טעינה
         </button>
         <button

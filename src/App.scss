@@ -16,7 +16,6 @@
   &-row {
     display: flex;
     flex-wrap: nowrap;
-    flex-grow: 1;
   }
 
   &-cell {
@@ -218,7 +217,13 @@ body {
 
 .trash-button {
   margin-top: 10px;
-  margin-right: 3px;
+  margin-right: 20px;
+  cursor: pointer;
+  &:hover{
+    transform: scale(1.1);
+  }
+  
+
 }
 
 .save-tables {

@@ -9,7 +9,7 @@ const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
 export const getDriverList = async (axiosPrivate) => {
   try {
     const res = await getRecordsAPI(axiosPrivate, "2", { "קוד מיון": "690" });
-    const rawData = JSON.parse(res.data.data);
+    const rawData = res.data.data;
     return (
       rawData?.length &&
       rawData.map((driver) => {
@@ -27,7 +27,7 @@ export const getDriverList = async (axiosPrivate) => {
 export const getCustomersAPI = async (axiosPrivate) => {
   try {
     const res = await getRecordsAPI(axiosPrivate, "2", { "קוד מיון": "300" });
-    const rawData = JSON.parse(res.data.data);
+    const rawData = res.data.data;
 
     return (
       rawData?.length &&
@@ -49,7 +49,7 @@ export const getProductsAPI = async (axiosPrivate, validationModal) => {
     const res = await getRecordsAPI(axiosPrivate, "1");
     const validationErrors = res.data.validationError;
     validationModal(validationErrors);
-    const elements = JSON.parse(res.data.data);
+    const elements = res.data.data;
     return elements;
   } catch (e) {
     console.log("error in getProductsAPI:", e);
@@ -240,11 +240,10 @@ export const logoutAPI = async () => {
 
 export const getUrlsAPI = async (axiosPrivate, userID) => {
   try {
-    console.log("*********axiosPrivate",axiosPrivate)
     const res = await axiosPrivate.post("/api/loadDocUrls", { UserID: userID });
     const data = res.data.result.data;
     const urls = data.map((element) => element["DocUrl"]);
-    return urls.slice(urls.length - 10, urls.length);
+    return urls
   } catch (e) {
     console.log("error in sendTableAPI:", e);
   }

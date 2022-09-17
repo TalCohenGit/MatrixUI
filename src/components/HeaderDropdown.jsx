@@ -57,13 +57,13 @@ const HeaderDropDown = ({ headerText, data, setData, colIndex, rowIndex }) => {
       hideSelectedOptions
     />
   ) : (
-    <div
+    <b
       onClick={() => {
         setIsDropdown(true);
       }}
     >
       {headerText}
-    </div>
+    </b>
   );
 };
 
