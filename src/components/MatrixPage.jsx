@@ -64,7 +64,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     productsMap,
   } = useContext(DataContext);
 
-  const [isOpen, toggleModal] = useState(true);
+  const [isOpenValidationModal, toggleValidationModal] = useState(false);
   const [validationErrors, setValidationError] = useState([]);
   const axiosPrivate = useAxiosPrivate();
   let interval;
@@ -255,7 +255,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const validationModal = (validationErrors) => {
     if (validationErrors?.length > 0) {
       setValidationError(validationErrors);
-      toggleModal(true);
+      toggleValidationModal(true);
     }
   };
 
@@ -436,13 +436,13 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     <div className="app-container">
       <h1> MatrixUi </h1>
       <Modal
-        isOpen={isOpen}
-        toggleModal={toggleModal}
+        isOpen={isOpenValidationModal}
+        toggleModal={toggleValidationModal}
         modalHeader={"נא לטפל בכפילויות של הנתונים"}
       >
         <div>{dataDoubles}</div>
         <div className="action-buttons">
-          <button className="cancel-button" onClick={() => toggleModal(false)}>
+          <button className="cancel-button" onClick={() => toggleValidationModal(false)}>
             בטל
           </button>
         </div>

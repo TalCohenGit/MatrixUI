@@ -301,15 +301,9 @@ const AddCustomer = ({
           <React.Fragment>
             <UrlCheckboxes
               producedUrls={producedUrls}
+              toggleModal={toggleModal}
             />
-            <div className="action-buttons">
-              <button
-                className="cancel-button"
-                onClick={() => toggleModal(false)}
-              >
-                בטל
-              </button>
-            </div>
+           
           </React.Fragment>
         </Modal>
       ) : (

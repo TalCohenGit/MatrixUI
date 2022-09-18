@@ -231,6 +231,10 @@ body {
   margin-left: 10px;
 }
 
+.send-to-print {
+  @extend .save-tables;
+  }
+  
 .login-button {
   @extend .addCustomer-button;
   margin-top: 20px;

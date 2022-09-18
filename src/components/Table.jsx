@@ -34,7 +34,7 @@ const Table = ({ data, setData, tableName, disabled = false, cb, bgColor }) => {
   const tableData = data?.length
     ? data.map((rowData, rowIndex) => {
         return (
-          <div style={{display:"flex"}}>
+          <div style={{display:"flex"}} key={rowIndex}>
             <div className="table-row" key={`${tableName},${rowIndex}`}>
               {rowData.map((cellValue, colIndex) => {
                 return (

@@ -4,7 +4,7 @@ import { DataContext } from "../context/DataContext";
 
 const HeaderDropDown = ({ headerText, data, setData, colIndex, rowIndex }) => {
   const [isDropdown, setIsDropdown] = useState(false);
-  const { selectedProducts, setSelectedProducts, products } =
+  const { selectedProducts, setSelectedProducts, products, balanceTableData, setBalanceTableData } =
     useContext(DataContext);
  
   const customStyles = {
@@ -35,10 +35,23 @@ const HeaderDropDown = ({ headerText, data, setData, colIndex, rowIndex }) => {
     setSelectedProducts(currentSelected);
   };
 
+  const handleBalanceTable = (value) => {
+    console.log("handleBalanceTable value to change", value)
+    console.log("handleBalanceTable products:", products)
+    const productObj = products.find(element => element["שם פריט"] === value)
+    console.log("handleBalanceTable productObj:", productObj)
+    const newValue = productObj["מפתח פריט אב"]
+    console.log("handleBalanceTable newValue:", newValue)
+    const currentBalanceTable = [...balanceTableData]
+    currentBalanceTable[0][colIndex] = newValue
+    setBalanceTableData(currentBalanceTable)
+  }
+
   const handleSelect = (e) => {
     setSelectedOption(e);
     setIsDropdown(false);
     handleSelectedProducts(e.value);
+    handleBalanceTable(e.value);
     const currentData = [...data];
     currentData[rowIndex][colIndex] = e.value;
     setData(currentData);
