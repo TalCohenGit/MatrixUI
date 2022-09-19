@@ -4,7 +4,7 @@ import PropTypes from "prop-types";
 import useClickOutside from "../hooks/useClickOutside";
 import { filterCustomers } from "../utils/utils";
 
-const SearchList = () => {
+const SearchList = ({ matrixData }) => {
   const {
     customers,
     toggleList,
@@ -16,16 +16,31 @@ const SearchList = () => {
   const clickRef = useRef(null);
   useClickOutside(clickRef, () => toggleList(false));
 
+  
   const handleCustomerClick = (parsedName) => {
     setCustomerName(parsedName);
     toggleList(false);
   };
 
-  const filteredCustomers = customers && customers.filter(({ userName }) =>
-    filterCustomers(userName, customerName)
-  );
-  const customersList = filteredCustomers && filteredCustomers.map(({ userName }, index) => (
-    <li key={index} onClick={() => handleCustomerClick(userName)}>
+  const filteredCustomers = customers?.filter(({ userName }) => filterCustomers(userName, customerName));
+
+  const liStyle = (userName) => {
+    return matrixData?.length > 1 &&
+      matrixData
+        .slice(1)
+        .map((rowData) => {
+          return rowData[0];
+        })
+        .includes(userName)
+      ? { pointerEvents: "none", opacity: "0.5" }
+      : { pointerEvents: "auto", opacity: "1" };
+  };
+  const customersList = filteredCustomers?.map(({ userName }, index) => (
+    <li
+      key={index}
+      onClick={() => handleCustomerClick(userName)}
+      style={liStyle(userName)}
+    >
       <p>{userName}</p>
     </li>
   ));

@@ -362,7 +362,7 @@ const AddCustomer = ({
               }
             }}
           />
-          <SearchList />
+          <SearchList matrixData={matrixData}/>
         </div>
         <button className="addCustomer-button" onClick={addCustomerToTable}>
           הוספת לקוח

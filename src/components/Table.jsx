@@ -27,7 +27,6 @@ const Table = ({ data, setData, tableName, disabled = false, cb, bgColor }) => {
     const tableRowToRemove = currentTable[rowIndex]
     const newArr = [...currentTable.slice(0, rowIndex), ...currentTable.slice(rowIndex + 1)]
     setData(newArr)
-    // if(tableName === "main")return
     const newBalanceTable = removeRowFromBalanceTable(balanceTableData, tableRowToRemove)
     setBalanceTableData(newBalanceTable)
   }
