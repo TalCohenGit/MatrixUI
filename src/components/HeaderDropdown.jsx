@@ -36,12 +36,8 @@ const HeaderDropDown = ({ headerText, data, setData, colIndex, rowIndex }) => {
   };
 
   const handleBalanceTable = (value) => {
-    console.log("handleBalanceTable value to change", value)
-    console.log("handleBalanceTable products:", products)
     const productObj = products.find(element => element["שם פריט"] === value)
-    console.log("handleBalanceTable productObj:", productObj)
     const newValue = productObj["מפתח פריט אב"]
-    console.log("handleBalanceTable newValue:", newValue)
     const currentBalanceTable = [...balanceTableData]
     currentBalanceTable[0][colIndex] = newValue
     setBalanceTableData(currentBalanceTable)

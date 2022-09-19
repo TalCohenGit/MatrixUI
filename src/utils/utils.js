@@ -123,10 +123,11 @@ export const customerNumbers = (matrixData) => matrixData.length - 1
 
 export const removeRowFromBalanceTable = (balanceTableData, tableRowToRemove) => {
   const newBalanceTable = [...balanceTableData]
+
   const productsNum = numOfProducts(tableRowToRemove.length)
   const inOrderRow = 2
   const leftRow = 3
-  for (let i= numOfColBeforeProducts; i<= numOfColBeforeProducts + productsNum; i++) {
+  for (let i = numOfColBeforeProducts; i < numOfColBeforeProducts + productsNum; i++) {
     newBalanceTable[inOrderRow][i] = newBalanceTable[inOrderRow][i] - tableRowToRemove[i]
     newBalanceTable[leftRow][i] = newBalanceTable[leftRow][i] + tableRowToRemove[i]
   }

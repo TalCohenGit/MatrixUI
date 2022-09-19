@@ -157,7 +157,6 @@ const AddCustomer = ({
         docCommentsToSend,
         metaDataToSend
       );
-      // console.log("sendTableRes", sendTableRes);
       const urls = await getUrlsAPI(axiosPrivate, userID);
       const relavantUrls = urls.slice(
         urls.length - customerNumbers(matrixData),

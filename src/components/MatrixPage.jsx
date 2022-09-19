@@ -247,7 +247,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         );
       }
     }
-
     setMatrixData(newMatrix);
     setBalanceTableData(newBalanceTable);
   };
@@ -427,7 +426,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   }, []);
 
   useEffect(() => {
-      console.log("!!!!!!!!render new table")
     window.addEventListener("beforeunload", onUnload);
     return () => window.removeEventListener("beforeunload", onUnload);
   }, [matrixData, matrixComments]);

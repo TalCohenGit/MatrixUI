@@ -33,11 +33,27 @@ const UrlCheckboxes = ({ producedUrls, toggleModal }) => {
   };
 
   const sendToPrint = () => {
-    printUrls
-      .filter((urlObj) => urlObj.checked)
-      .forEach((urlObj) => {
+   const filteredUrls =  printUrls
+      .filter((urlObj) => urlObj.checked);
+    filteredUrls.forEach((urlObj) => {
         window.open(urlObj.url, urlObj.url, "PRINT", "height=400,width=600");
       });
+      // let i = 0;
+// if (i< filteredUrls.length) {}
+// const win = window.open(filteredUrls[i].url, "PRINT", "height=400,width=600"); 
+// var timer = setInterval(function() {  
+  
+//   if(win.closed) {  
+//       i = i + 1 
+//       console.log("closed",i)
+//       clearInterval(timer); 
+//   }  
+
+// }, 1000); 
+
+      // for(const urlObj of filteredUrls){
+      //   window.open(urlObj.url, urlObj.url, "PRINT", "height=400,width=600");
+      // }
   };
   const urls = printUrls.map((urlObj) => {
     const { url, checked } = urlObj;
