@@ -1,6 +1,6 @@
-import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
-import { axiosAuth, axiosPrivate } from "./axios";
-import axios from "axios";
+
+import { axiosAuth } from "./axios";
+import { getItemNames } from "./utils/utils"
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
   return await axiosPrivate.post("/api/getrecords", { TID, sortKey });
@@ -70,7 +70,8 @@ const getMatrixesDataObj = (
   tableData,
   cellsData,
   docData,
-  metaData
+  metaData,
+  productsMap
 ) => {
   const { matrix, driverIDs, actionIDs, documentIDs, acountKeys } = tableData;
   const actionAutho = [];
@@ -79,6 +80,7 @@ const getMatrixesDataObj = (
     actionAutho.push("Default");
     documentIDsMock.push(1);
   }
+  const itemHeaders = matrix[0]
 
   return {
     mainMatrix: {
@@ -88,7 +90,8 @@ const getMatrixesDataObj = (
       DocumentID: documentIDsMock,
       DriverID: driverIDs,
       ActionAutho: actionAutho,
-      itemsHeaders: matrix[0],
+      itemsHeaders: itemHeaders,
+      itemsNames: getItemNames(itemHeaders, productsMap),
       cellsData: matrix.slice(1),
     },
     changesMatrix: {
@@ -107,7 +110,8 @@ export const sendTableAPI = async (
   matrixID,
   cellsData,
   docData,
-  metaData
+  metaData,
+  productsMap
 ) => {
   try {
     const matrixesData = getMatrixesDataObj(
@@ -115,7 +119,8 @@ export const sendTableAPI = async (
       tableData,
       cellsData,
       docData,
-      metaData
+      metaData,
+      productsMap
     );
     const dataToSend = { matrixesData };
     console.log("dataToSend:", JSON.stringify(dataToSend));

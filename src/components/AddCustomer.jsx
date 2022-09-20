@@ -5,6 +5,7 @@ import {
   handleMatrixData,
   handleCommentMatrixData,
   customerNumbers,
+  deleteAllTables
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -37,6 +38,9 @@ const AddCustomer = ({
     errorMessage,
     setError,
     matrixData,
+    setMatrixData,
+    setBalanceTableData,
+    setMatrixComments,
     productsMap,
     matrixComments,
     products,
@@ -123,8 +127,11 @@ const AddCustomer = ({
     }
   };
 
+  const deleteAll = () => {
+    deleteAllTables(setMatrixData, setBalanceTableData, setMatrixComments, setSelectedProducts)
+  }
+
   const produceDoc = async (productsMap) => {
-   
     if (matrixData.length <= 1) {
       return;
     }
@@ -149,13 +156,14 @@ const AddCustomer = ({
     }
     try {
       setDisableProduction(true);
-      const sendTableRes = await sendTableAPI(
+      await sendTableAPI(
         axiosPrivate,
         validatedData,
         newMatrixId,
         cellsData,
         docCommentsToSend,
-        metaDataToSend
+        metaDataToSend,
+        productsMap
       );
       const urls = await getUrlsAPI(axiosPrivate, userID);
       const relavantUrls = urls.slice(
@@ -302,7 +310,6 @@ const AddCustomer = ({
               producedUrls={producedUrls}
               toggleModal={toggleModal}
             />
-           
           </React.Fragment>
         </Modal>
       ) : (
@@ -362,7 +369,7 @@ const AddCustomer = ({
               }
             }}
           />
-          <SearchList matrixData={matrixData}/>
+          <SearchList matrixData={matrixData} />
         </div>
         <button className="addCustomer-button" onClick={addCustomerToTable}>
           הוספת לקוח
@@ -402,6 +409,13 @@ const AddCustomer = ({
           onClick={() => produceDoc(productsMap)}
         >
           הפקת חשבונית
+        </button>
+        <button
+          className="deleteAll-button" disabled=
+          {matrixData.length === 0}
+          onClick={() => deleteAll()}
+          >
+          מחק הכל  
         </button>
       </div>
       {errorMessage?.length ? (

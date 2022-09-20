@@ -1,4 +1,8 @@
-import { numOfColBeforeProducts, numOfColAfterProducts, titleWithoutProduct } from "./constants";
+import {
+  numOfColBeforeProducts,
+  numOfColAfterProducts,
+  titleWithoutProduct,
+} from "./constants";
 import { getMatrixIDAPI } from "../api";
 import _ from "lodash";
 
@@ -45,6 +49,18 @@ export const addProductsToBalanceTable = (
     newBalanceTable.push(newRow);
   });
   return newBalanceTable;
+};
+
+export const deleteAllTables = (
+  setMatrixData,
+  setBalanceTableData,
+  setMatrixComments,
+  setSelectedProducts
+) => {
+  setMatrixData([]);
+  setBalanceTableData([]);
+  setSelectedProducts([]);
+  setMatrixComments([]);
 };
 
 export const createBalanceTable = (data) => {
@@ -117,22 +133,32 @@ export const removeColFromBalanceTable = (
     return newArr;
   });
 };
-export const numOfProducts = (matrixLength) => matrixLength - titleWithoutProduct;
+export const numOfProducts = (matrixLength) =>
+  matrixLength - titleWithoutProduct;
 
-export const customerNumbers = (matrixData) => matrixData.length - 1
+export const customerNumbers = (matrixData) => matrixData.length - 1;
 
-export const removeRowFromBalanceTable = (balanceTableData, tableRowToRemove) => {
-  const newBalanceTable = [...balanceTableData]
+export const removeRowFromBalanceTable = (
+  balanceTableData,
+  tableRowToRemove
+) => {
+  const newBalanceTable = [...balanceTableData];
 
-  const productsNum = numOfProducts(tableRowToRemove.length)
-  const inOrderRow = 2
-  const leftRow = 3
-  for (let i = numOfColBeforeProducts; i < numOfColBeforeProducts + productsNum; i++) {
-    newBalanceTable[inOrderRow][i] = newBalanceTable[inOrderRow][i] - tableRowToRemove[i]
-    newBalanceTable[leftRow][i] = newBalanceTable[leftRow][i] + tableRowToRemove[i]
+  const productsNum = numOfProducts(tableRowToRemove.length);
+  const inOrderRow = 2;
+  const leftRow = 3;
+  for (
+    let i = numOfColBeforeProducts;
+    i < numOfColBeforeProducts + productsNum;
+    i++
+  ) {
+    newBalanceTable[inOrderRow][i] =
+      newBalanceTable[inOrderRow][i] - tableRowToRemove[i];
+    newBalanceTable[leftRow][i] =
+      newBalanceTable[leftRow][i] + tableRowToRemove[i];
   }
-  return newBalanceTable
-}
+  return newBalanceTable;
+};
 
 export const getUniqProducts = (productsData) => {
   return _.uniqBy(productsData, "שם פריט");
@@ -198,7 +224,7 @@ export const handleMatrixData = (
   let matrix = JSON.parse(JSON.stringify(tableData));
   const titleLength = matrix[0].length;
   let tableDetails = matrix.slice(1);
-  const newTableDetails = []
+  const newTableDetails = [];
   const acountKeys = [];
   const metaData = [];
   const documentIDs = [];
@@ -226,7 +252,7 @@ export const handleMatrixData = (
         "שדות ריקים עבור הלקוח: ",
         rowData[0]
       );
-      validationFailed = true
+      validationFailed = true;
       break;
     }
     if (!driverID || !actionID || !docId) {
@@ -235,7 +261,7 @@ export const handleMatrixData = (
         ":לא נבחרו כל השדות עבור הלקוח",
         rowData[0]
       );
-      validationFailed = true
+      validationFailed = true;
       break;
     }
     driverIDs.push(driverID);
@@ -313,4 +339,13 @@ export const getProductsNameKeyMap = (products) => {
     (element) => (productNameKey[element["שם פריט"]] = element["מפתח פריט"])
   );
   return productNameKey;
+};
+
+export const getItemNames = (itemsKeys, productsMap) => {
+  const itemsNameArr = [];
+  itemsKeys.forEach((itemKey) => {
+    const productName = Object.keys(productsMap).find(key => productsMap[key] === itemKey);
+    itemsNameArr.push(productName);
+  });
+  return itemsNameArr;
 };

@@ -215,6 +215,11 @@ body {
   margin-left: 0;
 }
 
+.deleteAll-button {
+  @extend .addCustomer-button;
+  margin-right: 10px;
+}
+
 .trash-button {
   margin-top: 10px;
   margin-right: 20px;
@@ -222,8 +227,6 @@ body {
   &:hover{
     transform: scale(1.1);
   }
-  
-
 }
 
 .save-tables {

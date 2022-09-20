@@ -3,10 +3,10 @@ import TableCell from "./TableCell";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/fontawesome-free-solid";
 import { DataContext } from "../context/DataContext";
-import { removeRowFromBalanceTable } from "../utils/utils"
+import { removeRowFromBalanceTable, deleteAllTables } from "../utils/utils"
 
 const Table = ({ data, setData, tableName, disabled = false, cb, bgColor }) => {
-  const {balanceTableData, setBalanceTableData, setSelectedProducts} = useContext(DataContext)
+  const {balanceTableData, setBalanceTableData, setSelectedProducts, setMatrixComments} = useContext(DataContext)
 
 
   const showRemoveRow = (rowIndex) => {
@@ -19,9 +19,7 @@ const Table = ({ data, setData, tableName, disabled = false, cb, bgColor }) => {
   const removeRow = (rowIndex) => {
     const currentTable = [...data]
     if(currentTable.length === 2) {
-      setData([])
-      setBalanceTableData([])
-      setSelectedProducts([])
+      deleteAllTables(setData, setBalanceTableData, setMatrixComments, setSelectedProducts)
       return;
     } 
     const tableRowToRemove = currentTable[rowIndex]
