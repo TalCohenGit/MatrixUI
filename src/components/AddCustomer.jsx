@@ -5,7 +5,8 @@ import {
   handleMatrixData,
   handleCommentMatrixData,
   customerNumbers,
-  deleteAllTables
+  deleteAllTables,
+  createUrlMap
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -156,7 +157,7 @@ const AddCustomer = ({
     }
     try {
       setDisableProduction(true);
-      await sendTableAPI(
+      const produceRes = await sendTableAPI(
         axiosPrivate,
         validatedData,
         newMatrixId,
@@ -165,10 +166,12 @@ const AddCustomer = ({
         metaDataToSend,
         productsMap
       );
-      const urls = await getUrlsAPI(axiosPrivate, userID);
-      const relavantUrls = urls.slice(
-        urls.length - customerNumbers(matrixData),
-        urls.length
+      const urlDataArr = await getUrlsAPI(axiosPrivate, userID);
+      // const urlMaps = createUrlMap(urlDataArr)
+      // const urls = urlDataArr.map((element) => element["Accountname"]);
+      const relavantUrls = urlDataArr.slice(
+        urlDataArr.length - customerNumbers(matrixData),
+        urlDataArr.length
       );
       setProducedUrls(relavantUrls);
       toggleUrlsModal(true);
@@ -307,6 +310,7 @@ const AddCustomer = ({
           {/* <div>{dataToShow}</div> */}
           <React.Fragment>
             <UrlCheckboxes
+              axiosPrivate={axiosPrivate}
               producedUrls={producedUrls}
               toggleModal={toggleModal}
             />

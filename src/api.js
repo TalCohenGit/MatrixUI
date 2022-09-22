@@ -247,12 +247,27 @@ export const getUrlsAPI = async (axiosPrivate, userID) => {
   try {
     const res = await axiosPrivate.post("/api/loadDocUrls", { UserID: userID });
     const data = res.data.result.data;
-    const urls = data.map((element) => element["DocUrl"]);
-    return urls
+    return data.map((element)=> {
+      return {
+        DocUrl: element["DocUrl"],
+        DocNumber: element["DocNumber"]
+      }
+    })
   } catch (e) {
     console.log("error in sendTableAPI:", e);
   }
 };
+
+export const mergePdfAPI = async(axiosPrivate, filteredUrl) => {
+  try {
+    const config = { responseType: 'blob' };
+    const file = await axiosPrivate.post("/api/mergepdfs", filteredUrl,config);
+    console.log("file",file)
+    return file.data
+  } catch (e) {
+    console.log("error in mergePdfAPI:", e);
+  }
+}
 
 export const loadTablesByDatesAPI = async(axiosPrivate, fromDate, toDate) => {
   try {

@@ -5,6 +5,7 @@ import {
 } from "./constants";
 import { getMatrixIDAPI } from "../api";
 import _ from "lodash";
+import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 export const filterCustomers = (parsedName, input) => {
   return input.length && parsedName?.length && parsedName.includes(input);
@@ -340,6 +341,14 @@ export const getProductsNameKeyMap = (products) => {
   );
   return productNameKey;
 };
+
+// export const createUrlMap = (urlDataArr) => {
+//   const accountNameUrlMap = {};
+//   urlDataArr.map(
+//     (element) => accountNameUrlMap[element["DocURL"]] = element
+//     )
+//   return accountNameUrlMap
+// }
 
 export const getItemNames = (itemsKeys, productsMap) => {
   const itemsNameArr = [];

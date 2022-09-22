@@ -1,16 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { customerNumbers } from "../../utils/utils";
 import "./UrlCheckboxes.scss";
 import PropTypes from "prop-types";
+import {mergePdfAPI} from "../../api"
 
-const UrlCheckboxes = ({ producedUrls, toggleModal }) => {
+const UrlCheckboxes = ({ axiosPrivate, producedUrls, toggleModal }) => {
   const [printUrls, setPrintUrls] = useState([]);
   const [checkAll, setCheckAll] = useState(false);
 
   const handleChange = (url) => {
     const currentUrls = [...printUrls];
     const urlIndex = currentUrls.findIndex((urlObj) => {
-      return urlObj.url === url;
+      return urlObj.DocUrl === url;
     });
     currentUrls[urlIndex].checked = !currentUrls[urlIndex].checked;
     if (currentUrls.every((urlObj) => urlObj.checked)) {
@@ -32,39 +32,27 @@ const UrlCheckboxes = ({ producedUrls, toggleModal }) => {
     setPrintUrls(currentUrls);
   };
 
-  const sendToPrint = () => {
+  const sendUrlToPrint = async() => {
    const filteredUrls =  printUrls
-      .filter((urlObj) => urlObj.checked);
-    filteredUrls.forEach((urlObj) => {
-        window.open(urlObj.url, urlObj.url, "PRINT", "height=400,width=600");
-      });
-      // let i = 0;
-// if (i< filteredUrls.length) {}
-// const win = window.open(filteredUrls[i].url, "PRINT", "height=400,width=600"); 
-// var timer = setInterval(function() {  
-  
-//   if(win.closed) {  
-//       i = i + 1 
-//       console.log("closed",i)
-//       clearInterval(timer); 
-//   }  
-
-// }, 1000); 
-
-      // for(const urlObj of filteredUrls){
-      //   window.open(urlObj.url, urlObj.url, "PRINT", "height=400,width=600");
-      // }
+      .filter((urlObj) => urlObj.checked); 
+   let fileURL = filteredUrls[0]["DocUrl"]  
+   if(filteredUrls.length > 1) {
+    const file = await mergePdfAPI(axiosPrivate, filteredUrls)
+    fileURL = URL.createObjectURL(file);
+   }
+   window.open(fileURL, "PRINT", "height=400,width=600");
   };
+
   const urls = printUrls.map((urlObj) => {
-    const { url, checked } = urlObj;
+    const { DocUrl, checked } = urlObj;
     return (
-      <div key={url} className="url-row">
+      <div key={DocUrl} className="url-row">
         <input
           type="checkbox"
           checked={checked}
-          onChange={(e) => handleChange(url)}
+          onChange={(e) => handleChange(DocUrl)}
         />
-        <a href={url}>{url}</a>
+        <a href={DocUrl}>{DocUrl}</a>
         <br />
       </div>
     );
@@ -72,7 +60,8 @@ const UrlCheckboxes = ({ producedUrls, toggleModal }) => {
 
   useEffect(() => {
     const parsedPrintUrls = producedUrls.map((url) => {
-      return { checked: false, url };
+     url["checked"] = false
+     return url
     });
     setPrintUrls(parsedPrintUrls);
   }, []);
@@ -96,7 +85,7 @@ const UrlCheckboxes = ({ producedUrls, toggleModal }) => {
         <button
           className="send-to-print"
           disabled={printUrls.every((urlObj) => !urlObj.checked)}
-          onClick={() => sendToPrint()}
+          onClick={() => sendUrlToPrint()}
         >
           שלח להדפסה
         </button>
