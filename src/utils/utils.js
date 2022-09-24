@@ -207,6 +207,31 @@ export const getRefreshToken = () => {
   return localStorage.getItem("refreshToken");
 };
 
+export const parseStrimingData = (dataToParse) => {
+    let str = "["
+  
+    for (let i = 0; i <= dataToParse.length - 1; i++) {
+      if (dataToParse[i] == "}" && dataToParse[i + 1] == "{") {
+        str += dataToParse[i]
+        str += ","
+      } else {
+        str += dataToParse[i]
+      }
+      //  console.log(dataToParse[i])
+    }
+    str += "]"
+    console.log("*** str", JSON.parse(str, null, 2))
+    return JSON.parse(str, null, 2)
+}
+
+export const getActionFromRes = (dataRes) => {
+  const dataObj = dataRes?.length > 0 && dataRes[dataRes.length - 1]
+  console.log("dataObj", dataObj)
+  const producedObj = dataObj?.data?.resultData?.data[0]
+  console.log("producedObj", producedObj)
+  return producedObj?.Action
+}
+
 const setError = (setCustomerValidationFailed, errorMsg, customerName) => {
   if (setCustomerValidationFailed) {
     setCustomerValidationFailed({
@@ -234,7 +259,6 @@ export const handleMatrixData = (
   const docComments = [];
   let validationFailed = false;
 
-  // tableDetails = tableDetails.map((rowData) => {
   for (let rowData of tableDetails) {
     acountKeys.push(rowData[1]);
     metaData.push(rowData.pop());
@@ -319,9 +343,6 @@ export const handleCommentMatrixData = (
     cellsData.push(rowData);
     let docData = null;
     if (docComments[index]) {
-      // docComments[index].forEach(
-      //   (comment) => (docData[comment["selectValue"]] = comment["inputValue"])
-      // );
       docData = handleComments(docComments[index]);
     }
     docCommentsToSend.push(docData);
@@ -342,16 +363,9 @@ export const getProductsNameKeyMap = (products) => {
   return productNameKey;
 };
 
-// export const createUrlMap = (urlDataArr) => {
-//   const accountNameUrlMap = {};
-//   urlDataArr.map(
-//     (element) => accountNameUrlMap[element["DocURL"]] = element
-//     )
-//   return accountNameUrlMap
-// }
-
 export const getItemNames = (itemsKeys, productsMap) => {
   const itemsNameArr = [];
+  
   itemsKeys.forEach((itemKey) => {
     const productName = Object.keys(productsMap).find(key => productsMap[key] === itemKey);
     itemsNameArr.push(productName);

@@ -6,7 +6,7 @@ import {
   handleCommentMatrixData,
   customerNumbers,
   deleteAllTables,
-  createUrlMap
+  getActionFromRes
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -57,7 +57,7 @@ const AddCustomer = ({
   const [producedUrls, setProducedUrls] = useState("");
   const [disableProduction, setDisableProduction] = useState(false);
   const [toSaveDataModal, toggleToSaveDataModal] = useState(false);
-  const [dateValue, setDateValue] = useState("");
+  const [dateValue, setDateValue] = useState(new Date());
   const [savedMatrixName, setSavedMatrixName] = useState("");
   const [toLoadDataModal, toggleToLoadDataModal] = useState(false);
   const [isMatrixNames, toggleMatrixNames] = useState(false);
@@ -166,7 +166,9 @@ const AddCustomer = ({
         metaDataToSend,
         productsMap
       );
-      const urlDataArr = await getUrlsAPI(axiosPrivate, userID);
+      const action = getActionFromRes(produceRes)
+      console.log("***action", action)
+      const urlDataArr = await getUrlsAPI(axiosPrivate, action);
       // const urlMaps = createUrlMap(urlDataArr)
       // const urls = urlDataArr.map((element) => element["Accountname"]);
       const relavantUrls = urlDataArr.slice(

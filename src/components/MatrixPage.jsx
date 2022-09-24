@@ -34,6 +34,7 @@ import {
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
+import { format } from 'date-fns'
 
 function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const {
@@ -333,7 +334,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const saveTables = async (isBI, dateValue, matrixName) => {
     let date = null;
     if (dateValue) {
-      date = dateValue.format(dateFormat);
+      date = format(dateValue,dateFormat);
     }
     const {
       newMatrixId,
@@ -365,7 +366,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       metaDataToSend,
       isBI,
       date,
-      matrixName
+      matrixName,
+      productsMap
     );
   };
 
