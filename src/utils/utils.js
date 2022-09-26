@@ -217,18 +217,14 @@ export const parseStrimingData = (dataToParse) => {
       } else {
         str += dataToParse[i]
       }
-      //  console.log(dataToParse[i])
     }
     str += "]"
-    console.log("*** str", JSON.parse(str, null, 2))
     return JSON.parse(str, null, 2)
 }
 
 export const getActionFromRes = (dataRes) => {
   const dataObj = dataRes?.length > 0 && dataRes[dataRes.length - 1]
-  console.log("dataObj", dataObj)
   const producedObj = dataObj?.data?.resultData?.data[0]
-  console.log("producedObj", producedObj)
   return producedObj?.Action
 }
 

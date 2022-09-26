@@ -125,7 +125,6 @@ export const sendTableAPI = async (
     console.log("dataToSend:", JSON.stringify(dataToSend));
     const res = await axiosPrivate.post("/api/createdoc", { matrixesData });
     const parsedData = parseStrimingData(res.data);
-    console.log("***parsedData", parsedData);
     return parsedData;
   } catch (e) {
     console.log("error in sendTableAPI:", e);
@@ -272,7 +271,6 @@ export const mergePdfAPI = async (axiosPrivate, filteredUrl) => {
   try {
     const config = { responseType: "blob" };
     const file = await axiosPrivate.post("/api/mergepdfs", filteredUrl, config);
-    console.log("file", file);
     return file.data;
   } catch (e) {
     console.log("error in mergePdfAPI:", e);

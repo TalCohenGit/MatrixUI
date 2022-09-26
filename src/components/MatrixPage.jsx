@@ -110,7 +110,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       }
       setCustomerName("");
     } catch (e) {
-      console.log(e, "addCustomerToTable");
+      console.log(e, "error in addCustomerToTable");
     }
   };
 
@@ -334,7 +334,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const saveTables = async (isBI, dateValue, matrixName) => {
     let date = null;
     if (dateValue) {
-      date = format(dateValue,dateFormat);
+      date = format(dateValue, 'MM/dd/yyyy');
     }
     const {
       newMatrixId,

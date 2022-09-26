@@ -23,6 +23,7 @@ import DateRangePickerToLoad from "./DateRangePickerToLoad";
 import { addDays } from "date-fns";
 import UrlCheckboxes from "./UrlCheckboxes/UrlCheckboxes";
 import LoaderContainer from "./LoaderContainer/LoaderContainer";
+import SaveModal from "./SaveModal/SaveModal";
 
 const AddCustomer = ({
   customerName,
@@ -167,10 +168,7 @@ const AddCustomer = ({
         productsMap
       );
       const action = getActionFromRes(produceRes)
-      console.log("***action", action)
       const urlDataArr = await getUrlsAPI(axiosPrivate, action);
-      // const urlMaps = createUrlMap(urlDataArr)
-      // const urls = urlDataArr.map((element) => element["Accountname"]);
       const relavantUrls = urlDataArr.slice(
         urlDataArr.length - customerNumbers(matrixData),
         urlDataArr.length
@@ -200,7 +198,7 @@ const AddCustomer = ({
   const handleSaving = async () => {
     const isBI = true;
     await saveTables(isBI, dateValue, savedMatrixName);
-    cancleSave();
+    cancelSave();
   };
 
   const formatDate = (dateValue) => {
@@ -230,38 +228,9 @@ const AddCustomer = ({
     cancleLoading();
   };
 
-  const cancleSave = () => {
+  const cancelSave = () => {
     toggleToSaveDataModal(false);
-    setDateValue("");
-  };
-
-  const saveModal = (isOpen, toggleModal, handleAction, action) => {
-    return (
-      <Modal
-        isOpen={isOpen}
-        toggleModal={cancleSave}
-        modalHeader="פרטים לשמירה"
-      >
-        <div>
-          <label>שם</label>
-          <input
-            type="text"
-            id="matrixName"
-            onChange={(e) => setSavedMatrixName(e.target.value)}
-          />
-          <p>תאריך לשמירה</p>
-          <DatePicker dateValue={dateValue} setDateValue={setDateValue} />
-        </div>
-        <div className="action-buttons">
-          <button className="cancel-button" onClick={() => handleAction()}>
-            {action}
-          </button>
-          <button className="cancel-button" onClick={() => cancleSave()}>
-            בטל
-          </button>
-        </div>
-      </Modal>
-    );
+    setDateValue(new Date());
   };
 
   const cancleLoading = () => {
@@ -271,7 +240,7 @@ const AddCustomer = ({
     setDateRanges(intialRangeState);
   };
 
-  const loadModal = (toLoadDataModal) => {
+  const LoadModal = (toLoadDataModal) => {
     return (
       <Modal
         isOpen={toLoadDataModal}
@@ -356,13 +325,29 @@ const AddCustomer = ({
               header={"מסמכים שהופקו"}
             />
           }
-          {saveModal(
-            toSaveDataModal,
-            toggleToSaveDataModal,
-            handleSaving,
-            "שמירה"
-          )}
-          {loadModal(toLoadDataModal, toggleToLoadDataModal)}
+          {
+           <SaveModal
+          isOpen={toSaveDataModal}
+          toggleModal={toggleToSaveDataModal}
+          cancelSave={cancelSave}
+          dateValue={dateValue}
+          setDateValue={setDateValue}
+          //  handleSaving={toSaveDataModal}
+           handleAction={handleSaving}
+           action="שמירה"
+           savedMatrixName={savedMatrixName}
+           setSavedMatrixName={setSavedMatrixName}
+
+           />
+          //  isOpen, toggleModal, handleAction, action,savedMatrixName
+          // SaveModal(
+          //   toSaveDataModal,
+          //   toggleToSaveDataModal,
+          //   handleSaving,
+          //   "שמירה"
+          // )
+          }
+          {LoadModal(toLoadDataModal, toggleToLoadDataModal)}
           <input
             type="text"
             value={customerName}
@@ -404,7 +389,7 @@ const AddCustomer = ({
           disabled={matrixData.length === 0}
           onClick={() => saveData()}
         >
-          שמירה
+         שמירה בשם
         </button>
         <button className="save-tables" onClick={() => loadData()}>
           טעינה

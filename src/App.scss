@@ -373,3 +373,19 @@ body {
 .calendar-save {
 direction: ltr;
 }
+
+.save-matrix-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  h3 {
+    margin-bottom: 0;
+  }
+}
+
+.disabled {
+  @extend .save-button;
+  pointer-events: none;
+  opacity: 0.5;
+}
