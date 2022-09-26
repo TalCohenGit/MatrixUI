@@ -6,7 +6,8 @@ import {
   handleCommentMatrixData,
   customerNumbers,
   deleteAllTables,
-  getActionFromRes
+  getActionFromRes,
+  getMatrixID,
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -14,16 +15,16 @@ import {
   getMatrixIDAPI,
   getUrlsAPI,
   sendTableAPI,
-  loadTablesByDatesAPI,
+  getTablesByDatesAPI,
 } from "../api";
 import Modal from "../common/components/Modal/Modal";
 import DropDownMatrixNames from "../components/DropDownMatrixNames";
-import DatePicker from "./DatePicker";
 import DateRangePickerToLoad from "./DateRangePickerToLoad";
 import { addDays } from "date-fns";
 import UrlCheckboxes from "./UrlCheckboxes/UrlCheckboxes";
 import LoaderContainer from "./LoaderContainer/LoaderContainer";
 import SaveModal from "./SaveModal/SaveModal";
+import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 const AddCustomer = ({
   customerName,
@@ -31,7 +32,6 @@ const AddCustomer = ({
   addCustomerToTable,
   addProductToTable,
   axiosPrivate,
-  userID,
   saveTables,
   loadTables,
 }) => {
@@ -130,17 +130,24 @@ const AddCustomer = ({
   };
 
   const deleteAll = () => {
-    deleteAllTables(setMatrixData, setBalanceTableData, setMatrixComments, setSelectedProducts)
-  }
+    deleteAllTables(
+      setMatrixData,
+      setBalanceTableData,
+      setMatrixComments,
+      setSelectedProducts
+    );
+  };
 
   const produceDoc = async (productsMap) => {
     if (matrixData.length <= 1) {
       return;
     }
+    const toValidateData = true;
     const validatedData = handleMatrixData(
       matrixData,
       productsMap,
-      setCustomerValidationFailed
+      setCustomerValidationFailed,
+      toValidateData
     );
     if (!validatedData) {
       return;
@@ -152,7 +159,8 @@ const AddCustomer = ({
         validatedData["docComments"],
         validatedData["metaData"]
       );
-    let newMatrixId = matrixID;
+    let newMatrixId = getMatrixID();
+    console.log("newMatrixId", newMatrixId)
     if (!newMatrixId) {
       newMatrixId = await getMatrixIDAPI(axiosPrivate);
     }
@@ -167,7 +175,7 @@ const AddCustomer = ({
         metaDataToSend,
         productsMap
       );
-      const action = getActionFromRes(produceRes)
+      const action = getActionFromRes(produceRes);
       const urlDataArr = await getUrlsAPI(axiosPrivate, action);
       const relavantUrls = urlDataArr.slice(
         urlDataArr.length - customerNumbers(matrixData),
@@ -187,9 +195,13 @@ const AddCustomer = ({
     setChecked(currentChecked);
   };
 
-  const saveData = () => {
+  const saveWithNameData = () => {
     toggleToSaveDataModal(true);
   };
+
+  // const savingMatrix = () => {
+
+  // }
 
   const loadData = () => {
     toggleToLoadDataModal(true);
@@ -210,7 +222,7 @@ const AddCustomer = ({
   const loadTableNames = async () => {
     const startDate = formatDate(dateRanges[0]["startDate"]);
     const endDate = formatDate(dateRanges[0]["endDate"]);
-    const matrixesDetails = await loadTablesByDatesAPI(
+    const matrixesDetails = await getTablesByDatesAPI(
       axiosPrivate,
       startDate,
       endDate
@@ -326,26 +338,25 @@ const AddCustomer = ({
             />
           }
           {
-           <SaveModal
-          isOpen={toSaveDataModal}
-          toggleModal={toggleToSaveDataModal}
-          cancelSave={cancelSave}
-          dateValue={dateValue}
-          setDateValue={setDateValue}
-          //  handleSaving={toSaveDataModal}
-           handleAction={handleSaving}
-           action="שמירה"
-           savedMatrixName={savedMatrixName}
-           setSavedMatrixName={setSavedMatrixName}
-
-           />
-          //  isOpen, toggleModal, handleAction, action,savedMatrixName
-          // SaveModal(
-          //   toSaveDataModal,
-          //   toggleToSaveDataModal,
-          //   handleSaving,
-          //   "שמירה"
-          // )
+            <SaveModal
+              isOpen={toSaveDataModal}
+              toggleModal={toggleToSaveDataModal}
+              cancelSave={cancelSave}
+              dateValue={dateValue}
+              setDateValue={setDateValue}
+              //  handleSaving={toSaveDataModal}
+              handleAction={handleSaving}
+              action="שמירה"
+              savedMatrixName={savedMatrixName}
+              setSavedMatrixName={setSavedMatrixName}
+            />
+            //  isOpen, toggleModal, handleAction, action,savedMatrixName
+            // SaveModal(
+            //   toSaveDataModal,
+            //   toggleToSaveDataModal,
+            //   handleSaving,
+            //   "שמירה"
+            // )
           }
           {LoadModal(toLoadDataModal, toggleToLoadDataModal)}
           <input
@@ -386,10 +397,17 @@ const AddCustomer = ({
         ) : null}
         <button
           className="save-tables"
-          disabled={matrixData.length === 0}
-          onClick={() => saveData()}
+          disabled={matrixData.length === 0 || !getMatrixID()}
+          onClick={() => saveWithNameData()}
         >
-         שמירה בשם
+          עדכון נתונים
+        </button>
+        <button
+          className="save-tables"
+          disabled={matrixData.length === 0}
+          onClick={() => saveWithNameData()}
+        >
+          שמירה בשם
         </button>
         <button className="save-tables" onClick={() => loadData()}>
           טעינה
@@ -402,11 +420,11 @@ const AddCustomer = ({
           הפקת חשבונית
         </button>
         <button
-          className="deleteAll-button" disabled=
-          {matrixData.length === 0}
+          className="deleteAll-button"
+          disabled={matrixData.length === 0}
           onClick={() => deleteAll()}
-          >
-          מחק הכל  
+        >
+          מחק נתונים
         </button>
       </div>
       {errorMessage?.length ? (

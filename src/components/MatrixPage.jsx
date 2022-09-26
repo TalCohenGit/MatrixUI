@@ -12,8 +12,8 @@ import {
   getDriverList,
   logoutAPI,
   refreshTokenAPI,
-  loadAllTablesAPI,
-  loadTablesByDatesAPI
+  getMatrixByIDAPI,
+  getTablesByDatesAPI,
 } from "../api";
 import { DataContext } from "../context/DataContext";
 import {
@@ -23,18 +23,19 @@ import {
   getUniqProducts,
   getRefreshToken,
   getMatrixesData,
-  numOfProducts
+  numOfProducts,
+  saveMatrixID,
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
   numOfColBeforeProducts,
   numOfColAfterProducts,
-  dateFormat
+  dateFormat,
 } from "../utils/constants";
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
-import { format } from 'date-fns'
+import { format } from "date-fns";
 
 function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const {
@@ -199,7 +200,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       currentMatrix.push(getTableTitle());
     }
     let newMatrix = currentMatrix;
-    const numCurrentProducts = numOfProducts(currentMatrix[0].length)
+    const numCurrentProducts = numOfProducts(currentMatrix[0].length);
     if (event.action === "select-option") {
       let productsToAdd = selectedProductNames;
       if (event.option.value === "*") {
@@ -289,7 +290,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   }, [accessToken]);
 
   useEffect(() => {
-    
     (async () => {
       let currentTimeLimit = timeLimit;
       if (!currentTimeLimit) {
@@ -334,7 +334,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const saveTables = async (isBI, dateValue, matrixName) => {
     let date = null;
     if (dateValue) {
-      date = format(dateValue, 'MM/dd/yyyy');
+      date = format(dateValue, "MM/dd/yyyy");
     }
     const {
       newMatrixId,
@@ -372,21 +372,20 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const loadTables = async (matrixID) => {
-        
-    //   const matrixID = "55fc21b42a0eeda60de39ef02b27398794d6d612412c318921ac2052882ba6ae"
-    const matrixesUiData = await loadAllTablesAPI(axiosPrivate, matrixID)
+    const {matrixesUiData} = await getMatrixByIDAPI(axiosPrivate, matrixID);
     if (matrixesUiData) {
-        loadData(matrixesUiData, setMatrixData, 0);
-        loadData(matrixesUiData, setMatrixComments, 1);
-        loadData(matrixesUiData, setSelectedProducts, 2);
-        loadData(matrixesUiData, setBalanceTableData, 3);
-      }
-  }
+      loadData(matrixesUiData, setMatrixData, 0);
+      loadData(matrixesUiData, setMatrixComments, 1);
+      loadData(matrixesUiData, setSelectedProducts, 2);
+      loadData(matrixesUiData, setBalanceTableData, 3);
+    }
+    saveMatrixID(matrixID);
+  };
 
   const onUnload = async (e) => {
     // if (matrixData?.length > 1) {
-      const isBI = false;
-      await saveTables(isBI);
+    const isBI = false;
+    await saveTables(isBI);
     // }
   };
 
@@ -405,7 +404,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       const currentUserID = getUserId();
       const savedData = await loadTablesAPI(axiosPrivate, currentUserID);
       if (savedData) {
-        const matrixesUiData = savedData.matrixesUiData
+        const matrixesUiData = savedData.matrixesUiData;
         loadData(matrixesUiData, setMatrixData, 0);
         loadData(matrixesUiData, setMatrixComments, 1);
         loadData(matrixesUiData, setSelectedProducts, 2);
@@ -422,7 +421,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         productsData?.length > 0 ? getUniqProducts(productsData) : undefined;
       setProducts(uniqProducts);
       setDrivers(driverList);
-      const productsMap = uniqProducts? getProductsNameKeyMap(uniqProducts) : undefined;
+      const productsMap = uniqProducts
+        ? getProductsNameKeyMap(uniqProducts)
+        : undefined;
       setProductsMap(productsMap);
     })();
   }, []);
@@ -442,7 +443,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       >
         <div>{dataDoubles}</div>
         <div className="action-buttons">
-          <button className="cancel-button" onClick={() => toggleValidationModal(false)}>
+          <button
+            className="cancel-button"
+            onClick={() => toggleValidationModal(false)}
+          >
             בטל
           </button>
         </div>

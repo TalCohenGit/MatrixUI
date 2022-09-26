@@ -83,7 +83,7 @@ const getMatrixesDataObj = (
 
   return {
     mainMatrix: {
-      matrixID: matrixID,
+      matrixID,
       ActionID: 1,
       AccountKey: acountKeys,
       DocumentID: documentIDsMock,
@@ -167,27 +167,6 @@ export const saveTablesAPI = async (
   }
 };
 
-export const loadTablesAPI = async (axiosPrivate, userID) => {
-  try {
-    const res = await axiosPrivate.post("/api/loadmatrixes", {
-      userID: userID,
-    });
-    const loadArr = res.data.result.data;
-    const length = loadArr?.length;
-    if (length) {
-      const lastLoad = loadArr[length - 1];
-      return {
-        matrixID: lastLoad.matrixID,
-        matrixName: lastLoad.matrixName,
-        matrixesUiData: JSON.parse(JSON.parse(lastLoad.matrixesUiData)),
-        saveData: new Date(lastLoad.createdAt),
-      };
-    }
-  } catch (e) {
-    console.log("error in loadTablesAPI: ", e);
-  }
-};
-
 export const loginUserAPI = async (userEmail, password) => {
   try {
     const res = await axiosAuth.post("/api/login", {
@@ -250,7 +229,6 @@ export const logoutAPI = async () => {
 
 export const getUrlsAPI = async (axiosPrivate, action) => {
   try {
-    // const res = await axiosPrivate.post("/api/loadDocUrls", { UserID: userID });
     const res = await axiosPrivate.post("/api/getdata", {
       collection: "DocData",
       searchParams: { Action: action },
@@ -277,7 +255,7 @@ export const mergePdfAPI = async (axiosPrivate, filteredUrl) => {
   }
 };
 
-export const loadTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
+export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
     let dates = {
       Date: {
@@ -305,11 +283,11 @@ export const loadTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
       });
     }
   } catch (e) {
-    console.log("error in loadAllTablesAPI:", e);
+    console.log("error in getTablesByDatesAPI:", e);
   }
 };
 
-export const loadAllTablesAPI = async (axiosPrivate, matrixID) => {
+export const getMatrixByIDAPI = async (axiosPrivate, matrixID) => {
   try {
     const res = await axiosPrivate.post("/api/getdata", {
       collection: "MtxLog",
@@ -317,9 +295,34 @@ export const loadAllTablesAPI = async (axiosPrivate, matrixID) => {
     });
     const data = res.data.result.data;
     if (data?.length) {
-      return JSON.parse(JSON.parse(data[0]["matrixesUiData"]));
+      return {
+        matrixesUiData: JSON.parse(JSON.parse(data[0]["matrixesUiData"])),
+        isProduced: data[0]["isProduced"]
+      }
     }
   } catch (e) {
-    console.log("error in loadAllTablesAPI:", e);
+    console.log("error in getMatrixByIDAPI:", e);
+  }
+};
+
+export const loadTablesAPI = async (axiosPrivate, userID) => {
+  try {
+    const res = await axiosPrivate.post("/api/loadmatrixes", {
+      userID: userID,
+    });
+    const loadArr = res.data.result.data;
+    const length = loadArr?.length;
+    if (length) {
+      const lastLoad = loadArr[length - 1];
+      return {
+        matrixID: lastLoad.matrixID,
+        matrixName: lastLoad.matrixName,
+        matrixesUiData: JSON.parse(JSON.parse(lastLoad.matrixesUiData)),
+        saveData: new Date(lastLoad.createdAt),
+        isProduced: lastLoad.isProduced
+      };
+    }
+  } catch (e) {
+    console.log("error in loadTablesAPI: ", e);
   }
 };

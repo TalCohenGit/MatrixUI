@@ -19,7 +19,7 @@ const SaveModal = ({isOpen, cancelSave, handleAction, action,savedMatrixName, se
               setSavedMatrixName(e.target.value)}}
             placeholder="בחר שם למטריצה"
           />
-          <h3>בחר תאריך</h3>
+          <h3>בחר תאריך ערך</h3>
           <DatePicker dateValue={dateValue} setDateValue={setDateValue} />
         </div>
         <div className="action-buttons">

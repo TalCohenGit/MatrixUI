@@ -171,6 +171,16 @@ const validateValueExist = (valueToCheck, setComment) => {
   }
 };
 
+export const saveMatrixID = (matrixID) => {
+  if (matrixID) {
+    localStorage.setItem("matrixID", matrixID)
+  }
+}
+
+export const getMatrixID = () => {
+  return localStorage.getItem("matrixID")
+}
+
 export const getMatrixesData = async (
   axiosPrivate,
   matrixData,
@@ -179,6 +189,7 @@ export const getMatrixesData = async (
   setCustomerValidationFailed
 ) => {
   const newMatrixId = await getMatrixIDAPI(axiosPrivate);
+  saveMatrixID(newMatrixId)
   const validatedData = handleMatrixData(
     matrixData,
     productsMap,
@@ -241,7 +252,8 @@ const setError = (setCustomerValidationFailed, errorMsg, customerName) => {
 export const handleMatrixData = (
   tableData,
   productsMap,
-  setCustomerValidationFailed
+  setCustomerValidationFailed,
+  toValidateData = false
 ) => {
   let matrix = JSON.parse(JSON.stringify(tableData));
   const titleLength = matrix[0].length;
@@ -267,29 +279,31 @@ export const handleMatrixData = (
     const validRow = rowData
       .slice(numOfColBeforeProducts)
       .find((element) => element !== 0);
-    if (!validRow) {
-      setError(
-        setCustomerValidationFailed,
-        "שדות ריקים עבור הלקוח: ",
-        rowData[0]
-      );
-      validationFailed = true;
-      break;
-    }
-    if (!driverID || !actionID || !docId) {
-      setError(
-        setCustomerValidationFailed,
-        ":לא נבחרו כל השדות עבור הלקוח",
-        rowData[0]
-      );
-      validationFailed = true;
-      break;
+    if (toValidateData) {
+      if (!validRow) {
+        setError(
+          setCustomerValidationFailed,
+          "שדות ריקים עבור הלקוח: ",
+          rowData[0]
+        );
+        validationFailed = true;
+        break;
+      }
+      if (!driverID || !actionID || !docId) {
+        setError(
+          setCustomerValidationFailed,
+          ":לא נבחרו כל השדות עבור הלקוח",
+          rowData[0]
+        );
+        validationFailed = true;
+        break;
+      }
     }
     driverIDs.push(driverID);
     newTableDetails.push(rowData.slice(3));
   }
 
-  if (validationFailed) {
+  if (toValidateData && validationFailed) {
     return;
   }
 
