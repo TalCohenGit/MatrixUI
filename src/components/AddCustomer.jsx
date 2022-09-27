@@ -7,7 +7,6 @@ import {
   customerNumbers,
   deleteAllTables,
   getActionFromRes,
-  getMatrixID,
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -24,7 +23,9 @@ import { addDays } from "date-fns";
 import UrlCheckboxes from "./UrlCheckboxes/UrlCheckboxes";
 import LoaderContainer from "./LoaderContainer/LoaderContainer";
 import SaveModal from "./SaveModal/SaveModal";
+import LoadModal from "./Modals/LoadModal";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
+import { savingAction, savingAsAction, produceDocAction } from "../utils/constants";
 
 const AddCustomer = ({
   customerName,
@@ -34,6 +35,9 @@ const AddCustomer = ({
   axiosPrivate,
   saveTables,
   loadTables,
+  setMatrixName,
+  matrixDate,
+  setMatrixDate
 }) => {
   const {
     toggleList,
@@ -48,7 +52,7 @@ const AddCustomer = ({
     products,
     matrixID,
     selectedProducts,
-    setSelectedProducts,
+    setSelectedProducts
   } = useContext(DataContext);
   const [customerValidationFailed, setCustomerValidationFailed] = useState({
     failure: false,
@@ -58,8 +62,8 @@ const AddCustomer = ({
   const [producedUrls, setProducedUrls] = useState("");
   const [disableProduction, setDisableProduction] = useState(false);
   const [toSaveDataModal, toggleToSaveDataModal] = useState(false);
-  const [dateValue, setDateValue] = useState(new Date());
-  const [savedMatrixName, setSavedMatrixName] = useState("");
+  const [toUpdateDataModal, toggleToUpdateDataModal] = useState(false);
+  // const [dateValue, setDateValue] = useState(new Date());
   const [toLoadDataModal, toggleToLoadDataModal] = useState(false);
   const [isMatrixNames, toggleMatrixNames] = useState(false);
   const [matrixesDetails, setMatrixesDetails] = useState([]);
@@ -142,12 +146,12 @@ const AddCustomer = ({
     if (matrixData.length <= 1) {
       return;
     }
-    const toValidateData = true;
+    const action = produceDocAction;
     const validatedData = handleMatrixData(
       matrixData,
       productsMap,
       setCustomerValidationFailed,
-      toValidateData
+      action
     );
     if (!validatedData) {
       return;
@@ -159,8 +163,8 @@ const AddCustomer = ({
         validatedData["docComments"],
         validatedData["metaData"]
       );
-    let newMatrixId = getMatrixID();
-    console.log("newMatrixId", newMatrixId)
+    let newMatrixId = matrixID;
+    console.log("newMatrixId", newMatrixId);
     if (!newMatrixId) {
       newMatrixId = await getMatrixIDAPI(axiosPrivate);
     }
@@ -199,23 +203,23 @@ const AddCustomer = ({
     toggleToSaveDataModal(true);
   };
 
-  // const savingMatrix = () => {
-
-  // }
+  const savingMatrix = () => {
+    toggleToUpdateDataModal(true);
+  };
 
   const loadData = () => {
     toggleToLoadDataModal(true);
   };
 
-  const handleSaving = async () => {
+  const handleSaving = async (action, toggleModal) => {
     const isBI = true;
-    await saveTables(isBI, dateValue, savedMatrixName);
-    cancelSave();
+    await saveTables(isBI, action);
+    toggleModal(false);
   };
 
-  const formatDate = (dateValue) => {
-    if (dateValue) {
-      return dateValue.toLocaleDateString("en-us");
+  const formatDate = () => {
+    if (matrixDate) {
+      return matrixDate.toLocaleDateString("en-us");
     }
   };
 
@@ -237,52 +241,23 @@ const AddCustomer = ({
 
   const loadTablesByID = async (matrixID) => {
     await loadTables(matrixID);
-    cancleLoading();
+    cancelLoading();
   };
 
   const cancelSave = () => {
     toggleToSaveDataModal(false);
-    setDateValue(new Date());
+    // setDateValue(new Date());
   };
 
-  const cancleLoading = () => {
+  const cancelUpdate = () => {
+    toggleToUpdateDataModal(false);
+  };
+
+  const cancelLoading = () => {
     toggleToLoadDataModal(false);
     toggleMatrixNames(false);
     setMatrixesDetails([]);
     setDateRanges(intialRangeState);
-  };
-
-  const LoadModal = (toLoadDataModal) => {
-    return (
-      <Modal
-        isOpen={toLoadDataModal}
-        toggleModal={cancleLoading}
-        modalHeader="טעינה"
-      >
-        <div>
-          <p>בחירת טווח תאריכים</p>
-          <DateRangePickerToLoad
-            dateRanges={dateRanges}
-            setDateRanges={setDateRanges}
-          />
-          {/* <DatePicker dateValue={toDateValue} setDateValue={setToDateValue} /> */}
-        </div>
-        <div className="action-buttons">
-          <button className="cancel-button" onClick={() => loadTableNames()}>
-            חיפוש
-          </button>
-          <button className="cancel-button" onClick={() => cancleLoading()}>
-            בטל
-          </button>
-        </div>
-        {isMatrixNames && (
-          <DropDownMatrixNames
-            matrixesDetails={matrixesDetails}
-            loadTablesByID={loadTablesByID}
-          />
-        )}
-      </Modal>
-    );
   };
 
   const ListModal = ({ isOpen, toggleModal, header }) => {
@@ -341,24 +316,35 @@ const AddCustomer = ({
             <SaveModal
               isOpen={toSaveDataModal}
               toggleModal={toggleToSaveDataModal}
-              cancelSave={cancelSave}
-              dateValue={dateValue}
-              setDateValue={setDateValue}
-              //  handleSaving={toSaveDataModal}
+              dateValue={matrixDate}
+              setDateValue={setMatrixDate}
               handleAction={handleSaving}
-              action="שמירה"
-              savedMatrixName={savedMatrixName}
-              setSavedMatrixName={setSavedMatrixName}
+              action={savingAsAction}
+              setMatrixName={setMatrixName}
             />
-            //  isOpen, toggleModal, handleAction, action,savedMatrixName
-            // SaveModal(
-            //   toSaveDataModal,
-            //   toggleToSaveDataModal,
-            //   handleSaving,
-            //   "שמירה"
-            // )
           }
-          {LoadModal(toLoadDataModal, toggleToLoadDataModal)}
+          {
+            <SaveModal
+              isOpen={toUpdateDataModal}
+              toggleModal={toggleToUpdateDataModal}
+              dateValue={matrixDate}
+              setDateValue={setMatrixDate}
+              handleAction={handleSaving}
+              action={savingAction}
+              setMatrixName={setMatrixName}
+            />
+          }
+          <LoadModal
+            isOpen={toLoadDataModal}
+            toggleModal={cancelLoading}
+            dateRanges={dateRanges}
+            setDateRanges={setDateRanges}
+            onCancel={cancelLoading}
+            onSearch={loadTableNames}
+            isMatrixNames={isMatrixNames}
+            matrixesDetails={matrixesDetails}
+            loadTablesByID={loadTablesByID}
+          />
           <input
             type="text"
             value={customerName}
@@ -397,10 +383,10 @@ const AddCustomer = ({
         ) : null}
         <button
           className="save-tables"
-          disabled={matrixData.length === 0 || !getMatrixID()}
-          onClick={() => saveWithNameData()}
+          disabled={matrixData.length === 0 || !matrixID}
+          onClick={() => savingMatrix()}
         >
-          עדכון נתונים
+          שמירה
         </button>
         <button
           className="save-tables"

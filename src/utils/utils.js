@@ -2,6 +2,8 @@ import {
   numOfColBeforeProducts,
   numOfColAfterProducts,
   titleWithoutProduct,
+  savingAsAction,
+  produceDocAction
 } from "./constants";
 import { getMatrixIDAPI } from "../api";
 import _ from "lodash";
@@ -171,29 +173,35 @@ const validateValueExist = (valueToCheck, setComment) => {
   }
 };
 
-export const saveMatrixID = (matrixID) => {
-  if (matrixID) {
-    localStorage.setItem("matrixID", matrixID)
-  }
-}
+// export const saveMatrixID = (matrixID) => {
+//   if (matrixID) {
+//     localStorage.setItem("matrixID", matrixID)
+//   }
+// }
 
-export const getMatrixID = () => {
-  return localStorage.getItem("matrixID")
-}
+// export const getMatrixID = () => {
+//   return localStorage.getItem("matrixID")
+// }
 
 export const getMatrixesData = async (
   axiosPrivate,
   matrixData,
   productsMap,
   matrixComments,
+  matrixID,
+  action,
   setCustomerValidationFailed
 ) => {
-  const newMatrixId = await getMatrixIDAPI(axiosPrivate);
-  saveMatrixID(newMatrixId)
+  let newMatrixId = matrixID
+  if(action === savingAsAction) {
+    console.log("New Saving")
+    newMatrixId = await getMatrixIDAPI(axiosPrivate);
+  }
   const validatedData = handleMatrixData(
     matrixData,
     productsMap,
-    setCustomerValidationFailed
+    setCustomerValidationFailed,
+    action
   );
   if (!validatedData) {
     return;
@@ -253,7 +261,7 @@ export const handleMatrixData = (
   tableData,
   productsMap,
   setCustomerValidationFailed,
-  toValidateData = false
+  action
 ) => {
   let matrix = JSON.parse(JSON.stringify(tableData));
   const titleLength = matrix[0].length;
@@ -279,7 +287,7 @@ export const handleMatrixData = (
     const validRow = rowData
       .slice(numOfColBeforeProducts)
       .find((element) => element !== 0);
-    if (toValidateData) {
+    if (action === produceDocAction) {
       if (!validRow) {
         setError(
           setCustomerValidationFailed,
@@ -303,7 +311,7 @@ export const handleMatrixData = (
     newTableDetails.push(rowData.slice(3));
   }
 
-  if (toValidateData && validationFailed) {
+  if (action === produceDocAction && validationFailed) {
     return;
   }
 

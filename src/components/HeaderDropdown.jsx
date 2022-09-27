@@ -9,6 +9,9 @@ const HeaderDropDown = ({ headerText, data, setData, colIndex, rowIndex }) => {
  
   const customStyles = {
     indicatorSeparator: () => ({ display: "none" }),
+    // menu: () => ({
+    //   direction: "ltr",
+    // }),
   };
  
   const options = products

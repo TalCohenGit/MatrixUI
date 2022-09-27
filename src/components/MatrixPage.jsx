@@ -24,13 +24,14 @@ import {
   getRefreshToken,
   getMatrixesData,
   numOfProducts,
-  saveMatrixID,
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
   numOfColBeforeProducts,
   numOfColAfterProducts,
   dateFormat,
+  savingAsAction,
+  savingAction
 } from "../utils/constants";
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
@@ -60,10 +61,15 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     setTimelimit,
     userID,
     setUserID,
+    matrixID,
     setMatrixID,
     selectedProducts,
     setSelectedProducts,
     productsMap,
+    matrixName,
+    setMatrixName,
+    matrixDate,
+    setMatrixDate
   } = useContext(DataContext);
 
   const [isOpenValidationModal, toggleValidationModal] = useState(false);
@@ -331,10 +337,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return currentUserID;
   };
 
-  const saveTables = async (isBI, dateValue, matrixName) => {
+  const saveTables = async (isBI, action) => {
     let date = null;
-    if (dateValue) {
-      date = format(dateValue, "MM/dd/yyyy");
+    if (matrixDate) {
+      date = format(matrixDate, "MM/dd/yyyy");
     }
     const {
       newMatrixId,
@@ -346,8 +352,15 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       axiosPrivate,
       matrixData,
       productsMap,
-      matrixComments
+      matrixComments,
+      matrixID,
+      action
     );
+    
+    if(action === savingAsAction) {
+      setMatrixID(newMatrixId)
+    }
+  
     const matrixesUiData = JSON.stringify([
       matrixData,
       matrixComments,
@@ -372,21 +385,24 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const loadTables = async (matrixID) => {
-    const {matrixesUiData} = await getMatrixByIDAPI(axiosPrivate, matrixID);
+    const {matrixesUiData, isProduced, matrixName, date} = await getMatrixByIDAPI(axiosPrivate, matrixID);
     if (matrixesUiData) {
       loadData(matrixesUiData, setMatrixData, 0);
       loadData(matrixesUiData, setMatrixComments, 1);
       loadData(matrixesUiData, setSelectedProducts, 2);
       loadData(matrixesUiData, setBalanceTableData, 3);
     }
-    saveMatrixID(matrixID);
+    setMatrixID(matrixID);
+    setMatrixName(matrixName);
   };
 
   const onUnload = async (e) => {
-    // if (matrixData?.length > 1) {
     const isBI = false;
-    await saveTables(isBI);
-    // }
+    let action = savingAction
+    if(matrixID) {
+      action = savingAsAction
+    }
+    await saveTables(isBI, action);
   };
 
   const loadData = (matrixesUiData, stateToChange, index) => {
@@ -410,6 +426,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         loadData(matrixesUiData, setSelectedProducts, 2);
         loadData(matrixesUiData, setBalanceTableData, 3);
         setMatrixID(savedData.matrixID);
+        setMatrixName(savedData.matrixName)
+        setMatrixDate(savedData.matrixDate)
       }
       const [productsData, customerList, driverList] = await Promise.all([
         getProductsAPI(axiosPrivate, validationModal),
@@ -434,7 +452,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   }, [matrixData, matrixComments]);
 
   return drivers?.length ? (
-    <div className="app-container">
+    <div className="matrix-page">
       <h1> MatrixUi </h1>
       <Modal
         isOpen={isOpenValidationModal}
@@ -460,6 +478,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         userID={userID}
         saveTables={saveTables}
         loadTables={loadTables}
+        setMatrixName={setMatrixName}
+        matrixDate={matrixDate}
+        setMatrixDate={setMatrixDate}
       />
 
       <Table

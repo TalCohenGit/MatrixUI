@@ -1,33 +1,36 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import DatePicker from '../DatePicker';
 import Modal from '../../common/components/Modal/Modal';
+import { modalAction, savingAsAction } from "../../utils/constants"
+import { DataContext } from "../../context/DataContext";
 
-const SaveModal = ({isOpen, cancelSave, handleAction, action,savedMatrixName, setSavedMatrixName,dateValue,setDateValue}) => {
-    return (
+const SaveModal = ({isOpen, toggleModal, handleAction, action, dateValue,setDateValue, setMatrixName}) => {
+
+  return (
      <Modal
         isOpen={isOpen}
-        toggleModal={cancelSave}
-        modalHeader="פרטים לשמירה"
+        toggleModal={toggleModal}
+        modalHeader={"פרטים ל" + modalAction[action]}
       >
         <div className="save-matrix-modal">
-          <input
+        {action === savingAsAction && <input
             style={{width:"100%"}}
-            value={savedMatrixName}
+            value={matrixName}
             type="text"
             id="matrixName"
             onChange={(e) => {
-              setSavedMatrixName(e.target.value)}}
+              setMatrixName(e.target.value)}}
             placeholder="בחר שם למטריצה"
-          />
+          />}
           <h3>בחר תאריך ערך</h3>
           <DatePicker dateValue={dateValue} setDateValue={setDateValue} />
         </div>
         <div className="action-buttons">
-          <button className="cancel-button" onClick={() => cancelSave()}>
+          <button className="cancel-button" onClick={() => toggleModal()}>
             בטל
           </button>
-          <button className={"save-button" + (savedMatrixName?.length ? "" : " disabled")} onClick={() => handleAction()}>
-            {action}
+          <button className={"save-button" + (action === savingAsAction && !savedMatrixName?.length ? " disabled" : "")} onClick={() => handleAction(action, toggleModal)}>
+            {modalAction[action]}
           </button>
         </div>
       </Modal>

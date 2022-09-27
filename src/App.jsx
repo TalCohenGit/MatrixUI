@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import MatrixPage from "./components/MatrixPage";
 import Login from "./components/Login";
 
-const App = (props) => {
+const App = () => {
   const [refreshToken, setRefreshToken] = useState("");
   const [seconds, setSeconds] = useState(0);
 

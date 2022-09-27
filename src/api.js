@@ -297,7 +297,9 @@ export const getMatrixByIDAPI = async (axiosPrivate, matrixID) => {
     if (data?.length) {
       return {
         matrixesUiData: JSON.parse(JSON.parse(data[0]["matrixesUiData"])),
-        isProduced: data[0]["isProduced"]
+        isProduced: data[0]["isProduced"],
+        matrixName: data[0]["matrixName"],
+        date: data[0]["date"]
       }
     }
   } catch (e) {
@@ -319,7 +321,8 @@ export const loadTablesAPI = async (axiosPrivate, userID) => {
         matrixName: lastLoad.matrixName,
         matrixesUiData: JSON.parse(JSON.parse(lastLoad.matrixesUiData)),
         saveData: new Date(lastLoad.createdAt),
-        isProduced: lastLoad.isProduced
+        isProduced: lastLoad.isProduced,
+        matrixDate: lastLoad.Date
       };
     }
   } catch (e) {

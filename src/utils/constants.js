@@ -18,4 +18,10 @@ export const numOfColBeforeProducts = 3
 export const numOfColAfterProducts = 5
 export const titleWithoutProduct = numOfColBeforeProducts + numOfColAfterProducts
 
+export const savingAsAction = "savingAsAction"
+export const savingAction = "savingAction"
+export const produceDocAction = "produceDoc"
+
+export const modalAction = {savingAsAction: "שמירה בשם", savingAction: "שמירה"}
+
 export const dateFormat = "mm/dd/yyyy"
