@@ -35,6 +35,7 @@ const AddCustomer = ({
   axiosPrivate,
   saveTables,
   loadTables,
+  matrixName,
   setMatrixName,
   matrixDate,
   setMatrixDate
@@ -320,6 +321,7 @@ const AddCustomer = ({
               setDateValue={setMatrixDate}
               handleAction={handleSaving}
               action={savingAsAction}
+              matrixName={matrixName}
               setMatrixName={setMatrixName}
             />
           }
@@ -331,6 +333,7 @@ const AddCustomer = ({
               setDateValue={setMatrixDate}
               handleAction={handleSaving}
               action={savingAction}
+              matrixName={matrixName}
               setMatrixName={setMatrixName}
             />
           }

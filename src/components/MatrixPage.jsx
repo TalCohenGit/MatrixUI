@@ -478,6 +478,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         userID={userID}
         saveTables={saveTables}
         loadTables={loadTables}
+        matrixName={matrixName}
         setMatrixName={setMatrixName}
         matrixDate={matrixDate}
         setMatrixDate={setMatrixDate}

@@ -4,7 +4,7 @@ import Modal from '../../common/components/Modal/Modal';
 import { modalAction, savingAsAction } from "../../utils/constants"
 import { DataContext } from "../../context/DataContext";
 
-const SaveModal = ({isOpen, toggleModal, handleAction, action, dateValue,setDateValue, setMatrixName}) => {
+const SaveModal = ({isOpen, toggleModal, handleAction, action, dateValue,setDateValue, matrixName, setMatrixName}) => {
 
   return (
      <Modal
@@ -29,7 +29,7 @@ const SaveModal = ({isOpen, toggleModal, handleAction, action, dateValue,setDate
           <button className="cancel-button" onClick={() => toggleModal()}>
             בטל
           </button>
-          <button className={"save-button" + (action === savingAsAction && !savedMatrixName?.length ? " disabled" : "")} onClick={() => handleAction(action, toggleModal)}>
+          <button className={"save-button" + (action === savingAsAction && !matrixName?.length ? " disabled" : "")} onClick={() => handleAction(action, toggleModal)}>
             {modalAction[action]}
           </button>
         </div>
