@@ -1,13 +1,15 @@
-import React from 'react'
+import React, {useEffect} from 'react'
 import { DateRangePicker } from 'react-date-range';
 import 'react-date-range/dist/styles.css'; 
 import 'react-date-range/dist/theme/default.css';
 
 const DateRangePickerToLoad = ({dateRanges, setDateRanges}) => {
-  
+  useEffect(()=>{},[dateRanges])
     return (
       <DateRangePicker
-        onChange={item => setDateRanges([item.selection])}
+        onChange={item => {
+          console.log("item.selection",item.selection)
+          setDateRanges([item.selection])}}
         showSelectionPreview={true}
         showDateDisplay={false}
         moveRangeOnFirstSelection={false}

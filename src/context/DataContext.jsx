@@ -20,7 +20,7 @@ const DataContextProvider = (props) => {
   const [userID, setUserID] = useState("");
   const [selectedProducts, setSelectedProducts] = useState([])
   const [matrixName, setMatrixName] = useState("")
-  const [matrixDate, setMatrixDate] = useState("")
+  const [matrixDate, setMatrixDate] = useState(new Date())
 
   const getNewCustomerData = () => {
     const customerObject = customers.find(

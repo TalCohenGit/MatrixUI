@@ -340,7 +340,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const saveTables = async (isBI, action) => {
     let date = null;
     if (matrixDate) {
-      date = format(matrixDate, "MM/dd/yyyy");
+      console.log("matrixDate", matrixDate)
+      date = format(new Date(matrixDate), "MM/dd/yyyy");
     }
     const {
       newMatrixId,

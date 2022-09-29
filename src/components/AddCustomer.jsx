@@ -201,10 +201,13 @@ const AddCustomer = ({
   };
 
   const saveWithNameData = () => {
+    console.log("saveWithNameData")
+
     toggleToSaveDataModal(true);
   };
 
   const savingMatrix = () => {
+    console.log("savingMatrix")
     toggleToUpdateDataModal(true);
   };
 
@@ -218,15 +221,16 @@ const AddCustomer = ({
     toggleModal(false);
   };
 
-  const formatDate = () => {
-    if (matrixDate) {
-      return matrixDate.toLocaleDateString("en-us");
+  const formatDate = (date) => {
+    if (date) {
+      return date.toLocaleDateString("en-us");
     }
   };
 
   const loadTableNames = async () => {
     const startDate = formatDate(dateRanges[0]["startDate"]);
     const endDate = formatDate(dateRanges[0]["endDate"]);
+    
     const matrixesDetails = await getTablesByDatesAPI(
       axiosPrivate,
       startDate,
@@ -386,7 +390,7 @@ const AddCustomer = ({
         ) : null}
         <button
           className="save-tables"
-          disabled={matrixData.length === 0 || !matrixID}
+          disabled={matrixData?.length === 0 || !matrixID}
           onClick={() => savingMatrix()}
         >
           שמירה

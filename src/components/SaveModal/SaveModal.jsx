@@ -2,10 +2,9 @@ import React, { useContext } from 'react'
 import DatePicker from '../DatePicker';
 import Modal from '../../common/components/Modal/Modal';
 import { modalAction, savingAsAction } from "../../utils/constants"
-import { DataContext } from "../../context/DataContext";
 
 const SaveModal = ({isOpen, toggleModal, handleAction, action, dateValue,setDateValue, matrixName, setMatrixName}) => {
-
+console.log("SaveModal toggleModal", toggleModal)
   return (
      <Modal
         isOpen={isOpen}
@@ -26,7 +25,7 @@ const SaveModal = ({isOpen, toggleModal, handleAction, action, dateValue,setDate
           <DatePicker dateValue={dateValue} setDateValue={setDateValue} />
         </div>
         <div className="action-buttons">
-          <button className="cancel-button" onClick={() => toggleModal()}>
+          <button className="cancel-button" onClick={() => toggleModal(false)}>
             בטל
           </button>
           <button className={"save-button" + (action === savingAsAction && !matrixName?.length ? " disabled" : "")} onClick={() => handleAction(action, toggleModal)}>

@@ -257,6 +257,7 @@ export const mergePdfAPI = async (axiosPrivate, filteredUrl) => {
 
 export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
+    
     let dates = {
       Date: {
         $gte: fromDate,
@@ -296,7 +297,7 @@ export const getMatrixByIDAPI = async (axiosPrivate, matrixID) => {
     const data = res.data.result.data;
     if (data?.length) {
       return {
-        matrixesUiData: JSON.parse(JSON.parse(data[0]["matrixesUiData"])),
+        matrixesUiData: JSON.parse(data[0]["matrixesUiData"]),
         isProduced: data[0]["isProduced"],
         matrixName: data[0]["matrixName"],
         date: data[0]["date"]
@@ -319,7 +320,7 @@ export const loadTablesAPI = async (axiosPrivate, userID) => {
       return {
         matrixID: lastLoad.matrixID,
         matrixName: lastLoad.matrixName,
-        matrixesUiData: JSON.parse(JSON.parse(lastLoad.matrixesUiData)),
+        matrixesUiData: JSON.parse(lastLoad.matrixesUiData),
         saveData: new Date(lastLoad.createdAt),
         isProduced: lastLoad.isProduced,
         matrixDate: lastLoad.Date
