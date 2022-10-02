@@ -7,6 +7,7 @@ import {
   customerNumbers,
   deleteAllTables,
   getActionFromRes,
+  loadAllMatrixesData
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import CircularProgress from "@mui/material/CircularProgress";
@@ -68,6 +69,7 @@ const AddCustomer = ({
   const [toLoadDataModal, toggleToLoadDataModal] = useState(false);
   const [isMatrixNames, toggleMatrixNames] = useState(false);
   const [matrixesDetails, setMatrixesDetails] = useState([]);
+
   const intialRangeState = [
     {
       startDate: new Date(),
@@ -215,8 +217,7 @@ const AddCustomer = ({
     toggleToLoadDataModal(true);
   };
 
-  const handleSaving = async (action, toggleModal) => {
-    const isBI = true;
+  const handleSaving = async (action, toggleModal, isBI) => {
     await saveTables(isBI, action);
     toggleModal(false);
   };
@@ -230,7 +231,7 @@ const AddCustomer = ({
   const loadTableNames = async () => {
     const startDate = formatDate(dateRanges[0]["startDate"]);
     const endDate = formatDate(dateRanges[0]["endDate"]);
-    
+
     const matrixesDetails = await getTablesByDatesAPI(
       axiosPrivate,
       startDate,
@@ -240,7 +241,7 @@ const AddCustomer = ({
       setMatrixesDetails(matrixesDetails);
       toggleMatrixNames(true);
     } else {
-      console.log("error in loadTableNames - getting matrixDetails");
+      console.log("cannot find matrixes to load");
     }
   };
 

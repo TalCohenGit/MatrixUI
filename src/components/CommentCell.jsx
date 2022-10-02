@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CommentsModal from "./CommentsModal";
+import {docInformationOptions} from "../utils/constants"
 
 const CommentCell = ({ rowIndex, colIndex, data, setData }) => {
   const [isOpen, toggleModal] = useState(false);
@@ -33,19 +34,18 @@ const CommentCell = ({ rowIndex, colIndex, data, setData }) => {
   return (
     <div>
       <button className="createInvoice-button" onClick={() => addComments()}>
-        הוספה
+        הערה
       </button>
       {isOpen && (
         <CommentsModal
           isOpen={isOpen}
           toggleModal={toggleModal}
-          rowIndex={rowIndex}
-          colIndex={colIndex}
           modalTitle={data[0][colIndex]}
           saveComments={saveComments}
           comments={comments}
           setComments={setComments}
           loadOldComments={loadOldComments}
+          commentsCellOptions={docInformationOptions}
         />
       )}
     </div>

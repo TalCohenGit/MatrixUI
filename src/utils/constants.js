@@ -1,15 +1,26 @@
-export const commentsOptions = [
+export const commentsCellOptions = [
   { value: "Price", label: "מחיר" },
-  { value: "Quantity", label: "כמות" },
-  { value: "DiscountPrc", label: "מחיר לאחר הנחה" },
-  { value: "CommitionPrc", label: "עמלה" },
-  { value: "LineNoForSorting", label: "מספר קו לצורך מיון" },
-  { value: "Warehouse", label: "מחסן" },
+  { value: "DiscountPrc", label: "% הנחה" },
   { value: "Details", label: "פרטים" },
-  { value: "Reference", label: "ייחוס" },
-  { value: "Packs", label: "אריזות" },
-  { value: "Alternum", label: "מספר אחר" },
+  { value: "ItemName", label: "שם פריט" },
+  { value: "Warehouse", label: "מחסן" },
+  { value: "Agent", label: "סוכן" },
+  { value: "CommitionPrc", label: "עמלה" }
 ];
+
+export const docInformationOptions = [
+  { value: "AccountName", label: "שם לקוח" },
+  { value: "Address", label: "כתובת" },
+  { value: "Phone", label: "טלפון" },
+  { value: "ValueDate", label: "תאריך" },
+  { value: "DiscountPrc", label: "% הנחה" },
+  { value: "Tftal", label: "סכום כולל של מסמך" },
+  { value: "Remarks", label: "הערות" },
+  { value: "Details", label: "פרטים" },
+  { value: "Agent", label: "סוכן" },
+  { value: "Osek874", label: "עוסק מורשה" },
+  { value: "Email", label: "דואר אלקטרוני" }
+]
 
 export const MUDUL_SERVER_NAME = "http://localhost:4001"
 export const AUTH_SERVER_NAME = "http://localhost:4000"

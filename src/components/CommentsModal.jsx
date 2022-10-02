@@ -1,14 +1,11 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Modal from "../common/components/Modal/Modal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPlus } from "@fortawesome/fontawesome-free-solid";
 import Select from "react-select";
-import { commentsOptions, numOfColBeforeProducts } from "../utils/constants";
-import { DataContext } from "../context/DataContext";
 
-const CommentsModal = ({ isOpen, toggleModal, rowIndex, colIndex, modalTitle, saveComments, comments, setComments, loadOldComments }) => {
+const CommentsModal = ({ isOpen, toggleModal, modalTitle, saveComments, comments, setComments, loadOldComments, commentsCellOptions }) => {
   const intialValue = { selectValue: "", inputValue: "" };
-  const { matrixComments, setMatrixComments} = useContext(DataContext)
 
   useEffect(() => {
     loadOldComments()
@@ -51,9 +48,9 @@ const CommentsModal = ({ isOpen, toggleModal, rowIndex, colIndex, modalTitle, sa
     return (
       <div className="comments-row" key={index}>
         <Select
-          placeholder={comment?.selectValue ?  getCommentLabel(commentsOptions, comment.selectValue): "בחר מהרשימה..."}
+          placeholder={comment?.selectValue ?  getCommentLabel(commentsCellOptions, comment.selectValue): "בחר מהרשימה..."}
           onChange={(e) => handleSelect(e, index, "selectValue")}
-          options={commentsOptions}
+          options={commentsCellOptions}
           styles={customStyles}
           isOptionDisabled={(option) =>
             comments.find((comment) => comment.selectValue === option.value)

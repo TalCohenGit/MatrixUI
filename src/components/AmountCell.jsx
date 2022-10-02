@@ -4,7 +4,7 @@ import { DataContext } from "../context/DataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment } from "@fortawesome/fontawesome-free-solid";
 import CommentsModal from "./CommentsModal";
-import { numOfColBeforeProducts } from "../utils/constants";
+import { numOfColBeforeProducts, commentsCellOptions } from "../utils/constants";
 
 const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb }) => {
   const [isOpen, toggleModal] = useState(false);
@@ -95,6 +95,7 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb }) => {
               comments={comments}
               setComments={setComments}
               loadOldComments={loadOldComments}
+              commentsCellOptions={commentsCellOptions}
             />
           )}
         </div>

@@ -300,7 +300,7 @@ export const getMatrixByIDAPI = async (axiosPrivate, matrixID) => {
         matrixesUiData: JSON.parse(data[0]["matrixesUiData"]),
         isProduced: data[0]["isProduced"],
         matrixName: data[0]["matrixName"],
-        date: data[0]["date"]
+        date: data[0]["Date"]
       }
     }
   } catch (e) {

@@ -332,6 +332,28 @@ export const handleMatrixData = (
   };
 };
 
+export const loadData = (matrixesUiData, stateToChange, index) => {
+  if (matrixesUiData) {
+    const loadedMatrix = matrixesUiData[index];
+    if (loadedMatrix) {
+      stateToChange(loadedMatrix);
+      // stateToChange([]);
+    }
+  }
+};
+
+
+export const loadAllMatrixesData = (
+  matrixesUiData,
+  setArr
+) => {
+  if (matrixesUiData) {
+    setArr.forEach((setAction, index) => {
+      loadData(matrixesUiData, setAction, index);
+    });
+  }
+};
+
 const handleComments = (comments) => {
   const commentsObj = {};
   comments.forEach(
