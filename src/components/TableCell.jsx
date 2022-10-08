@@ -4,8 +4,8 @@ import DropDownCell from "./DropDownCell";
 import CommentCell from "./CommentCell";
 import DocCommentCell from "./DocCommentCell.jsx";
 import HeaderDropDown from "./HeaderDropdown";
-
 import { DataContext } from "../context/DataContext";
+
 
 const TableCell = (props) => {
   const {
@@ -17,14 +17,18 @@ const TableCell = (props) => {
     setData,
     disabled,
     bgColor,
+    missingProductsCol,
+    tableName
   } = props;
   const { drivers } = useContext(DataContext);
 
-  let cellType
+  let cellType;
 
   if (rowIndex === 0) {
     if (colIndex < 3 || (rowLength > 7 && colIndex > rowLength - 6)) {
-      cellType = <b>{cellValue}</b>;
+      cellType = (
+          <b>{cellValue}</b>
+      );
     } else {
       cellType = (
         <HeaderDropDown
@@ -33,6 +37,7 @@ const TableCell = (props) => {
           setData={setData}
           colIndex={colIndex}
           rowIndex={rowIndex}
+          tableName={tableName}
         />
       );
     }
@@ -105,6 +110,10 @@ const TableCell = (props) => {
         pointerEvents: disabled ? "none" : "auto",
         backgroundColor: cellValue === "" ? "none" : bgColor,
         border: colIndex === rowLength - 1 ? "0" : "1px solid #a9a9a9",
+        color:
+          colIndex === missingProductsCol && missingProductsCol > 0
+            ? "red"
+            : "black",
       }}
     >
       {cellType}

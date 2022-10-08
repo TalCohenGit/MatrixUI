@@ -7,7 +7,6 @@ import {
 } from "./constants";
 import { getMatrixIDAPI } from "../api";
 import _ from "lodash";
-import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 export const filterCustomers = (parsedName, input) => {
   return input.length && parsedName?.length && parsedName.includes(input);
@@ -115,6 +114,24 @@ export const updateBalanceTable = (
   }
 };
 
+export const removeColFromTable = (colIndex, numOfColBeforeProducts, matrix) => {
+ return matrix.map((row) => {
+    let newArr;
+    newArr = [
+      ...row.slice(0, colIndex - numOfColBeforeProducts),
+      ...row.slice(colIndex + 1 - numOfColBeforeProducts, row.length)
+    ];
+    return newArr;
+  });
+}
+
+export const removeProductCol = (productIndx, currentMatrix, currentMatrixComments) => {
+  const newMatrixData = removeColFromTable(productIndx, 0, currentMatrix)
+  const newMatrixComments = removeColFromTable(productIndx, numOfColBeforeProducts, currentMatrixComments)
+  console.log("newMatrixComments:", newMatrixComments)
+  return {newMatrixData, newMatrixComments}
+}
+
 export const removeColFromBalanceTable = (
   currentBalanceTable,
   productsData,
@@ -123,18 +140,8 @@ export const removeColFromBalanceTable = (
   const selectedProduct = productsData.filter(
     (product) => productName === product["שם פריט"]
   )[0];
-  let colIndexToRemove = 0;
-  return currentBalanceTable.map((row, rowIndx) => {
-    let newArr;
-    if (rowIndx === 0) {
-      colIndexToRemove = row.indexOf(selectedProduct["מפתח פריט אב"]);
-    }
-    newArr = [
-      ...row.slice(0, colIndexToRemove),
-      ...row.slice(colIndexToRemove + 1, row.length),
-    ];
-    return newArr;
-  });
+  const colIndexToRemove = currentBalanceTable[0].indexOf(selectedProduct["מפתח פריט אב"]);
+  return removeColFromTable(colIndexToRemove, 0, currentBalanceTable)
 };
 export const numOfProducts = (matrixLength) =>
   matrixLength - titleWithoutProduct;
@@ -173,16 +180,6 @@ const validateValueExist = (valueToCheck, setComment) => {
   }
 };
 
-// export const saveMatrixID = (matrixID) => {
-//   if (matrixID) {
-//     localStorage.setItem("matrixID", matrixID)
-//   }
-// }
-
-// export const getMatrixID = () => {
-//   return localStorage.getItem("matrixID")
-// }
-
 export const getMatrixesData = async (
   axiosPrivate,
   matrixData,
@@ -194,7 +191,6 @@ export const getMatrixesData = async (
 ) => {
   let newMatrixId = matrixID
   if(action === savingAsAction) {
-    console.log("New Saving")
     newMatrixId = await getMatrixIDAPI(axiosPrivate);
   }
   const validatedData = handleMatrixData(

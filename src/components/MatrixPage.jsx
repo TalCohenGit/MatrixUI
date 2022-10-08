@@ -26,7 +26,8 @@ import {
   getMatrixesData,
   numOfProducts,
   loadAllMatrixesData,
-  loadData
+  loadData,
+  removeProductCol
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
@@ -80,6 +81,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const axiosPrivate = useAxiosPrivate();
   const [toCopyDataModal, toggleToCopyDataModal] = useState(false);
   const [dataToLoad, setDataToLoad] = useState({matrixName : "", date: "", matrixesUiData : []})
+  const [missingProductCol, setMissingProductsCol] = useState(0)
+
 
   let interval;
   const getTableTitle = () => {
@@ -168,24 +171,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const removeProduct = (productName, currentMatrix) => {
-    let productIndx;
-    return currentMatrix.map((row, rowIndex) => {
-      let newArr;
-      if (rowIndex === 0) {
-        productIndx = row.indexOf(productName);
-      }
-      newArr = [
-        ...row.slice(0, productIndx),
-        ...row.slice(productIndx + 1, currentMatrix[0].length),
-      ];
-      const newMatrixComment = [...matrixComments];
-      if (newMatrixComment?.length > 0 && rowIndex > 0) {
-        newMatrixComment[rowIndex - 1].pop();
-
-        setMatrixComments(newMatrixComment);
-      }
-      return newArr;
-    });
+    const firstRow = currentMatrix[0]
+    const productIndx = firstRow.indexOf(productName);
+    const currentMatrixComments = [...matrixComments];
+    return removeProductCol(productIndx, currentMatrix, currentMatrixComments)
   };
 
   const removeAllProducts = (currentMatrix, numCurrentProducts) => {
@@ -204,7 +193,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return newMatrix;
   };
 
-  const addProductToTable = (selectedProductNames, event) => {
+  const handleProducts = (selectedProductNames, event) => {
     const currentMatrix = [...matrixData];
     const currentBalanceTable = [...balanceTableData];
     let newBalanceTable = [];
@@ -253,7 +242,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       if (event.option.value === "*") {
         newMatrix = removeAllProducts(currentMatrix, numCurrentProducts);
       } else {
-        newMatrix = removeProduct(event.option.value, currentMatrix);
+        const {newMatrixData, newMatrixComments} = removeProduct(event.option.value, currentMatrix);
+        newMatrix = newMatrixData
+        setMatrixComments(newMatrixComments)
         newBalanceTable = removeColFromBalanceTable(
           currentBalanceTable,
           products,
@@ -278,6 +269,11 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     );
   });
 
+  const missingProducts = (n) => {
+    console.log("missing product for column number", n)
+    setMissingProductsCol(n)
+  }
+
   const calcProductsSum = (n) => {
     let sum = 0;
     matrixData.forEach((rowData, rowDataIndex) => {
@@ -289,6 +285,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     const currentData = [...balanceTableData];
     currentData[2][n] = sum;
     currentData[3][n] = currentData[1][n] - sum;
+    if (currentData[3][n] < 0) {
+      missingProducts(n)
+    }
     setBalanceTableData(currentData);
   };
 
@@ -511,7 +510,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         customerName={customerName}
         setCustomerName={setCustomerName}
         addCustomerToTable={addCustomerToTable}
-        addProductToTable={addProductToTable}
+        handleProducts={handleProducts}
         axiosPrivate={axiosPrivate}
         userID={userID}
         saveTables={saveTables}
@@ -528,6 +527,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         tableName="main"
         cb={calcProductsSum}
         bgColor="#F5FFFA"
+        missingProductsCol={missingProductCol}
       />
       <Table
         data={balanceTableData}
@@ -535,6 +535,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         tableName="balance"
         disabled
         bgColor="#F0FFFF"
+        missingProductsCol={missingProductCol}
       />
     </div>
   ) : (

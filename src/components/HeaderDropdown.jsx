@@ -1,19 +1,32 @@
-import React, { useEffect, useState, useContext } from "react";
+import React, { useState, useContext } from "react";
 import Select from "react-select";
 import { DataContext } from "../context/DataContext";
+import HeaderNavigation from "./HeaderNavigation";
 
-const HeaderDropDown = ({ headerText, data, setData, colIndex, rowIndex }) => {
+const HeaderDropDown = ({
+  headerText,
+  data,
+  setData,
+  colIndex,
+  rowIndex,
+  tableName,
+}) => {
   const [isDropdown, setIsDropdown] = useState(false);
-  const { selectedProducts, setSelectedProducts, products, balanceTableData, setBalanceTableData } =
-    useContext(DataContext);
- 
+  const {
+    selectedProducts,
+    setSelectedProducts,
+    products,
+    balanceTableData,
+    setBalanceTableData
+  } = useContext(DataContext);
+
   const customStyles = {
     indicatorSeparator: () => ({ display: "none" }),
     // menu: () => ({
     //   direction: "ltr",
     // }),
   };
- 
+
   const options = products
     .map((product) => {
       return {
@@ -39,12 +52,12 @@ const HeaderDropDown = ({ headerText, data, setData, colIndex, rowIndex }) => {
   };
 
   const handleBalanceTable = (value) => {
-    const productObj = products.find(element => element["שם פריט"] === value)
-    const newValue = productObj["מפתח פריט אב"]
-    const currentBalanceTable = [...balanceTableData]
-    currentBalanceTable[0][colIndex] = newValue
-    setBalanceTableData(currentBalanceTable)
-  }
+    const productObj = products.find((element) => element["שם פריט"] === value);
+    const newValue = productObj["מפתח פריט אב"];
+    const currentBalanceTable = [...balanceTableData];
+    currentBalanceTable[0][colIndex] = newValue;
+    setBalanceTableData(currentBalanceTable);
+  };
 
   const handleSelect = (e) => {
     setSelectedOption(e);
@@ -69,13 +82,20 @@ const HeaderDropDown = ({ headerText, data, setData, colIndex, rowIndex }) => {
       hideSelectedOptions
     />
   ) : (
-    <b
-      onClick={() => {
-        setIsDropdown(true);
-      }}
+    <HeaderNavigation
+      data={data}
+      setData={setData}
+      colIndex={colIndex}
+      tableName={tableName}
     >
-      {headerText}
-    </b>
+      <b
+        onClick={() => {
+          setIsDropdown(true);
+        }}
+      >
+        {headerText}
+      </b>
+    </HeaderNavigation>
   );
 };
 

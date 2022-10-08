@@ -32,7 +32,7 @@ const AddCustomer = ({
   customerName,
   setCustomerName,
   addCustomerToTable,
-  addProductToTable,
+  handleProducts,
   axiosPrivate,
   saveTables,
   loadTables,
@@ -121,7 +121,7 @@ const AddCustomer = ({
       setSelectedProducts(value);
       selectedValues = value.map((element) => element.value);
     }
-    addProductToTable(selectedValues, event);
+    handleProducts(selectedValues, event);
   };
 
   const getDropdownButtonLabel = ({ placeholderButtonLabel, value }) => {
