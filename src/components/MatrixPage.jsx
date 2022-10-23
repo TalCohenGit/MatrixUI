@@ -359,11 +359,11 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       }
   };
 
-  const getMatrixID = async (action, isInitiated, newMatrixName) => {
+  const getMatrixID = async (action) => {
     let newMatrixId = matrixID;
     if (
       (action === savingAsAction && isInitiated) ||
-      action === copyMatrixAction || action === savingAction && newMatrixName
+      action === copyMatrixAction || action === savingAction && !isInitiated
     ) {
       newMatrixId = await getMatrixIDAPI(axiosPrivate);
       setMatrixID(newMatrixId);
@@ -372,10 +372,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return newMatrixId;
   };
 
-  const saveTables = async (matrixDate, isBI, action, isInitiated, newMatrixName) => {
+  const saveTables = async (matrixDate, isBI, action, newIsInitiated, newMatrixName) => {
     const date = getMatrixFormatedDate(matrixDate);
     console.log("date is:", date)
-    const newMatrixId = await getMatrixID(action, isInitiated, newMatrixName);
+    const newMatrixId = await getMatrixID(action);
 
     const { validatedData, cellsData, docCommentsToSend, metaDataToSend } =
       await getMatrixesData(
@@ -421,16 +421,16 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   const copyMatrix = async () => {
     try {
-      const isInitiated = false;
+      const newIsInitiated = false
       await saveTables(
         dataToLoad["date"],
         dataToLoad["isBI"],
         copyMatrixAction,
-        isInitiated,
+        newIsInitiated,
         undefined
       );
 
-      setIsInitiated(true);
+      setIsInitiated(false);
       loadAllMatrixesData(dataToLoad["matrixesUiData"], [
         setMatrixData,
         setMatrixComments,
@@ -470,10 +470,11 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const onUnload = async (ev) => {
     const isBI = false;
     let action = savingAction;
-    if (matrixID) {
+    if (!isInitiated) {
       action = savingAsAction;
     }
-    await saveTables(matrixDate, isBI, action, isInitiated, matrixName);
+    const newIsInitiated = isInitiated
+    await saveTables(matrixDate, isBI, action, newIsInitiated, matrixName);
     // ev.preventDefault();
     // return ev.returnValue = 'Do you want to save data before close?';
   };
@@ -493,6 +494,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         console.log("loaded matrixDate:", savedData.matrixDate)
         setMatrixDate(savedData.matrixDate);
         setIsInitiated(savedData.isInitiated);
+        console.log("isInitiated:", savedData.isInitiated)
+
       }
       const [productsData, customerList, driverList] = await Promise.all([
         getProductsAPI(axiosPrivate, validationModal),
@@ -519,6 +522,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   return drivers?.length ? (
     <div className="matrix-page">
       <h1> MatrixUi </h1>
+      <h2> שם המטריצה: {matrixName}</h2>
+      <h3> תאריך ערך למטריצה: {new Date(matrixDate).toLocaleDateString()}</h3>
       <Modal
         isOpen={isOpenValidationModal}
         toggleModal={toggleValidationModal}

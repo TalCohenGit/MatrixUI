@@ -215,8 +215,8 @@ const AddCustomer = ({
   };
 
   const handleSaving = async (action, toggleModal, isBI, newMatrixName, dateValue) => {
-    const isInitiated = true
-    await saveTables(dateValue, isBI, action, isInitiated, newMatrixName);
+    const newIsInitiated = true
+    await saveTables(dateValue, isBI, action, newIsInitiated, newMatrixName);
     setMatrixName(newMatrixName)
     setMatrixDate(dateValue)
     toggleModal(false);
