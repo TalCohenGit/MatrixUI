@@ -5,8 +5,8 @@ import {
   savingAsAction,
   produceDocAction
 } from "./constants";
-import { getMatrixIDAPI } from "../api";
 import _ from "lodash";
+import { format } from "date-fns";
 
 export const filterCustomers = (parsedName, input) => {
   return input.length && parsedName?.length && parsedName.includes(input);
@@ -181,18 +181,13 @@ const validateValueExist = (valueToCheck, setComment) => {
 };
 
 export const getMatrixesData = async (
-  axiosPrivate,
   matrixData,
   productsMap,
   matrixComments,
-  matrixID,
   action,
   setCustomerValidationFailed
 ) => {
-  let newMatrixId = matrixID
-  if(action === savingAsAction) {
-    newMatrixId = await getMatrixIDAPI(axiosPrivate);
-  }
+
   const validatedData = handleMatrixData(
     matrixData,
     productsMap,
@@ -209,7 +204,6 @@ export const getMatrixesData = async (
       validatedData["metaData"]
     );
   return {
-    newMatrixId,
     validatedData,
     cellsData,
     docCommentsToSend,
@@ -243,11 +237,16 @@ export const getActionFromRes = (dataRes) => {
   return producedObj?.Action
 }
 
+export const formatDate = (matrixDate) => {
+  // return format(new Date(matrixDate), "MM/dd/yyyy")
+   return new Date(matrixDate).toLocaleString('en', {  timeZone: "Asia/Jerusalem", })
+}
+
 const setError = (setCustomerValidationFailed, errorMsg, customerName) => {
   if (setCustomerValidationFailed) {
     setCustomerValidationFailed({
       failure: true,
-      error: "חסרות שדות עבור הלקוח",
+      error: errorMsg,
       customerName,
     });
   }

@@ -26,7 +26,6 @@ const LoadModal = ({
           dateRanges={dateRanges}
           setDateRanges={setDateRanges}
         />
-        {/* <DatePicker dateValue={toDateValue} setDateValue={setToDateValue} /> */}
       </div>
       <div className="action-buttons">
         <button className="cancel-button" onClick={() => onCancel()}>

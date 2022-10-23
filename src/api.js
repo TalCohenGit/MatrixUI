@@ -1,5 +1,5 @@
 import { axiosAuth } from "./axios";
-import { getItemNames, parseStrimingData } from "./utils/utils";
+import { getItemNames, parseStrimingData, formatDate } from "./utils/utils";
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
   return await axiosPrivate.post("/api/getrecords", { TID, sortKey });
@@ -103,14 +103,15 @@ const getMatrixesDataObj = (
   };
 };
 
-export const sendTableAPI = async (
+export const createDocAPI = async (
   axiosPrivate,
   tableData,
   matrixID,
   cellsData,
   docData,
   metaData,
-  productsMap
+  productsMap,
+  matrixName
 ) => {
   try {
     const matrixesData = getMatrixesDataObj(
@@ -121,14 +122,29 @@ export const sendTableAPI = async (
       metaData,
       productsMap
     );
-    const dataToSend = { matrixesData };
+    const date = formatDate(new Date())
+    const isBI = true
+    
+    const dataToSend = getMatrixObject(date, matrixID, matrixesData, isBI, matrixName);
     console.log("dataToSend:", JSON.stringify(dataToSend));
-    const res = await axiosPrivate.post("/api/createdoc", { matrixesData });
+    const res = await axiosPrivate.post("/api/createdoc", dataToSend);
     const parsedData = parseStrimingData(res.data);
     return parsedData;
   } catch (e) {
-    console.log("error in sendTableAPI:", e);
+    console.log("error in createDocAPI:", e);
   }
+};
+
+const getMatrixObject = (date, matrixID, matrixesData, isBI, matrixName, matrixesUiData) => {
+  return {
+    matrixID,
+    matrixName,
+    matrixesData,
+    matrixesUiData,
+    Date: date,
+    isBI,
+    isInitiated: true
+  };
 };
 
 export const saveTablesAPI = async (
@@ -142,7 +158,8 @@ export const saveTablesAPI = async (
   isBI,
   date,
   matrixName,
-  productsMap
+  productsMap,
+  isInitiated
 ) => {
   const matrixesData = getMatrixesDataObj(
     matrixID,
@@ -153,14 +170,15 @@ export const saveTablesAPI = async (
     productsMap
   );
   try {
-    const res = await axiosPrivate.post("/api/savematrix", {
+    const res = await axiosPrivate.post("/api/savematrix", getMatrixObject(
+      date,
       matrixID,
-      matrixName,
       matrixesData,
-      matrixesUiData,
-      Date: date,
       isBI,
-    });
+      matrixName,
+      matrixesUiData,
+      isInitiated
+    ));
     return res;
   } catch (e) {
     console.log("error in saveTablesAPI: ", e);
@@ -241,7 +259,7 @@ export const getUrlsAPI = async (axiosPrivate, action) => {
       };
     });
   } catch (e) {
-    console.log("error in sendTableAPI:", e);
+    console.log("error in createDocAPI:", e);
   }
 };
 
@@ -257,7 +275,6 @@ export const mergePdfAPI = async (axiosPrivate, filteredUrl) => {
 
 export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
-    
     let dates = {
       Date: {
         $gte: fromDate,
@@ -300,8 +317,9 @@ export const getMatrixByIDAPI = async (axiosPrivate, matrixID) => {
         matrixesUiData: JSON.parse(data[0]["matrixesUiData"]),
         isProduced: data[0]["isProduced"],
         matrixName: data[0]["matrixName"],
-        date: data[0]["Date"]
-      }
+        date: data[0]["Date"],
+        isBI: data[0]["isBI"]
+      };
     }
   } catch (e) {
     console.log("error in getMatrixByIDAPI:", e);
@@ -323,7 +341,8 @@ export const loadTablesAPI = async (axiosPrivate, userID) => {
         matrixesUiData: JSON.parse(lastLoad.matrixesUiData),
         saveData: new Date(lastLoad.createdAt),
         isProduced: lastLoad.isProduced,
-        matrixDate: lastLoad.Date
+        matrixDate: lastLoad.Date,
+        isInitiated: lastLoad.isInitiated
       };
     }
   } catch (e) {

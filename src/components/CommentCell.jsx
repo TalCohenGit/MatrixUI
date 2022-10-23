@@ -34,7 +34,7 @@ const CommentCell = ({ rowIndex, colIndex, data, setData }) => {
   return (
     <div>
       <button className="createInvoice-button" onClick={() => addComments()}>
-        הערה
+        הוסף
       </button>
       {isOpen && (
         <CommentsModal

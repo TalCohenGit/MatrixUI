@@ -32,6 +32,7 @@ export const titleWithoutProduct = numOfColBeforeProducts + numOfColAfterProduct
 export const savingAsAction = "savingAsAction"
 export const savingAction = "savingAction"
 export const produceDocAction = "produceDoc"
+export const copyMatrixAction = "copyMatrix"
 
 export const modalAction = {savingAsAction: "שמירה בשם", savingAction: "שמירה"}
 

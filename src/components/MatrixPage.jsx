@@ -4,7 +4,7 @@ import "../App.scss";
 import "normalize.css";
 import AddCustomer from "../components/AddCustomer";
 import Table from "../components/Table";
-import CopyDataModal from "../components/Modals/CopyDataModal"
+import CopyDataModal from "../components/Modals/CopyDataModal";
 import {
   getCustomersAPI,
   getProductsAPI,
@@ -15,6 +15,7 @@ import {
   refreshTokenAPI,
   getMatrixByIDAPI,
   getTablesByDatesAPI,
+  getMatrixIDAPI,
 } from "../api";
 import { DataContext } from "../context/DataContext";
 import {
@@ -27,20 +28,20 @@ import {
   numOfProducts,
   loadAllMatrixesData,
   loadData,
-  removeProductCol
+  removeProductCol,
+  formatDate,
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
   numOfColBeforeProducts,
   numOfColAfterProducts,
-  dateFormat,
   savingAsAction,
   savingAction,
+  copyMatrixAction,
 } from "../utils/constants";
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
-import { format } from "date-fns";
 
 function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const {
@@ -74,15 +75,21 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     setMatrixName,
     matrixDate,
     setMatrixDate,
+    setIsInitiated,
+    isInitiated,
   } = useContext(DataContext);
 
   const [isOpenValidationModal, toggleValidationModal] = useState(false);
   const [validationErrors, setValidationError] = useState([]);
   const axiosPrivate = useAxiosPrivate();
   const [toCopyDataModal, toggleToCopyDataModal] = useState(false);
-  const [dataToLoad, setDataToLoad] = useState({matrixName : "", date: "", matrixesUiData : []})
-  const [missingProductCol, setMissingProductsCol] = useState(0)
-
+  const [dataToLoad, setDataToLoad] = useState({
+    matrixName: "",
+    date: "",
+    matrixesUiData: [],
+    isBI: true,
+  });
+  const [missingProductCol, setMissingProductsCol] = useState(0);
 
   let interval;
   const getTableTitle = () => {
@@ -171,10 +178,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const removeProduct = (productName, currentMatrix) => {
-    const firstRow = currentMatrix[0]
+    const firstRow = currentMatrix[0];
     const productIndx = firstRow.indexOf(productName);
     const currentMatrixComments = [...matrixComments];
-    return removeProductCol(productIndx, currentMatrix, currentMatrixComments)
+    return removeProductCol(productIndx, currentMatrix, currentMatrixComments);
   };
 
   const removeAllProducts = (currentMatrix, numCurrentProducts) => {
@@ -242,9 +249,12 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       if (event.option.value === "*") {
         newMatrix = removeAllProducts(currentMatrix, numCurrentProducts);
       } else {
-        const {newMatrixData, newMatrixComments} = removeProduct(event.option.value, currentMatrix);
-        newMatrix = newMatrixData
-        setMatrixComments(newMatrixComments)
+        const { newMatrixData, newMatrixComments } = removeProduct(
+          event.option.value,
+          currentMatrix
+        );
+        newMatrix = newMatrixData;
+        setMatrixComments(newMatrixComments);
         newBalanceTable = removeColFromBalanceTable(
           currentBalanceTable,
           products,
@@ -270,9 +280,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   });
 
   const missingProducts = (n) => {
-    console.log("missing product for column number", n)
-    setMissingProductsCol(n)
-  }
+    console.log("missing product for column number", n);
+    setMissingProductsCol(n);
+  };
 
   const calcProductsSum = (n) => {
     let sum = 0;
@@ -286,7 +296,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     currentData[2][n] = sum;
     currentData[3][n] = currentData[1][n] - sum;
     if (currentData[3][n] < 0) {
-      missingProducts(n)
+      missingProducts(n);
     }
     setBalanceTableData(currentData);
   };
@@ -342,29 +352,39 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return currentUserID;
   };
 
-  const saveTables = async (isBI, action) => {
-    let date = null;
-    if (matrixDate) {
-      date = format(new Date(matrixDate), "MM/dd/yyyy");
-    }
-    const {
-      newMatrixId,
-      validatedData,
-      cellsData,
-      docCommentsToSend,
-      metaDataToSend,
-    } = await getMatrixesData(
-      axiosPrivate,
-      matrixData,
-      productsMap,
-      matrixComments,
-      matrixID,
-      action
-    );
+  const getMatrixFormatedDate = (matrixDate) => {
+    console.log("getMatrixFormatedDate matrixDate", matrixDate)
+      if (matrixDate) {
+        return formatDate(matrixDate);
+      }
+  };
 
-    if (action === savingAsAction) {
+  const getMatrixID = async (action, isInitiated, newMatrixName) => {
+    let newMatrixId = matrixID;
+    if (
+      (action === savingAsAction && isInitiated) ||
+      action === copyMatrixAction || action === savingAction && newMatrixName
+    ) {
+      newMatrixId = await getMatrixIDAPI(axiosPrivate);
       setMatrixID(newMatrixId);
     }
+
+    return newMatrixId;
+  };
+
+  const saveTables = async (matrixDate, isBI, action, isInitiated, newMatrixName) => {
+    const date = getMatrixFormatedDate(matrixDate);
+    console.log("date is:", date)
+    const newMatrixId = await getMatrixID(action, isInitiated, newMatrixName);
+
+    const { validatedData, cellsData, docCommentsToSend, metaDataToSend } =
+      await getMatrixesData(
+        matrixData,
+        productsMap,
+        matrixComments,
+        matrixID,
+        action
+      );
 
     const matrixesUiData = JSON.stringify([
       matrixData,
@@ -372,7 +392,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       selectedProducts,
       balanceTableData,
     ]);
-    localStorage.setItem("matrixesUiData", JSON.stringify(matrixesUiData));
 
     await saveTablesAPI(
       axiosPrivate,
@@ -384,8 +403,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       metaDataToSend,
       isBI,
       date,
-      matrixName,
-      productsMap
+      newMatrixName,
+      productsMap,
+      isInitiated
     );
   };
 
@@ -396,33 +416,45 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const cancelCopyModal = () => {
-    toggleToCopyDataModal(false)
-  }
+    toggleToCopyDataModal(false);
+  };
 
-  const copyMatrix = () => {
-    console.log("matrixName is", dataToLoad["matrixName"]);
-    console.log("matrix Date is", dataToLoad["date"]);
-    console.log("matrixesUiData is", dataToLoad["matrixesUiData"]);
+  const copyMatrix = async () => {
+    try {
+      const isInitiated = false;
+      await saveTables(
+        dataToLoad["date"],
+        dataToLoad["isBI"],
+        copyMatrixAction,
+        isInitiated,
+        undefined
+      );
 
-    loadAllMatrixesData(dataToLoad["matrixesUiData"], [
-      setMatrixData,
-      setMatrixComments,
-      setSelectedProducts,
-      setBalanceTableData,
-    ]);
-    setMatrixesDetails(
-      dataToLoad["matrixID"],
-      dataToLoad["matrixName"],
-      dataToLoad["date"]
-    );
+      setIsInitiated(true);
+      loadAllMatrixesData(dataToLoad["matrixesUiData"], [
+        setMatrixData,
+        setMatrixComments,
+        setSelectedProducts,
+        setBalanceTableData,
+      ]);
+      setMatrixesDetails(
+        dataToLoad["matrixID"],
+        dataToLoad["matrixName"],
+        dataToLoad["date"]
+      );
+      toggleToCopyDataModal(false);
+    } catch (e) {
+      console.log("copyMatrix: failed to copy ", e);
+      toggleToCopyDataModal(false);
+    }
   };
 
   const loadTables = async (matrixID) => {
-    const { matrixesUiData, isProduced, matrixName, date } =
+    const { matrixesUiData, isProduced, matrixName, date, isBI } =
       await getMatrixByIDAPI(axiosPrivate, matrixID);
     if (isProduced) {
       toggleToCopyDataModal(true);
-      setDataToLoad({ matrixName, date, matrixesUiData });
+      setDataToLoad({ matrixName, date, matrixesUiData, isBI });
     } else {
       loadAllMatrixesData(matrixesUiData, [
         setMatrixData,
@@ -435,13 +467,15 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return { matrixName, date, matrixesUiData };
   };
 
-  const onUnload = async (e) => {
+  const onUnload = async (ev) => {
     const isBI = false;
     let action = savingAction;
     if (matrixID) {
       action = savingAsAction;
     }
-    await saveTables(isBI, action);
+    await saveTables(matrixDate, isBI, action, isInitiated, matrixName);
+    // ev.preventDefault();
+    // return ev.returnValue = 'Do you want to save data before close?';
   };
 
   useEffect(() => {
@@ -456,7 +490,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         loadData(matrixesUiData, setBalanceTableData, 3);
         setMatrixID(savedData.matrixID);
         setMatrixName(savedData.matrixName);
+        console.log("loaded matrixDate:", savedData.matrixDate)
         setMatrixDate(savedData.matrixDate);
+        setIsInitiated(savedData.isInitiated);
       }
       const [productsData, customerList, driverList] = await Promise.all([
         getProductsAPI(axiosPrivate, validationModal),

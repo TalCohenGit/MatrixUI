@@ -21,6 +21,7 @@ const DataContextProvider = (props) => {
   const [selectedProducts, setSelectedProducts] = useState([])
   const [matrixName, setMatrixName] = useState("")
   const [matrixDate, setMatrixDate] = useState(new Date())
+  const [isInitiated, setIsInitiated] = useState(false)
 
   const getNewCustomerData = () => {
     const customerObject = customers.find(
@@ -71,7 +72,9 @@ const DataContextProvider = (props) => {
         matrixName,
         setMatrixName,
         matrixDate,
-        setMatrixDate
+        setMatrixDate,
+        isInitiated,
+        setIsInitiated
       }}
     >
       {props.children}

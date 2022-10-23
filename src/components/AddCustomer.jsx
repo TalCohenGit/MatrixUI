@@ -7,25 +7,20 @@ import {
   customerNumbers,
   deleteAllTables,
   getActionFromRes,
-  loadAllMatrixesData
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
-import CircularProgress from "@mui/material/CircularProgress";
 import {
   getMatrixIDAPI,
   getUrlsAPI,
-  sendTableAPI,
+  createDocAPI,
   getTablesByDatesAPI,
 } from "../api";
 import Modal from "../common/components/Modal/Modal";
-import DropDownMatrixNames from "../components/DropDownMatrixNames";
-import DateRangePickerToLoad from "./DateRangePickerToLoad";
 import { addDays } from "date-fns";
 import UrlCheckboxes from "./UrlCheckboxes/UrlCheckboxes";
 import LoaderContainer from "./LoaderContainer/LoaderContainer";
 import SaveModal from "./SaveModal/SaveModal";
 import LoadModal from "./Modals/LoadModal";
-import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 import { savingAction, savingAsAction, produceDocAction } from "../utils/constants";
 
 const AddCustomer = ({
@@ -65,7 +60,6 @@ const AddCustomer = ({
   const [disableProduction, setDisableProduction] = useState(false);
   const [toSaveDataModal, toggleToSaveDataModal] = useState(false);
   const [toUpdateDataModal, toggleToUpdateDataModal] = useState(false);
-  // const [dateValue, setDateValue] = useState(new Date());
   const [toLoadDataModal, toggleToLoadDataModal] = useState(false);
   const [isMatrixNames, toggleMatrixNames] = useState(false);
   const [matrixesDetails, setMatrixesDetails] = useState([]);
@@ -149,12 +143,11 @@ const AddCustomer = ({
     if (matrixData.length <= 1) {
       return;
     }
-    const action = produceDocAction;
     const validatedData = handleMatrixData(
       matrixData,
       productsMap,
       setCustomerValidationFailed,
-      action
+      produceDocAction
     );
     if (!validatedData) {
       return;
@@ -166,21 +159,25 @@ const AddCustomer = ({
         validatedData["docComments"],
         validatedData["metaData"]
       );
-    let newMatrixId = matrixID;
-    console.log("newMatrixId", newMatrixId);
-    if (!newMatrixId) {
-      newMatrixId = await getMatrixIDAPI(axiosPrivate);
-    }
+      let newMatrixId = matrixID;
+      console.log("newMatrixId", newMatrixId);
+      console.log("matrixDate", matrixDate)
+      console.log("this Date", new Date())
+
+      if (new Date(matrixDate).toDateString() !== new Date().toDateString()) {
+        newMatrixId = await getMatrixIDAPI(axiosPrivate);
+      }
     try {
       setDisableProduction(true);
-      const produceRes = await sendTableAPI(
+      const produceRes = await createDocAPI(
         axiosPrivate,
         validatedData,
         newMatrixId,
         cellsData,
         docCommentsToSend,
         metaDataToSend,
-        productsMap
+        productsMap,
+        matrixName
       );
       const action = getActionFromRes(produceRes);
       const urlDataArr = await getUrlsAPI(axiosPrivate, action);
@@ -217,8 +214,11 @@ const AddCustomer = ({
     toggleToLoadDataModal(true);
   };
 
-  const handleSaving = async (action, toggleModal, isBI) => {
-    await saveTables(isBI, action);
+  const handleSaving = async (action, toggleModal, isBI, newMatrixName, dateValue) => {
+    const isInitiated = true
+    await saveTables(dateValue, isBI, action, isInitiated, newMatrixName);
+    setMatrixName(newMatrixName)
+    setMatrixDate(dateValue)
     toggleModal(false);
   };
 
@@ -229,6 +229,7 @@ const AddCustomer = ({
   };
 
   const loadTableNames = async () => {
+    
     const startDate = formatDate(dateRanges[0]["startDate"]);
     const endDate = formatDate(dateRanges[0]["endDate"]);
 
@@ -322,8 +323,6 @@ const AddCustomer = ({
             <SaveModal
               isOpen={toSaveDataModal}
               toggleModal={toggleToSaveDataModal}
-              dateValue={matrixDate}
-              setDateValue={setMatrixDate}
               handleAction={handleSaving}
               action={savingAsAction}
               matrixName={matrixName}
@@ -334,8 +333,6 @@ const AddCustomer = ({
             <SaveModal
               isOpen={toUpdateDataModal}
               toggleModal={toggleToUpdateDataModal}
-              dateValue={matrixDate}
-              setDateValue={setMatrixDate}
               handleAction={handleSaving}
               action={savingAction}
               matrixName={matrixName}

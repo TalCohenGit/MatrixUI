@@ -1,19 +1,22 @@
-import React, { useContext, useState } from "react";
+import React, { useEffect, useState } from "react";
 import DatePicker from "../DatePicker";
 import Modal from "../../common/components/Modal/Modal";
-import { modalAction, savingAsAction } from "../../utils/constants";
+import {
+  modalAction,
+  savingAsAction,
+  savingAction,
+} from "../../utils/constants";
 
 const SaveModal = ({
   isOpen,
   toggleModal,
   handleAction,
   action,
-  dateValue,
-  setDateValue,
-  matrixName,
-  setMatrixName,
+  matrixName
 }) => {
   const [isBi, setIsBi] = useState(true);
+  const [newMatrixName, setNewMatrixName] = useState("");
+  const [dateValue, setDateValue] = useState(new Date())
 
   const handleChange = () => {
     setIsBi(!isBi);
@@ -29,15 +32,33 @@ const SaveModal = ({
         {action === savingAsAction && (
           <input
             style={{ width: "100%" }}
-            value={matrixName}
+            value={newMatrixName}
             type="text"
-            id="matrixName"
+            id="newMatrixName"
             onChange={(e) => {
-              setMatrixName(e.target.value);
+              setNewMatrixName(e.target.value);
             }}
             placeholder="בחר שם למטריצה"
           />
         )}
+        {action === savingAction && !matrixName && (
+          <input
+            style={{ width: "100%" }}
+            value={newMatrixName}
+            type="text"
+            id="newMatrixName"
+            onChange={(e) => {
+              setNewMatrixName(e.target.value);
+            }}
+            placeholder="שנה שם למטריצה"
+          />
+        )}
+        {action === savingAction && matrixName && (
+          <div>
+          <p>שם המטריצה: {matrixName}</p>
+          </div>
+        )}
+
         <label>
           <input
             type="checkbox"
@@ -57,11 +78,11 @@ const SaveModal = ({
         <button
           className={
             "save-button" +
-            (action === savingAsAction && !matrixName?.length
+            (action === savingAsAction && !newMatrixName?.length
               ? " disabled"
               : "")
           }
-          onClick={() => handleAction(action, toggleModal, isBi)}
+          onClick={() => handleAction(action, toggleModal, isBi, newMatrixName, dateValue)}
         >
           {modalAction[action]}
         </button>

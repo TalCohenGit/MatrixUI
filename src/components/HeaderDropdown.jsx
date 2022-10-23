@@ -27,7 +27,7 @@ const HeaderDropDown = ({
     // }),
   };
 
-  const options = products
+  const options = products && products
     .map((product) => {
       return {
         value: product["שם פריט"],
