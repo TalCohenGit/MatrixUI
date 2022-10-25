@@ -30,6 +30,7 @@ const Login = ({setSeconds, setRefreshToken}) => {
       localStorage.setItem("timeLimit", timeLimit)
       setRefreshToken(refreshToken)
       setTimelimit(timeLimit)
+      console.log("accessToken:", accessToken)
       setAccessToken(accessToken)
     } catch (e) {
       console.log("error in handleSubmit: ", e);

@@ -1,3 +1,4 @@
+import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 import { axiosAuth } from "./axios";
 import { getItemNames, parseStrimingData, formatDate } from "./utils/utils";
 
@@ -262,6 +263,20 @@ export const getUrlsAPI = async (axiosPrivate, action) => {
     console.log("error in createDocAPI:", e);
   }
 };
+
+export const deleteMatrixAPI = async (axiosPrivate, matrixID) => {
+  console.log("matrixID", matrixID)
+  try {
+    await axiosPrivate.post("/api/deletedata", {
+      collection: "MtxLog",
+      indentifierValue: matrixID,
+      indentifier: "matrixID"
+    });
+  } catch (e) {
+    console.log("error in deleteMatrixAPI:", e)
+  }
+
+} 
 
 export const mergePdfAPI = async (axiosPrivate, filteredUrl) => {
   try {

@@ -14,6 +14,7 @@ import {
   getUrlsAPI,
   createDocAPI,
   getTablesByDatesAPI,
+  deleteMatrixAPI
 } from "../api";
 import Modal from "../common/components/Modal/Modal";
 import { addDays } from "date-fns";
@@ -21,7 +22,12 @@ import UrlCheckboxes from "./UrlCheckboxes/UrlCheckboxes";
 import LoaderContainer from "./LoaderContainer/LoaderContainer";
 import SaveModal from "./SaveModal/SaveModal";
 import LoadModal from "./Modals/LoadModal";
-import { savingAction, savingAsAction, produceDocAction } from "../utils/constants";
+import AreUSureModal from "./Modals/AreUSureModal";
+import {
+  savingAction,
+  savingAsAction,
+  produceDocAction,
+} from "../utils/constants";
 
 const AddCustomer = ({
   customerName,
@@ -34,7 +40,7 @@ const AddCustomer = ({
   matrixName,
   setMatrixName,
   matrixDate,
-  setMatrixDate
+  setMatrixDate,
 }) => {
   const {
     toggleList,
@@ -49,7 +55,7 @@ const AddCustomer = ({
     products,
     matrixID,
     selectedProducts,
-    setSelectedProducts
+    setSelectedProducts,
   } = useContext(DataContext);
   const [customerValidationFailed, setCustomerValidationFailed] = useState({
     failure: false,
@@ -63,6 +69,8 @@ const AddCustomer = ({
   const [toLoadDataModal, toggleToLoadDataModal] = useState(false);
   const [isMatrixNames, toggleMatrixNames] = useState(false);
   const [matrixesDetails, setMatrixesDetails] = useState([]);
+  const [toDeleteDataModal, toggleToDeleteData] = useState(false);
+  const [toDeleteMatrixModal, toggleToDeleteMatrix] = useState(false);
 
   const intialRangeState = [
     {
@@ -139,6 +147,45 @@ const AddCustomer = ({
     );
   };
 
+  const handleDeleteData = () => {
+    toggleToDeleteData(true);
+  };
+
+  const cancleDelete = () => {
+    toggleToDeleteData(false);
+  };
+
+  const handleDeleteMatrix = () => {
+    toggleToDeleteMatrix(true);
+  };
+
+  const cancleDeleteMatrix = () => {
+    toggleToDeleteMatrix(false);
+  };
+
+  const deleteMatrix = async () => {
+    await deleteMatrixAPI(axiosPrivate, matrixID)
+    console.log("DB נמחקה המטריצה")
+    deleteAllTables(
+      setMatrixData,
+      setBalanceTableData,
+      setMatrixComments,
+      setSelectedProducts
+    );
+    setMatrixName("")
+    setMatrixDate("")
+  };
+
+  const deleteData = () => {
+    deleteAllTables(
+      setMatrixData,
+      setBalanceTableData,
+      setMatrixComments,
+      setSelectedProducts
+    );
+    toggleToDeleteData(false);
+  };
+
   const produceDoc = async (productsMap) => {
     if (matrixData.length <= 1) {
       return;
@@ -159,14 +206,14 @@ const AddCustomer = ({
         validatedData["docComments"],
         validatedData["metaData"]
       );
-      let newMatrixId = matrixID;
-      console.log("newMatrixId", newMatrixId);
-      console.log("matrixDate", matrixDate)
-      console.log("this Date", new Date())
+    let newMatrixId = matrixID;
+    console.log("newMatrixId", newMatrixId);
+    console.log("matrixDate", matrixDate);
+    console.log("this Date", new Date());
 
-      if (new Date(matrixDate).toDateString() !== new Date().toDateString()) {
-        newMatrixId = await getMatrixIDAPI(axiosPrivate);
-      }
+    if (new Date(matrixDate).toDateString() !== new Date().toDateString()) {
+      newMatrixId = await getMatrixIDAPI(axiosPrivate);
+    }
     try {
       setDisableProduction(true);
       const produceRes = await createDocAPI(
@@ -200,13 +247,13 @@ const AddCustomer = ({
   };
 
   const saveWithNameData = () => {
-    console.log("saveWithNameData")
+    console.log("saveWithNameData");
 
     toggleToSaveDataModal(true);
   };
 
   const savingMatrix = () => {
-    console.log("savingMatrix")
+    console.log("savingMatrix");
     toggleToUpdateDataModal(true);
   };
 
@@ -214,11 +261,17 @@ const AddCustomer = ({
     toggleToLoadDataModal(true);
   };
 
-  const handleSaving = async (action, toggleModal, isBI, newMatrixName, dateValue) => {
-    const newIsInitiated = true
+  const handleSaving = async (
+    action,
+    toggleModal,
+    isBI,
+    newMatrixName,
+    dateValue
+  ) => {
+    const newIsInitiated = true;
     await saveTables(dateValue, isBI, action, newIsInitiated, newMatrixName);
-    setMatrixName(newMatrixName)
-    setMatrixDate(dateValue)
+    setMatrixName(newMatrixName);
+    setMatrixDate(dateValue);
     toggleModal(false);
   };
 
@@ -229,7 +282,6 @@ const AddCustomer = ({
   };
 
   const loadTableNames = async () => {
-    
     const startDate = formatDate(dateRanges[0]["startDate"]);
     const endDate = formatDate(dateRanges[0]["endDate"]);
 
@@ -312,33 +364,43 @@ const AddCustomer = ({
     <>
       <div className="addCustomer-wrapper">
         <div className="addCustomer-input-wrapper">
-          {
-            <ListModal
-              isOpen={isUrlsModalOpen}
-              toggleModal={toggleUrlsModal}
-              header={"מסמכים שהופקו"}
-            />
-          }
-          {
-            <SaveModal
-              isOpen={toSaveDataModal}
-              toggleModal={toggleToSaveDataModal}
-              handleAction={handleSaving}
-              action={savingAsAction}
-              matrixName={matrixName}
-              setMatrixName={setMatrixName}
-            />
-          }
-          {
-            <SaveModal
-              isOpen={toUpdateDataModal}
-              toggleModal={toggleToUpdateDataModal}
-              handleAction={handleSaving}
-              action={savingAction}
-              matrixName={matrixName}
-              setMatrixName={setMatrixName}
-            />
-          }
+          <AreUSureModal
+            isOpen={toDeleteMatrixModal}
+            toggleModal={toggleToDeleteMatrix}
+            onCancel={cancleDeleteMatrix}
+            onDelete={deleteMatrix}
+            header={"האם אתה בטוח שברצונך למחוק את המטריצה?"}
+            deleteBtnText={"מחק מטריצה"}
+          />
+          <AreUSureModal
+            isOpen={toDeleteDataModal}
+            toggleModal={toggleToDeleteData}
+            onCancel={cancleDelete}
+            onDelete={deleteData}
+            header={"האם אתה בטוח שברצונך למחוק נתונים?"}
+            deleteBtnText={"מחק נתונים"}
+          />
+          <ListModal
+            isOpen={isUrlsModalOpen}
+            toggleModal={toggleUrlsModal}
+            header={"מסמכים שהופקו"}
+          />
+          <SaveModal
+            isOpen={toSaveDataModal}
+            toggleModal={toggleToSaveDataModal}
+            handleAction={handleSaving}
+            action={savingAsAction}
+            matrixName={matrixName}
+            setMatrixName={setMatrixName}
+          />
+          <SaveModal
+            isOpen={toUpdateDataModal}
+            toggleModal={toggleToUpdateDataModal}
+            handleAction={handleSaving}
+            action={savingAction}
+            matrixName={matrixName}
+            setMatrixName={setMatrixName}
+          />
           <LoadModal
             isOpen={toLoadDataModal}
             toggleModal={cancelLoading}
@@ -413,9 +475,15 @@ const AddCustomer = ({
         <button
           className="deleteAll-button"
           disabled={matrixData.length === 0}
-          onClick={() => deleteAll()}
+          onClick={() => handleDeleteData()}
         >
           מחק נתונים
+        </button>
+        <button
+          className="deleteAll-button"
+          onClick={() => handleDeleteMatrix()}
+        >
+          מחק מטריצה
         </button>
       </div>
       {errorMessage?.length ? (

@@ -523,7 +523,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     <div className="matrix-page">
       <h1> MatrixUi </h1>
       <h2> שם המטריצה: {matrixName}</h2>
-      <h3> תאריך ערך למטריצה: {new Date(matrixDate).toLocaleDateString()}</h3>
+      <h3> תאריך ערך למטריצה: {matrixDate && new Date(matrixDate).toLocaleDateString()}</h3>
       <Modal
         isOpen={isOpenValidationModal}
         toggleModal={toggleValidationModal}
