@@ -265,7 +265,6 @@ export const getUrlsAPI = async (axiosPrivate, action) => {
 };
 
 export const deleteMatrixAPI = async (axiosPrivate, matrixID) => {
-  console.log("matrixID", matrixID)
   try {
     await axiosPrivate.post("/api/deletedata", {
       collection: "MtxLog",

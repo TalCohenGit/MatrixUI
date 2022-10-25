@@ -174,6 +174,7 @@ const AddCustomer = ({
     );
     setMatrixName("")
     setMatrixDate("")
+    toggleToDeleteMatrix(false);
   };
 
   const deleteData = () => {
