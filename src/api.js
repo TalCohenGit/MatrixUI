@@ -289,6 +289,9 @@ export const mergePdfAPI = async (axiosPrivate, filteredUrl) => {
 
 export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
+    console.log("fromDate", fromDate)
+    console.log("toDate", toDate)
+
     let dates = {
       Date: {
         $gte: fromDate,
@@ -297,8 +300,14 @@ export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
     };
 
     if (fromDate === toDate) {
-      dates = { Date: toDate };
+      dates = {
+        Date: {
+          $gte: new Date(fromDate).setUTCHours(0, 0, 0, 0),
+          $lte: new Date(toDate).setUTCHours(23, 59, 59, 999),
+        },
+      };
     }
+    console.log("dates", dates)
 
     const res = await axiosPrivate.post("/api/getdata", {
       collection: "MtxLog",

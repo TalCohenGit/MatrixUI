@@ -5,6 +5,7 @@ import {
   savingAsAction,
   produceDocAction
 } from "./constants";
+import { logoutAPI } from "../api"
 import _ from "lodash";
 import { format } from "date-fns";
 
@@ -132,6 +133,14 @@ export const removeProductCol = (productIndx, currentMatrix, currentMatrixCommen
   return {newMatrixData, newMatrixComments}
 }
 
+export const logout = async (setAccessToken, setRefreshToken) => {
+  setAccessToken("");
+  setRefreshToken("");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("timeLimit");
+  await logoutAPI();
+}
+
 export const removeColFromBalanceTable = (
   currentBalanceTable,
   productsData,
@@ -238,7 +247,7 @@ export const getActionFromRes = (dataRes) => {
 }
 
 export const formatDate = (matrixDate) => {
-  // return format(new Date(matrixDate), "MM/dd/yyyy")
+  // return format(new Date(matrixDate), "MM/dd/yyyy"
    return new Date(matrixDate).toLocaleString('en', {  timeZone: "Asia/Jerusalem", })
 }
 

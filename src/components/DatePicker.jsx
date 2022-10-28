@@ -5,7 +5,6 @@ import { Calendar } from "react-date-range";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 const DatePicker = ({ dateValue, setDateValue }) => {
-  console.log("dateValue", dateValue)
   const handleChange = (newValue) => {
     setDateValue(newValue);
   };

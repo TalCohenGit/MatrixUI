@@ -5,6 +5,7 @@ import "normalize.css";
 import AddCustomer from "../components/AddCustomer";
 import Table from "../components/Table";
 import CopyDataModal from "../components/Modals/CopyDataModal";
+import Logout from "../components/Logout"
 import {
   getCustomersAPI,
   getProductsAPI,
@@ -30,6 +31,7 @@ import {
   loadData,
   removeProductCol,
   formatDate,
+  logout
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
@@ -318,12 +320,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         setTimelimit(timeLimit);
       }
       if (currentTimeLimit && seconds > currentTimeLimit) {
-        setAccessToken("");
-        setRefreshToken("");
         clearInterval(interval);
-        localStorage.removeItem("refreshToken");
-        localStorage.removeItem("timeLimit");
-        await logoutAPI();
+        await logout(setAccessToken, setRefreshToken)
       }
     })();
   }, []);
@@ -374,7 +372,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   const saveTables = async (matrixDate, isBI, action, newIsInitiated, newMatrixName) => {
     const date = getMatrixFormatedDate(matrixDate);
-    console.log("date is:", date)
     const newMatrixId = await getMatrixID(action);
 
     const { validatedData, cellsData, docCommentsToSend, metaDataToSend } =
@@ -491,11 +488,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         loadData(matrixesUiData, setBalanceTableData, 3);
         setMatrixID(savedData.matrixID);
         setMatrixName(savedData.matrixName);
-        console.log("loaded matrixDate:", savedData.matrixDate)
         setMatrixDate(savedData.matrixDate);
         setIsInitiated(savedData.isInitiated);
-        console.log("isInitiated:", savedData.isInitiated)
-
       }
       const [productsData, customerList, driverList] = await Promise.all([
         getProductsAPI(axiosPrivate, validationModal),
@@ -521,6 +515,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   return drivers?.length ? (
     <div className="matrix-page">
+      <Logout setAccessToken={setAccessToken} setRefreshToken={setRefreshToken}/>
       <h1> MatrixUi </h1>
       <h2> שם המטריצה: {matrixName}</h2>
       <h3> תאריך ערך למטריצה: {matrixDate && new Date(matrixDate).toLocaleDateString()}</h3>

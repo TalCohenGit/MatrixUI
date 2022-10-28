@@ -277,6 +277,7 @@ const AddCustomer = ({
   };
 
   const formatDate = (date) => {
+    console.log("formatDate date", date)
     if (date) {
       return date.toLocaleDateString("en-us");
     }
@@ -285,6 +286,9 @@ const AddCustomer = ({
   const loadTableNames = async () => {
     const startDate = formatDate(dateRanges[0]["startDate"]);
     const endDate = formatDate(dateRanges[0]["endDate"]);
+    console.log("startDate", startDate)
+    console.log("endDate", endDate)
+
 
     const matrixesDetails = await getTablesByDatesAPI(
       axiosPrivate,

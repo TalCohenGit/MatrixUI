@@ -82,8 +82,11 @@ const SaveModal = ({
               ? " disabled"
               : "")
           }
-          onClick={() => handleAction(action, toggleModal, isBi, newMatrixName, dateValue)}
-        >
+          onClick={() => {
+            handleAction(action, toggleModal, isBi, newMatrixName, dateValue)
+            setNewMatrixName("")
+          }
+          }>
           {modalAction[action]}
         </button>
       </div>
