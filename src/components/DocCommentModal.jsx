@@ -12,6 +12,8 @@ const DocCommentModal = ({ isOpen, toggleModal, rowIndex, colIndex, data, setDat
           type="text"
           value={comment}
           onChange={(e) => setComment(e.target.value)}
+          placeholder="הוסף הערה"
+          className="single-comment"
         />
       </div>
       <div className="action-buttons">

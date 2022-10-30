@@ -6,7 +6,6 @@ import DocCommentCell from "./DocCommentCell.jsx";
 import HeaderDropDown from "./HeaderDropdown";
 import { DataContext } from "../context/DataContext";
 
-
 const TableCell = (props) => {
   const {
     rowLength,
@@ -17,18 +16,15 @@ const TableCell = (props) => {
     setData,
     disabled,
     bgColor,
-    missingProductsCol,
-    tableName
+    tableName,
   } = props;
-  const { drivers } = useContext(DataContext);
+  const { drivers, balanceTableData } = useContext(DataContext);
 
   let cellType;
 
   if (rowIndex === 0) {
     if (colIndex < 3 || (rowLength > 7 && colIndex > rowLength - 6)) {
-      cellType = (
-          <b>{cellValue}</b>
-      );
+      cellType = <b>{cellValue}</b>;
     } else {
       cellType = (
         <HeaderDropDown
@@ -110,10 +106,7 @@ const TableCell = (props) => {
         pointerEvents: disabled ? "none" : "auto",
         backgroundColor: cellValue === "" ? "none" : bgColor,
         border: colIndex === rowLength - 1 ? "0" : "1px solid #a9a9a9",
-        color:
-          colIndex === missingProductsCol && missingProductsCol > 0
-            ? "red"
-            : "black",
+        color: balanceTableData[3][colIndex] < 0 ? "red" : "black",
       }}
     >
       {cellType}
