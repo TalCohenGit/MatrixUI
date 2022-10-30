@@ -1,5 +1,4 @@
-import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
-import { axiosAuth } from "./axios";
+import { axiosAuth, axiosRegister } from "./axios";
 import { getItemNames, parseStrimingData, formatDate } from "./utils/utils";
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
@@ -207,13 +206,14 @@ export const registerAPI = async (
   accountName
 ) => {
   try {
-    const res = await axiosAuth.post("/api/register", {
+    const res = await axiosRegister.post("/api/Register", {
       FirstName: firstName,
       LastName: lastName,
       Phone: phone,
       Mail: email,
       userPassword: userPassword,
       Accountname: accountName,
+      isAdmin: "no"
     });
     return res;
   } catch (e) {
