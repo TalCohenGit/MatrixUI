@@ -35,12 +35,12 @@ const LoadModal = ({
           חיפוש
         </button>
       </div>
-      {isMatrixNames && (
+      {isMatrixNames && matrixesDetails?.length ? (
         <DropDownMatrixNames
           matrixesDetails={matrixesDetails}
           loadTablesByID={loadTablesByID}
         />
-      )}
+      ) : null}
     </Modal>
   );
 };

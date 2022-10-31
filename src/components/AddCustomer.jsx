@@ -272,8 +272,19 @@ const AddCustomer = ({
     const newIsInitiated = true;
     await saveTables(dateValue, isBI, action, newIsInitiated, newMatrixName);
     setMatrixName(newMatrixName);
+    console.log("handleSaving dateValue", dateValue)
     setMatrixDate(dateValue);
     toggleModal(false);
+  };
+
+  const formatDate2 = (date) => {
+    console.log("date", date)
+    if (date) {
+      date = (new Date(date)).setHours(12)
+      const formatedDate = (new Date(date)).toISOString().substring(0, 10)    
+      return {startDate: new Date(formatedDate).setUTCHours(0, 0, 0, 0), 
+        endDate:  new Date(formatedDate).setUTCHours(23, 59, 59, 999)}
+    }
   };
 
   const formatDate = (date) => {
@@ -284,8 +295,16 @@ const AddCustomer = ({
   };
 
   const loadTableNames = async () => {
-    const startDate = formatDate(dateRanges[0]["startDate"]);
-    const endDate = formatDate(dateRanges[0]["endDate"]);
+    let startDate, endDate;
+    if (dateRanges[0]["startDate"] === dateRanges[0]["endDate"]) {
+      const dates = formatDate2(dateRanges[0]["startDate"])
+      startDate = dates.startDate
+      endDate = dates.endDate
+    } else {
+      startDate = formatDate(dateRanges[0]["startDate"]);
+      endDate = formatDate(dateRanges[0]["endDate"]);
+
+    }
     console.log("startDate", startDate)
     console.log("endDate", endDate)
 
@@ -299,6 +318,7 @@ const AddCustomer = ({
       setMatrixesDetails(matrixesDetails);
       toggleMatrixNames(true);
     } else {
+      setMatrixesDetails([]);
       console.log("cannot find matrixes to load");
     }
   };

@@ -3,6 +3,7 @@ import { logout } from '../utils/utils';
 
 const Logout = ({setAccessToken, setRefreshToken}) => {
     const handleLogout = async () => {
+        console.log("logout")
         await logout(setAccessToken, setRefreshToken)        
     }
 

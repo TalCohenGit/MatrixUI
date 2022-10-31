@@ -292,21 +292,12 @@ export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
     console.log("fromDate", fromDate)
     console.log("toDate", toDate)
 
-    let dates = {
+    const dates = {
       Date: {
         $gte: fromDate,
         $lte: toDate,
       },
     };
-
-    if (fromDate === toDate) {
-      dates = {
-        Date: {
-          $gte: new Date(fromDate).setUTCHours(0, 0, 0, 0),
-          $lte: new Date(toDate).setUTCHours(23, 59, 59, 999),
-        },
-      };
-    }
     console.log("dates", dates)
 
     const res = await axiosPrivate.post("/api/getdata", {

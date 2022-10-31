@@ -106,7 +106,7 @@ const TableCell = (props) => {
         pointerEvents: disabled ? "none" : "auto",
         backgroundColor: cellValue === "" ? "none" : bgColor,
         border: colIndex === rowLength - 1 ? "0" : "1px solid #a9a9a9",
-        color: balanceTableData[3][colIndex] < 0 ? "red" : "black",
+        color: balanceTableData?.length > 0 && balanceTableData[3][colIndex] < 0 ? "red" : "black",
       }}
     >
       {cellType}
