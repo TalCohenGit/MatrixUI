@@ -28,9 +28,9 @@ const Login = ({setSeconds, setRefreshToken}) => {
       setUserID(userID)
       localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("timeLimit", timeLimit)
+      localStorage.setItem("userEmail", userEmail)
       setRefreshToken(refreshToken)
       setTimelimit(timeLimit)
-      console.log("accessToken:", accessToken)
       setAccessToken(accessToken)
     } catch (e) {
       console.log("error in handleSubmit: ", e);

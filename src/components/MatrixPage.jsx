@@ -12,7 +12,6 @@ import {
   saveTablesAPI,
   loadTablesAPI,
   getDriverList,
-  logoutAPI,
   refreshTokenAPI,
   getMatrixByIDAPI,
   getTablesByDatesAPI,
@@ -31,7 +30,8 @@ import {
   loadData,
   removeProductCol,
   formatDate,
-  logout
+  logout,
+  getUserEmail
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
@@ -281,11 +281,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     );
   });
 
-  const missingProducts = (n) => {
-    console.log("missing product for column number", n);
-    setMissingProductsCol(n);
-  };
-
   const calcProductsSum = (n) => {
     let sum = 0;
     matrixData.forEach((rowData, rowDataIndex) => {
@@ -297,9 +292,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     const currentData = [...balanceTableData];
     currentData[2][n] = sum;
     currentData[3][n] = currentData[1][n] - sum;
-    if (currentData[3][n] < 0) {
-      missingProducts(n);
-    }
     setBalanceTableData(currentData);
   };
 
@@ -312,19 +304,19 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     // };
   }, [accessToken]);
 
-  useEffect(() => {
-    (async () => {
-      let currentTimeLimit = timeLimit;
-      if (!currentTimeLimit) {
-        currentTimeLimit = localStorage.getItem("timeLimit");
-        setTimelimit(timeLimit);
-      }
-      if (currentTimeLimit && seconds > currentTimeLimit) {
-        clearInterval(interval);
-        await logout(setAccessToken, setRefreshToken)
-      }
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     let currentTimeLimit = timeLimit;
+  //     if (!currentTimeLimit) {
+  //       currentTimeLimit = localStorage.getItem("timeLimit");
+  //       setTimelimit(timeLimit);
+  //     }
+  //     if (currentTimeLimit && seconds > currentTimeLimit) {
+  //       clearInterval(interval);
+  //       await logout(setAccessToken, setRefreshToken)
+  //     }
+  //   })();
+  // }, []);
 
   useEffect(() => {
     setSeconds(0);
@@ -515,6 +507,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   return drivers?.length ? (
     <div className="matrix-page">
+      <h1 className="login-details">שלום {getUserEmail()}</h1>
       <Logout setAccessToken={setAccessToken} setRefreshToken={setRefreshToken}/>
       <h1> MatrixUi </h1>
       <h2> שם המטריצה: {matrixName}</h2>

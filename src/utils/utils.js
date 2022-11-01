@@ -138,7 +138,12 @@ export const logout = async (setAccessToken, setRefreshToken) => {
   setRefreshToken("");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("timeLimit");
+  localStorage.removeItem("userEmail")
   await logoutAPI();
+}
+
+export const getUserEmail = () => {
+  return localStorage.getItem("userEmail")
 }
 
 export const removeColFromBalanceTable = (
