@@ -14,7 +14,7 @@ const App = () => {
     return false;
   };
 
-  useEffect(() => {}, [refreshToken]);
+  // useEffect(() => {}, [refreshToken]);
 
   if (!refreshToken && !getRefreshToken()) {
     return <Login setSeconds={setSeconds} setRefreshToken={setRefreshToken} />;
