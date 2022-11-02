@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import MatrixPage from "./components/MatrixPage";
 import Login from "./components/Login";
 
@@ -13,6 +13,8 @@ const App = () => {
     }
     return false;
   };
+
+  useEffect(() => {}, [refreshToken]);
 
   if (!refreshToken && !getRefreshToken()) {
     return <Login setSeconds={setSeconds} setRefreshToken={setRefreshToken} />;

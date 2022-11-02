@@ -129,7 +129,6 @@ export const removeColFromTable = (colIndex, numOfColBeforeProducts, matrix) => 
 export const removeProductCol = (productIndx, currentMatrix, currentMatrixComments) => {
   const newMatrixData = removeColFromTable(productIndx, 0, currentMatrix)
   const newMatrixComments = removeColFromTable(productIndx, numOfColBeforeProducts, currentMatrixComments)
-  console.log("newMatrixComments:", newMatrixComments)
   return {newMatrixData, newMatrixComments}
 }
 

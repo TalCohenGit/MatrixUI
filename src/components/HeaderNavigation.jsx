@@ -84,7 +84,6 @@ const HeaderNavigation = ({ children, data, setData, colIndex, tableName }) => {
               className="delete-column-icon"
               onClick={(e) => {
                 e.stopPropagation();
-                console.log("delete from col:", colIndex);
                 deleteFromCol(colIndex);
               }}
             />

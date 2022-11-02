@@ -16,7 +16,7 @@ const DropDownMatrixNames = ({ matrixesDetails, loadTablesByID }) => {
       options.push({ value: element.matrixID, label: element.matrixName });
     });
   }
-console.log("selectedOption",selectedOption)
+
   return (
     <>
       <div className="search-dropdown-wrapper">

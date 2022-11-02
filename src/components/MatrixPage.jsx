@@ -343,7 +343,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const getMatrixFormatedDate = (matrixDate) => {
-    console.log("getMatrixFormatedDate matrixDate", matrixDate)
       if (matrixDate) {
         return formatDate(matrixDate);
       }

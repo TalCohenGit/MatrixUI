@@ -165,7 +165,6 @@ const AddCustomer = ({
 
   const deleteMatrix = async () => {
     await deleteMatrixAPI(axiosPrivate, matrixID)
-    console.log("DB נמחקה המטריצה")
     deleteAllTables(
       setMatrixData,
       setBalanceTableData,
@@ -208,10 +207,6 @@ const AddCustomer = ({
         validatedData["metaData"]
       );
     let newMatrixId = matrixID;
-    console.log("newMatrixId", newMatrixId);
-    console.log("matrixDate", matrixDate);
-    console.log("this Date", new Date());
-
     if (new Date(matrixDate).toDateString() !== new Date().toDateString()) {
       newMatrixId = await getMatrixIDAPI(axiosPrivate);
     }
@@ -248,13 +243,10 @@ const AddCustomer = ({
   };
 
   const saveWithNameData = () => {
-    console.log("saveWithNameData");
-
     toggleToSaveDataModal(true);
   };
 
   const savingMatrix = () => {
-    console.log("savingMatrix");
     toggleToUpdateDataModal(true);
   };
 
@@ -272,13 +264,11 @@ const AddCustomer = ({
     const newIsInitiated = true;
     await saveTables(dateValue, isBI, action, newIsInitiated, newMatrixName);
     setMatrixName(newMatrixName);
-    console.log("handleSaving dateValue", dateValue)
     setMatrixDate(dateValue);
     toggleModal(false);
   };
 
   const formatDate2 = (date) => {
-    console.log("date", date)
     if (date) {
       date = (new Date(date)).setHours(12)
       const formatedDate = (new Date(date)).toISOString().substring(0, 10)    
@@ -288,7 +278,6 @@ const AddCustomer = ({
   };
 
   const formatDate = (date) => {
-    console.log("formatDate date", date)
     if (date) {
       return date.toLocaleDateString("en-us");
     }
@@ -305,10 +294,7 @@ const AddCustomer = ({
       endDate = formatDate(dateRanges[0]["endDate"]);
 
     }
-    console.log("startDate", startDate)
-    console.log("endDate", endDate)
-
-
+    
     const matrixesDetails = await getTablesByDatesAPI(
       axiosPrivate,
       startDate,
@@ -319,7 +305,6 @@ const AddCustomer = ({
       toggleMatrixNames(true);
     } else {
       setMatrixesDetails([]);
-      console.log("cannot find matrixes to load");
     }
   };
 
