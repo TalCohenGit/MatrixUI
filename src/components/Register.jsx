@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   faCheck,
   faTimes,
@@ -6,12 +6,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { registerAPI } from "../api";
+import { DataContext } from "../context/DataContext";
 
 const USER_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
 const Register = ({ setNeedToRegister }) => {
+  const {businessName, setBusinessName} = useContext(DataContext)
+  
   const [userEmail, setUserEmail] = useState("");
   const [validUser, setValidUser] = useState(false);
   const [userFocus, setUserFocus] = useState(false);
@@ -78,6 +81,7 @@ const Register = ({ setNeedToRegister }) => {
     !validMatch ||
     !validFirstName ||
     !validLastName
+    || !businessName
     return validation
   };
 
@@ -139,6 +143,12 @@ const Register = ({ setNeedToRegister }) => {
             type="text"
             id="accountName"
             onChange={(e) => setAccountName(e.target.value)}
+          />
+          <label>שם העסק</label>
+          <input
+            type="text"
+            id="businessName"
+            onChange={(e) => setBusinessName(e.target.value)}
           />
           <label>
             סיסמה

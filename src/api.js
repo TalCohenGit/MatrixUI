@@ -1,4 +1,4 @@
-import { axiosAuth, axiosRegister } from "./axios";
+import { axiosAuth, axiosRegister, axiosMsgs } from "./axios";
 import { getItemNames, parseStrimingData, formatDate } from "./utils/utils";
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
@@ -269,9 +269,15 @@ export const getUrlsAPI = async (axiosPrivate, action) => {
     });
     const data = res.data.result.data;
     return data.map((element) => {
+      const { DocUrl,DocNumber,Accountname,ValueDate,Action,TotalCost, DocumentDetails } = element
       return {
-        DocUrl: element["DocUrl"],
-        DocNumber: element["DocNumber"],
+        DocUrl,
+        Accountname,
+        Action,
+        ValueDate,
+        TotalCost,
+        DocNumber,
+        DocumentDetails
       };
     });
   } catch (e) {
@@ -373,3 +379,15 @@ export const loadTablesAPI = async (axiosPrivate, userID) => {
     console.log("error in loadTablesAPI: ", e);
   }
 };
+
+export const sendMsgsAPI = async (numbers, msgs) => {
+  try {
+    await axiosMsgs.post("/api/sendMsgs", {
+      password: "password",
+      numbers: numbers,
+      msg: msgs
+    });
+  } catch (e) {
+    console.log("error in sendMsgsAPI: ", e);
+  }
+}

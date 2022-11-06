@@ -450,3 +450,13 @@ body {
   margin-bottom: 10px;
 
 }
+
+th,td {
+  border: 1px solid black;
+  padding: 1em;
+  text-align: center;
+}
+
+input[type=checkbox] {
+  transform: scale(1.5);
+}

@@ -2,6 +2,7 @@ import axios from "axios";
 
 const matrixServerURL = process.env.REACT_APP_MATRIX_URL;
 const authServerURL = process.env.REACT_APP_AUTH_URL;
+const msgsServerURL = process.env.REACT_APP_MSGS_URL
 
 const headers = {
   "Content-Type": "application/json",
@@ -27,5 +28,12 @@ export const axiosRegister = axios.create({
   headers: {
     "Content-Type": "application/json",
     Authorization: "Bearer 33333"
+  },
+});
+
+export const axiosMsgs = axios.create({
+  baseURL: msgsServerURL,
+  headers: {
+    "Content-Type": "application/json",
   },
 });

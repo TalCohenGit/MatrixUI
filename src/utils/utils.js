@@ -145,6 +145,10 @@ export const getUserEmail = () => {
   return localStorage.getItem("userEmail")
 }
 
+export const getInternationalNum = (phoneNum) => {
+  return "972" + phoneNum.substring(1)
+}
+
 export const removeColFromBalanceTable = (
   currentBalanceTable,
   productsData,

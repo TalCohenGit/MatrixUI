@@ -3,7 +3,6 @@ import { useContext, useEffect } from "react";
 import { DataContext } from "../context/DataContext";
 import { refreshTokenAPI } from "../api"
 import { getRefreshToken } from "../utils/utils";
-import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 const useAxiosPrivate = () => {
     const { accessToken, setAccessToken } = useContext(DataContext);

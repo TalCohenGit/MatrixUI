@@ -62,7 +62,7 @@ const AddCustomer = ({
     error: "",
   });
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
-  const [producedUrls, setProducedUrls] = useState("");
+  const [invoiceData, setInvoiceData] = useState([]);
   const [disableProduction, setDisableProduction] = useState(false);
   const [toSaveDataModal, toggleToSaveDataModal] = useState(false);
   const [toUpdateDataModal, toggleToUpdateDataModal] = useState(false);
@@ -223,12 +223,13 @@ const AddCustomer = ({
         matrixName
       );
       const action = getActionFromRes(produceRes);
-      const urlDataArr = await getUrlsAPI(axiosPrivate, action);
-      const relavantUrls = urlDataArr.slice(
-        urlDataArr.length - customerNumbers(matrixData),
-        urlDataArr.length
+      const invoiceDataArr = await getUrlsAPI(axiosPrivate, action);
+      console.log("urlDataArr",invoiceDataArr)
+      const relavantInvoiceData = invoiceDataArr.slice(
+        invoiceDataArr.length - customerNumbers(matrixData),
+        invoiceDataArr.length
       );
-      setProducedUrls(relavantUrls);
+      setInvoiceData(relavantInvoiceData);
       toggleUrlsModal(true);
       setDisableProduction(false);
     } catch (e) {
@@ -332,13 +333,13 @@ const AddCustomer = ({
   const ListModal = ({ isOpen, toggleModal, header }) => {
     return (
       isOpen &&
-      (producedUrls?.length ? (
+      (invoiceData?.length ? (
         <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={header}>
           {/* <div>{dataToShow}</div> */}
           <React.Fragment>
             <UrlCheckboxes
               axiosPrivate={axiosPrivate}
-              producedUrls={producedUrls}
+              invoiceData={invoiceData}
               toggleModal={toggleModal}
             />
           </React.Fragment>

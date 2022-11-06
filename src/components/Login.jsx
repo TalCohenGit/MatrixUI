@@ -20,10 +20,14 @@ const Login = ({setSeconds, setRefreshToken}) => {
     setSeconds(0)
   }, [])
 
+  const getUserPermission  = (userConfig) => {
+    return userConfig?.ModulsPremission?.Messages?.whatsApp?.isOpend
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const { accessToken, refreshToken, timeLimit } = await loginUserAPI(userEmail, password);
+      const { accessToken, refreshToken, timeLimit, userConfig } = await loginUserAPI(userEmail, password);
       const userID = jwt(accessToken).fetchedData.userID
       setUserID(userID)
       localStorage.setItem("refreshToken", refreshToken);
@@ -32,6 +36,8 @@ const Login = ({setSeconds, setRefreshToken}) => {
       setRefreshToken(refreshToken)
       setTimelimit(timeLimit)
       setAccessToken(accessToken)
+      const whatsappPermissions = getUserPermission(userConfig)
+      localStorage.setItem("whatsapp", whatsappPermissions)
     } catch (e) {
       console.log("error in handleSubmit: ", e);
       setErrMsg(e);
