@@ -12,19 +12,30 @@ const HeaderNavigation = ({ children, data, setData, colIndex, tableName }) => {
     matrixComments,
     setMatrixComments,
     selectedProducts,
-    setSelectedProducts
+    setSelectedProducts,
+    calcProductsSum
   } = useContext(DataContext);
   const [isHovered, setHover] = useState(false);
 
+  // const switchRows = (currentBalanceData) => {
+
+  // }
+
   const handleClick = (newIndex) => {
     const currentData = [...data];
-    const currentBalanceData = [...balanceTableData];
     const temp1 = currentData[0][newIndex];
-    const temp2 = currentBalanceData[0][newIndex];
     currentData[0][newIndex] = currentData[0][colIndex];
     currentData[0][colIndex] = temp1;
-    currentBalanceData[0][newIndex] = currentBalanceData[0][colIndex];
-    currentBalanceData[0][colIndex] = temp2;
+
+    const currentBalanceData = [...balanceTableData];
+    // switchRows(currentBalanceData)
+    for (let i = 0; i < 2; i++) {
+      const temp2 = currentBalanceData[i][newIndex];
+      currentBalanceData[i][newIndex] = currentBalanceData[i][colIndex];
+      currentBalanceData[i][colIndex] = temp2;
+    }
+    calcProductsSum(colIndex)
+    calcProductsSum(newIndex)
 
     setData(currentData);
     setBalanceTableData(currentBalanceData);
@@ -32,10 +43,12 @@ const HeaderNavigation = ({ children, data, setData, colIndex, tableName }) => {
 
   const deleteFromCol = (colIndex) => {
     const currentData = [...data];
-    const currentSelectedProducts = [...selectedProducts]
-    const productName = currentData[0][colIndex]
-    const newSelectedProducts = currentSelectedProducts.filter(element => element.value != productName)
-    setSelectedProducts(newSelectedProducts)
+    const currentSelectedProducts = [...selectedProducts];
+    const productName = currentData[0][colIndex];
+    const newSelectedProducts = currentSelectedProducts.filter(
+      (element) => element.value != productName
+    );
+    setSelectedProducts(newSelectedProducts);
     const currentMatrixComments = [...matrixComments];
     const { newMatrixData, newMatrixComments } = removeProductCol(
       colIndex,

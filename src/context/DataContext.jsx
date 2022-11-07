@@ -36,6 +36,21 @@ const DataContextProvider = (props) => {
     );
   };
 
+  const calcProductsSum = (n) => {
+    let sum = 0;
+    matrixData.forEach((rowData, rowDataIndex) => {
+      if (rowDataIndex === 0) {
+        return;
+      }
+      sum += Number(rowData[n]);
+    });
+    const currentData = [...balanceTableData];
+    currentData[2][n] = sum;
+    currentData[3][n] = currentData[1][n] - sum;
+    setBalanceTableData(currentData);
+  };
+
+
   return (
     <DataContext.Provider
       value={{
@@ -77,7 +92,8 @@ const DataContextProvider = (props) => {
         isInitiated,
         setIsInitiated,
         businessName,
-        setBusinessName
+        setBusinessName,
+        calcProductsSum
       }}
     >
       {props.children}

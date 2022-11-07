@@ -79,6 +79,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     setMatrixDate,
     setIsInitiated,
     isInitiated,
+    calcProductsSum
   } = useContext(DataContext);
 
   const [isOpenValidationModal, toggleValidationModal] = useState(false);
@@ -281,19 +282,19 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     );
   });
 
-  const calcProductsSum = (n) => {
-    let sum = 0;
-    matrixData.forEach((rowData, rowDataIndex) => {
-      if (rowDataIndex === 0) {
-        return;
-      }
-      sum += Number(rowData[n]);
-    });
-    const currentData = [...balanceTableData];
-    currentData[2][n] = sum;
-    currentData[3][n] = currentData[1][n] - sum;
-    setBalanceTableData(currentData);
-  };
+  // const calcProductsSum = (n) => {
+  //   let sum = 0;
+  //   matrixData.forEach((rowData, rowDataIndex) => {
+  //     if (rowDataIndex === 0) {
+  //       return;
+  //     }
+  //     sum += Number(rowData[n]);
+  //   });
+  //   const currentData = [...balanceTableData];
+  //   currentData[2][n] = sum;
+  //   currentData[3][n] = currentData[1][n] - sum;
+  //   setBalanceTableData(currentData);
+  // };
 
   useEffect(() => {
     // interval = setInterval(() => {

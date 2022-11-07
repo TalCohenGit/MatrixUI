@@ -460,3 +460,12 @@ th,td {
 input[type=checkbox] {
   transform: scale(1.5);
 }
+
+.hasOpacity {
+  opacity: 0.5;
+
+  &:hover {
+    box-shadow: none;
+    opacity: 0.5;
+  }
+}

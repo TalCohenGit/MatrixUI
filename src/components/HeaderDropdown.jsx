@@ -10,6 +10,7 @@ const HeaderDropDown = ({
   colIndex,
   rowIndex,
   tableName,
+  cb
 }) => {
   const [isDropdown, setIsDropdown] = useState(false);
   const {

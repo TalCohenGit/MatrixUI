@@ -69,6 +69,7 @@ const Register = ({ setNeedToRegister }) => {
         accountName
       );
       setSuccess(true);
+      localStorage.setItem("businessName", businessName)
     } catch (e) {
       console.log("error in handleSubmit: ", e);
       setErrMsg(e);

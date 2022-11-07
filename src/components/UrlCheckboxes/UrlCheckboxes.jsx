@@ -3,7 +3,8 @@ import "./UrlCheckboxes.scss";
 import PropTypes from "prop-types";
 import { mergePdfAPI, sendMsgsAPI } from "../../api";
 import InvoiceTable from "../InvoiceTable";
-import {getInternationalNum} from "../../utils/utils"
+import { getInternationalNum } from "../../utils/utils";
+import { Tooltip } from "@mui/material";
 
 const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
   const [invoiceTableData, setInvoiceTableData] = useState([]);
@@ -50,24 +51,26 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
   };
 
   const sendMessages = async () => {
-    console.log("שליחת הודעות");
     const filteredUrls = checkedUrl(invoiceTableData);
     const msgs = [];
     const numbers = [];
+    const businessName = localStorage.getItem("businessName");
     filteredUrls.map((checkedUrl) => {
       const url = checkedUrl["DocUrl"];
       const accountName = checkedUrl["Accountname"];
       const docNumber = checkedUrl["DocNumber"];
-      const phoneNumber = checkedUrl["DocumentDetails"]
-      const fixedNum = getInternationalNum(phoneNumber)
-      console.log("fixedNum", fixedNum)
-      const msg = `:הודעה מעסק\n` + `שלום ${accountName}, ${docNumber} מצורפת בזאת חשבונית מס` + `${url}`;
-      // const msg = `${url}`
+      const phoneNumber = checkedUrl["DocumentDetails"];
+      const fixedNum = getInternationalNum(phoneNumber);
+      const msg =
+        `הודעה מעסק ${businessName}\n` +
+        `שלום ${accountName}\n` +
+        `מצורפת בזאת חשבונית מס ${docNumber}\n` +
+        `${url}`;
       console.log("msg: ", msg);
       msgs.push(msg);
-      numbers.push("972526544346")
+      numbers.push("972526544346");
     });
-    await sendMsgsAPI(numbers, msgs)
+    await sendMsgsAPI(numbers, msgs);
   };
 
   const invoiceDataToShow = invoiceTableData.map((invoice) => {
@@ -92,6 +95,10 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     setInvoiceTableData(parsedInvoiceData);
   }, []);
 
+  useEffect(() => {
+    console.log("fffff");
+  }, [invoiceData]);
+
   const checkAllHeader = (
     <div className="url-row">
       <input
@@ -104,10 +111,9 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     </div>
   );
 
-  const sendingDisabled = invoiceTableData.every((urlObj) => !urlObj.checked)
-  const hasPermission = localStorage.getItem("whatsapp")
-  console.log("hasPermission", hasPermission)
-  // const hasPermission = true
+  const hasPermission = localStorage.getItem("whatsapp") === "true";
+  const sendingDisabled = invoiceTableData.every((urlObj) => !urlObj.checked);
+  const enableMessagesFeature = hasPermission && !sendingDisabled;
 
   return (
     <>
@@ -121,7 +127,7 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
           "תאריך",
           "סכום",
           "מס' מסמך",
-          "מס' טלפון"
+          "מס' טלפון",
         ]}
       />
       <div className="action-buttons">
@@ -134,12 +140,28 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
         >
           שלח להדפסה
         </button>
-        <button
-          className={"send-to-print" + ((!hasPermission || sendingDisabled) ? " disabled" : "")}
-          onClick={() => sendMessages()}
+        <Tooltip
+          title={
+            <p style={{ fontSize: "15px", textAlign: "center" }}>
+              בכדי לאפשר שליחת הודעות עם מסמך מצורף ללקוחות, אנא פנה למייל הבא
+            </p>
+          }
+          placement="top"
+          disableHoverListener={hasPermission}
         >
-          שליחת הודעות
-        </button>
+          <button
+            className={
+              "send-to-print" + (enableMessagesFeature ? "" : " hasOpacity")
+            }
+            onClick={(e) => {
+              if (enableMessagesFeature) {
+                sendMessages();
+              }
+            }}
+          >
+            שליחת הודעות
+          </button>
+        </Tooltip>
       </div>
     </>
   );
