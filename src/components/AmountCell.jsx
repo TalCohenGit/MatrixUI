@@ -6,20 +6,13 @@ import { faComment } from "@fortawesome/fontawesome-free-solid";
 import CommentsModal from "./CommentsModal";
 import { numOfColBeforeProducts, commentsCellOptions } from "../utils/constants";
 
-const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb }) => {
+const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb, isFocus }) => {
   const [isOpen, toggleModal] = useState(false);
   const [isHovered, setHover] = useState(false);
-  const [isFocus, setFocus] = useState(false);
   const [count, setCount] = useState(cellValue);
   const clickRef = React.createRef(null);
   const intialValue = { selectValue: "", inputValue: "" };
   const [comments, setComments] = useState([intialValue]);
-
-  useClickOutside(clickRef, () => {
-    if(isFocus){
-      setFocus(false)
-    }
-  });
 
   const {matrixComments, setMatrixComments} = useContext(DataContext)
 
@@ -55,7 +48,6 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb }) => {
             currentData[rowIndex][colIndex] = count;
             cb(colIndex);
             setData(currentData);
-            setFocus(false);
           }}
           autoFocus
 
@@ -67,9 +59,6 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb }) => {
           className="count-wrapper"
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
-          onClick={() => {
-            setFocus(true);
-          }} 
         >
           {isHovered && (
             <span

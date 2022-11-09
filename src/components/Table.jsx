@@ -1,9 +1,10 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import TableCell from "./TableCell";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash } from "@fortawesome/fontawesome-free-solid";
+import { faTrash, faSave } from "@fortawesome/fontawesome-free-solid";
 import { DataContext } from "../context/DataContext";
 import { removeRowFromBalanceTable, deleteAllTables } from "../utils/utils";
+import { faPenToSquare } from "@fortawesome/free-solid-svg-icons";
 
 const Table = ({
   data,
@@ -20,6 +21,12 @@ const Table = ({
     setSelectedProducts,
     setMatrixComments,
   } = useContext(DataContext);
+
+  const [isFocus, setFocus] = useState(false);
+
+  const editTableToggle = () => {
+    setFocus((prevState) => !prevState);
+  };
 
   const showRemoveRow = (rowIndex) => {
     if (rowIndex !== 0 && tableName === "main") {
@@ -72,6 +79,8 @@ const Table = ({
                     bgColor={bgColor}
                     tableName={tableName}
                     missingProductsCol={missingProductsCol}
+                    isFocus={isFocus}
+                    setFocus={setFocus}
                   />
                 );
               })}
@@ -90,7 +99,25 @@ const Table = ({
         );
       })
     : null;
-  return <div className="table">{tableData}</div>;
+  return (
+    <div>
+      {tableName === "main" && (
+        <div
+          className="edit-table"
+          onClick={() => {
+            editTableToggle();
+          }}
+        >
+          <FontAwesomeIcon
+            icon={!isFocus ? faPenToSquare : faSave}
+            color="#00308F"
+            size="3x"
+          />
+        </div>
+      )}
+      <div className="table">{tableData}</div>
+    </div>
+  );
 };
 
 export default Table;
