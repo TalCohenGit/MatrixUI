@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { getDriverList } from "../api";
 
 export const DataContext = React.createContext(null);
 

@@ -11,7 +11,7 @@ import {
   getProductsAPI,
   saveTablesAPI,
   loadTablesAPI,
-  getDriverList,
+  getDriversAPI,
   refreshTokenAPI,
   getMatrixByIDAPI,
   getTablesByDatesAPI,
@@ -44,7 +44,7 @@ import {
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
-import ProgressBar from "./ProgressBar/ProgressBar";
+// import ProgressBar from "./ProgressBar/ProgressBar";
 
 function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const {
@@ -473,7 +473,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       const [productsData, customerList, driverList] = await Promise.all([
         getProductsAPI(axiosPrivate, validationModal),
         getCustomersAPI(axiosPrivate),
-        getDriverList(axiosPrivate),
+        getDriversAPI(),
       ]);
       setCustomers(customerList);
       const uniqProducts =

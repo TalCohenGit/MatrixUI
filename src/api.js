@@ -1,27 +1,25 @@
-import { axiosAuth, axiosRegister, axiosMsgs } from "./axios";
+import { axiosAuth, axiosRegister, axiosMsgs, axiosDrivers } from "./axios";
 import { getItemNames, parseStrimingData, formatDate } from "./utils/utils";
+import axios from "axios";
+
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
   return await axiosPrivate.post("/api/getrecords", { TID, sortKey });
 };
 
-export const getDriverList = async (axiosPrivate) => {
+export const getDriversAPI = async () => {
   try {
-    const res = await getRecordsAPI(axiosPrivate, "2", { "קוד מיון": "690" });
-    const rawData = res.data.data;
-    return (
-      rawData?.length &&
-      rawData.map((driver) => {
-        return {
-          name: driver["שם חשבון"],
-          key: driver["מפתח"],
-        };
-      })
-    );
+    const res = await axios.get('https://script.googleusercontent.com/macros/echo?user_content_key=w839cMrrTIPbioHkT5dAYxvxDnQL98PmiIUuoKNnmDa7a9tX1lCrTDPIzTjCx9l2fpegXX_dDEQLdEajOxBjnLjpzISNAAE_m5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnMn-AVuQdkoz4dmqGuvSPPzhahxZbFP7z80rUHEk_r8AqiYkD31LwkqTYQ85ycG6XdxQTipwiRHVDjfL4SbuQeXBIndAU2515A&lib=MLsM0LIWSq2RcZhKp-OZc4gfx44b5R80M');
+    return res.data.map((driver) => {
+      return {
+        name: driver["name"],
+        key: driver["pivotKey"]
+      }
+    })
   } catch (e) {
     console.log("error in getDriverList:", e);
   }
-};
+}
 
 export const getCustomersAPI = async (axiosPrivate) => {
   try {
