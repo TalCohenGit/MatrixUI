@@ -6,7 +6,7 @@ import { faComment } from "@fortawesome/fontawesome-free-solid";
 import CommentsModal from "./CommentsModal";
 import { numOfColBeforeProducts, commentsCellOptions } from "../utils/constants";
 
-const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb, isFocus }) => {
+const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb, isFocus, tableName }) => {
   const [isOpen, toggleModal] = useState(false);
   const [isHovered, setHover] = useState(false);
   const [count, setCount] = useState(cellValue);
@@ -36,7 +36,7 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb, isFocus 
   return (
     <>
       {" "}
-      {isFocus ? (
+      {isFocus && (tableName === "main" || rowIndex === 1) ? (
         <input
           dir="ltr"
           type="number"
@@ -55,7 +55,7 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb, isFocus 
       ) : (
         <div
           dir="ltr"
-          ref={clickRef}
+          // ref={clickRef}
           className="count-wrapper"
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}

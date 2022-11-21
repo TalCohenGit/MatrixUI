@@ -44,6 +44,7 @@ import {
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
+import ProgressBar from "./ProgressBar/ProgressBar";
 
 function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const {
@@ -282,20 +283,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     );
   });
 
-  // const calcProductsSum = (n) => {
-  //   let sum = 0;
-  //   matrixData.forEach((rowData, rowDataIndex) => {
-  //     if (rowDataIndex === 0) {
-  //       return;
-  //     }
-  //     sum += Number(rowData[n]);
-  //   });
-  //   const currentData = [...balanceTableData];
-  //   currentData[2][n] = sum;
-  //   currentData[3][n] = currentData[1][n] - sum;
-  //   setBalanceTableData(currentData);
-  // };
-
   useEffect(() => {
     // interval = setInterval(() => {
     //   setSeconds((prevSeconds) => prevSeconds + 1);
@@ -509,6 +496,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     <div className="matrix-page">
       <h1 className="login-details">שלום {getUserEmail()}</h1>
       <Logout setAccessToken={setAccessToken} setRefreshToken={setRefreshToken}/>
+      {/* <ProgressBar /> */}
       <h1> MatrixUi </h1>
       <h2> שם המטריצה: {matrixName}</h2>
       <h3> תאריך ערך למטריצה: {matrixDate && new Date(matrixDate).toLocaleDateString()}</h3>
@@ -565,6 +553,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         disabled
         bgColor="#F0FFFF"
         missingProductsCol={missingProductCol}
+        cb={calcProductsSum}
       />
     </div>
   ) : (

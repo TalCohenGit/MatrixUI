@@ -25,6 +25,9 @@ const Table = ({
   const [isFocus, setFocus] = useState(false);
 
   const editTableToggle = () => {
+    // if (isFocus && tableName === "balance") {
+    //   cb()
+    // }
     setFocus((prevState) => !prevState);
   };
 
@@ -101,7 +104,9 @@ const Table = ({
     : null;
   return (
     <div>
-      {tableName === "main" && (
+      {
+      // tableName === "main" &&
+       (
         <div
           className="edit-table"
           onClick={() => {
