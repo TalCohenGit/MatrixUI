@@ -73,10 +73,10 @@ const getMatrixesDataObj = (
   const { matrix, driverIDs, actionIDs, documentIDs, acountKeys } = tableData;
   const actionAutho = [];
   // const documentIDsMock = [];
-  // for (var i = 0; i < driverIDs.length; i++) {
-  //   actionAutho.push("Default");
-  //   documentIDsMock.push(1);
-  // }
+  for (var i = 0; i < driverIDs.length; i++) {
+    actionAutho.push("Default");
+    // documentIDsMock.push(1);
+  }
   const itemHeaders = matrix[0];
 
   return {
