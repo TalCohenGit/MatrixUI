@@ -29,7 +29,7 @@
     width: 128px;
     word-break: break-word;
     input {
-      width: 40px;
+      width: 60px;
     }
   }
 }
@@ -285,6 +285,7 @@ body {
   &-row {
     display: flex;
     margin-bottom: 10px;
+    color: #000000;
 
     input {
       width: 200px;

@@ -1,12 +1,25 @@
 import React, { useState, useEffect, useContext } from "react";
-import useClickOutside from "../hooks/useClickOutside";
 import { DataContext } from "../context/DataContext";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faComment } from "@fortawesome/fontawesome-free-solid";
+import {
+  faComment
+} from "@fortawesome/fontawesome-free-solid";
 import CommentsModal from "./CommentsModal";
-import { numOfColBeforeProducts, commentsCellOptions } from "../utils/constants";
+import {
+  numOfColBeforeProducts,
+  commentsCellOptions,
+} from "../utils/constants";
 
-const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb, isFocus, tableName }) => {
+const AmountCell = ({
+  cellValue,
+  rowIndex,
+  colIndex,
+  data,
+  setData,
+  cb,
+  isFocus,
+  tableName,
+}) => {
   const [isOpen, toggleModal] = useState(false);
   const [isHovered, setHover] = useState(false);
   const [count, setCount] = useState(cellValue);
@@ -14,24 +27,38 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb, isFocus,
   const intialValue = { selectValue: "", inputValue: "" };
   const [comments, setComments] = useState([intialValue]);
 
-  const {matrixComments, setMatrixComments} = useContext(DataContext)
+  const { matrixComments, setMatrixComments } = useContext(DataContext);
 
   useEffect(() => {
+    if(matrixComments[rowIndex-1][colIndex-3])
+    console.log(rowIndex,colIndex)
     setCount(cellValue);
   }, [cellValue]);
 
+  useEffect(() => {
+    if (matrixComments[rowIndex-1][colIndex-3] && tableName === "main") {
+      setComments(matrixComments[rowIndex-1][colIndex-3])
+    }
+  },[])
+
   const saveComments = (comments) => {
     const newMatrixComments = [...matrixComments];
-    newMatrixComments[rowIndex - 1][colIndex - numOfColBeforeProducts] = comments;
+    newMatrixComments[rowIndex - 1][colIndex - numOfColBeforeProducts] =
+      comments;
     setMatrixComments(newMatrixComments);
   };
 
   const loadOldComments = () => {
-    const commentsInCell = matrixComments[rowIndex-1][colIndex-numOfColBeforeProducts]
-    if(commentsInCell){
-      setComments(commentsInCell) 
+    const commentsInCell =
+      matrixComments[rowIndex - 1][colIndex - numOfColBeforeProducts];
+    if (commentsInCell) {
+      setComments(commentsInCell);
     }
-  }
+  };
+
+  const { inputValue, selectValue } = comments[0];
+
+  const isPermanent = inputValue?.length && selectValue?.length;
 
   return (
     <>
@@ -49,18 +76,16 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb, isFocus,
             cb(colIndex);
             setData(currentData);
           }}
-          autoFocus
-
         />
       ) : (
         <div
           dir="ltr"
-          // ref={clickRef}
+          ref={clickRef}
           className="count-wrapper"
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
         >
-          {isHovered && (
+          {(isHovered || isPermanent) ? (
             <span
               className="comment"
               onClick={(e) => {
@@ -68,9 +93,12 @@ const AmountCell = ({ cellValue, rowIndex, colIndex, data, setData, cb, isFocus,
                 toggleModal(true);
               }}
             >
-              <FontAwesomeIcon icon={faComment} color="#464d55" />
+              <FontAwesomeIcon
+                icon={faComment}
+                color={isPermanent ? "#3D9970" : "#464d55"}
+              />
             </span>
-          )}
+          ) : <div/>}
           <span className="count">{count}</span>
 
           {isOpen && (

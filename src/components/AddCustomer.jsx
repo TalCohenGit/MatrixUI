@@ -224,7 +224,6 @@ const AddCustomer = ({
       );
       const action = getActionFromRes(produceRes);
       const invoiceDataArr = await getUrlsAPI(axiosPrivate, action);
-      console.log("urlDataArr",invoiceDataArr)
       const relavantInvoiceData = invoiceDataArr.slice(
         invoiceDataArr.length - customerNumbers(matrixData),
         invoiceDataArr.length

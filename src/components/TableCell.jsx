@@ -103,7 +103,7 @@ const TableCell = (props) => {
       className="table-cell"
       style={{
         opacity: cellValue === null ? "0" : "1",
-        pointerEvents: disabled ? "none" : "auto",
+        pointerEvents: disabled && rowIndex !== 1 ? "none" : "auto",
         backgroundColor: cellValue === "" ? "none" : bgColor,
         border: colIndex === rowLength - 1 ? "0" : "1px solid #a9a9a9",
         color: balanceTableData?.length > 0 && balanceTableData[3][colIndex] < 0 ? "red" : "black",
