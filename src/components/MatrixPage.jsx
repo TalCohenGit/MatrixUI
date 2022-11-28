@@ -5,7 +5,8 @@ import "normalize.css";
 import AddCustomer from "../components/AddCustomer";
 import Table from "../components/Table";
 import CopyDataModal from "../components/Modals/CopyDataModal";
-import Logout from "../components/Logout"
+import Logout from "../components/Logout";
+import SaveModal from "./SaveModal/SaveModal";
 import {
   getCustomersAPI,
   getProductsAPI,
@@ -31,7 +32,7 @@ import {
   removeProductCol,
   formatDate,
   logout,
-  getUserEmail
+  getUserEmail,
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
 import {
@@ -80,7 +81,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     setMatrixDate,
     setIsInitiated,
     isInitiated,
-    calcProductsSum
+    calcProductsSum,
   } = useContext(DataContext);
 
   const [isOpenValidationModal, toggleValidationModal] = useState(false);
@@ -94,6 +95,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     isBI: true,
   });
   const [missingProductCol, setMissingProductsCol] = useState(0);
+  const [detailsToCopyModal, toggleDetailsToCopyModal] = useState(false);
 
   let interval;
   const getTableTitle = () => {
@@ -133,6 +135,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         } else {
           newMatrixComment = [commentsRow];
         }
+        console.log("addCustomerToTable newMatrixComment", newMatrixComment);
         setMatrixComments(newMatrixComment);
       }
       setCustomerName("");
@@ -177,6 +180,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       }
       return newArr;
     });
+    console.log("addProducts matrixWithProduct", matrixWithProduct);
+    console.log("addProducts newMatrixComment", newMatrixComment);
     setMatrixComments(newMatrixComment);
     return matrixWithProduct;
   };
@@ -331,16 +336,17 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const getMatrixFormatedDate = (matrixDate) => {
-      if (matrixDate) {
-        return formatDate(matrixDate);
-      }
+    if (matrixDate) {
+      return formatDate(matrixDate);
+    }
   };
 
   const getMatrixID = async (action) => {
     let newMatrixId = matrixID;
     if (
       (action === savingAsAction && isInitiated) ||
-      action === copyMatrixAction || action === savingAction && !isInitiated
+      action === copyMatrixAction ||
+      (action === savingAction && !isInitiated)
     ) {
       newMatrixId = await getMatrixIDAPI(axiosPrivate);
       setMatrixID(newMatrixId);
@@ -349,7 +355,13 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return newMatrixId;
   };
 
-  const saveTables = async (matrixDate, isBI, action, newIsInitiated, newMatrixName) => {
+  const saveTables = async (
+    matrixDate,
+    isBI,
+    action,
+    newIsInitiated,
+    newMatrixName
+  ) => {
     const date = getMatrixFormatedDate(matrixDate);
     const newMatrixId = await getMatrixID(action);
 
@@ -381,8 +393,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       date,
       newMatrixName,
       productsMap,
-      isInitiated
+      newIsInitiated
     );
+    return newMatrixId
   };
 
   const setMatrixesDetails = (matrixID, matrixName, matrixDate) => {
@@ -395,33 +408,39 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     toggleToCopyDataModal(false);
   };
 
-  const copyMatrix = async () => {
-    try {
-      const newIsInitiated = false
-      await saveTables(
-        dataToLoad["date"],
-        dataToLoad["isBI"],
-        copyMatrixAction,
-        newIsInitiated,
-        undefined
-      );
+  const handleCopy = () => {
+    toggleToCopyDataModal(false);
+    toggleDetailsToCopyModal(true);
+  };
 
-      setIsInitiated(false);
+  const copyMatrix = async (action, toggleModal, isBi, newMatrixName, dateValue) => {
+    try {
       loadAllMatrixesData(dataToLoad["matrixesUiData"], [
         setMatrixData,
         setMatrixComments,
         setSelectedProducts,
         setBalanceTableData,
       ]);
-      setMatrixesDetails(
-        dataToLoad["matrixID"],
-        dataToLoad["matrixName"],
-        dataToLoad["date"]
+
+      const newIsInitiated = false
+      const newMatrixID = await saveTables(
+        dateValue,
+        isBi,
+        copyMatrixAction,
+        newIsInitiated,
+        newMatrixName
       );
-      toggleToCopyDataModal(false);
+
+      setIsInitiated(false);
+      setMatrixesDetails(
+        newMatrixID,
+        newMatrixName,
+        dateValue
+      );
+      toggleDetailsToCopyModal(false);
     } catch (e) {
       console.log("copyMatrix: failed to copy ", e);
-      toggleToCopyDataModal(false);
+      toggleDetailsToCopyModal(false);
     }
   };
 
@@ -449,7 +468,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     if (!isInitiated) {
       action = savingAsAction;
     }
-    const newIsInitiated = isInitiated
+    const newIsInitiated = isInitiated;
     await saveTables(matrixDate, isBI, action, newIsInitiated, matrixName);
     // ev.preventDefault();
     // return ev.returnValue = 'Do you want to save data before close?';
@@ -495,11 +514,18 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   return drivers?.length ? (
     <div className="matrix-page">
       <h1 className="login-details">שלום {getUserEmail()}</h1>
-      <Logout setAccessToken={setAccessToken} setRefreshToken={setRefreshToken}/>
+      <Logout
+        setAccessToken={setAccessToken}
+        setRefreshToken={setRefreshToken}
+      />
       {/* <ProgressBar /> */}
       <h1> MatrixUi </h1>
       <h2> שם המטריצה: {matrixName}</h2>
-      <h3> תאריך ערך למטריצה: {matrixDate && new Date(matrixDate).toLocaleDateString()}</h3>
+      <h3>
+        {" "}
+        תאריך ערך למטריצה:{" "}
+        {matrixDate && new Date(matrixDate).toLocaleDateString()}
+      </h3>
       <Modal
         isOpen={isOpenValidationModal}
         toggleModal={toggleValidationModal}
@@ -515,14 +541,18 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
           </button>
         </div>
       </Modal>
-      {
-        <CopyDataModal
-          isOpen={toCopyDataModal}
-          toggleModal={toggleToCopyDataModal}
-          onCancel={cancelCopyModal}
-          onCopy={copyMatrix}
-        />
-      }
+      <CopyDataModal
+        isOpen={toCopyDataModal}
+        toggleModal={toggleToCopyDataModal}
+        onCancel={cancelCopyModal}
+        onCopy={handleCopy}
+      />
+      <SaveModal
+        isOpen={detailsToCopyModal}
+        toggleModal={toggleDetailsToCopyModal}
+        handleAction={copyMatrix}
+        action={copyMatrixAction}
+      />
       <AddCustomer
         customerName={customerName}
         setCustomerName={setCustomerName}

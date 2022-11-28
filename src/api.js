@@ -2,24 +2,25 @@ import { axiosAuth, axiosRegister, axiosMsgs, axiosDrivers } from "./axios";
 import { getItemNames, parseStrimingData, formatDate } from "./utils/utils";
 import axios from "axios";
 
-
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
   return await axiosPrivate.post("/api/getrecords", { TID, sortKey });
 };
 
 export const getDriversAPI = async () => {
   try {
-    const res = await axios.get('https://script.googleusercontent.com/macros/echo?user_content_key=w839cMrrTIPbioHkT5dAYxvxDnQL98PmiIUuoKNnmDa7a9tX1lCrTDPIzTjCx9l2fpegXX_dDEQLdEajOxBjnLjpzISNAAE_m5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnMn-AVuQdkoz4dmqGuvSPPzhahxZbFP7z80rUHEk_r8AqiYkD31LwkqTYQ85ycG6XdxQTipwiRHVDjfL4SbuQeXBIndAU2515A&lib=MLsM0LIWSq2RcZhKp-OZc4gfx44b5R80M');
+    const res = await axios.get(
+      "https://script.googleusercontent.com/macros/echo?user_content_key=w839cMrrTIPbioHkT5dAYxvxDnQL98PmiIUuoKNnmDa7a9tX1lCrTDPIzTjCx9l2fpegXX_dDEQLdEajOxBjnLjpzISNAAE_m5_BxDlH2jW0nuo2oDemN9CCS2h10ox_1xSncGQajx_ryfhECjZEnMn-AVuQdkoz4dmqGuvSPPzhahxZbFP7z80rUHEk_r8AqiYkD31LwkqTYQ85ycG6XdxQTipwiRHVDjfL4SbuQeXBIndAU2515A&lib=MLsM0LIWSq2RcZhKp-OZc4gfx44b5R80M"
+    );
     return res.data.map((driver) => {
       return {
         name: driver["name"],
-        key: driver["pivotKey"]
-      }
-    })
+        key: driver["pivotKey"],
+      };
+    });
   } catch (e) {
     console.log("error in getDriverList:", e);
   }
-}
+};
 
 export const getCustomersAPI = async (axiosPrivate) => {
   try {
@@ -129,10 +130,16 @@ export const createDocAPI = async (
       isBI,
       matrixName
     );
-    const res = await axiosPrivate.post("/api/createdoc", dataToSend);
-    const parsedData = parseStrimingData(res.data);
-
-    return parsedData;
+    const res = await axiosPrivate.post("/api/createdoc", dataToSend, {
+      headers: {
+        // 'application/json' is the modern content-type for JSON, but some
+        // older servers may use 'text/json'.
+        // See: http://bit.ly/text-json
+        fileName: "filename",
+      },
+    });
+    
+    return res;
   } catch (e) {
     console.log("error in createDocAPI:", e);
   }
@@ -144,7 +151,8 @@ const getMatrixObject = (
   matrixesData,
   isBI,
   matrixName,
-  matrixesUiData
+  matrixesUiData,
+  isInitiated
 ) => {
   return {
     matrixID,
@@ -153,7 +161,7 @@ const getMatrixObject = (
     matrixesUiData,
     Date: date,
     isBI,
-    isInitiated: true,
+    isInitiated,
   };
 };
 
@@ -192,7 +200,7 @@ export const saveTablesAPI = async (
         isInitiated
       )
     );
-    return res;
+    return matrixID;
   } catch (e) {
     console.log("error in saveTablesAPI: ", e);
   }
@@ -267,7 +275,15 @@ export const getUrlsAPI = async (axiosPrivate, action) => {
     });
     const data = res.data.result.data;
     return data.map((element) => {
-      const { DocUrl,DocNumber,Accountname,ValueDate,Action,TotalCost, DocumentDetails } = element
+      const {
+        DocUrl,
+        DocNumber,
+        Accountname,
+        ValueDate,
+        Action,
+        TotalCost,
+        DocumentDetails,
+      } = element;
       return {
         DocUrl,
         Accountname,
@@ -275,7 +291,7 @@ export const getUrlsAPI = async (axiosPrivate, action) => {
         ValueDate,
         TotalCost,
         DocNumber,
-        DocumentDetails
+        DocumentDetails,
       };
     });
   } catch (e) {
@@ -383,9 +399,9 @@ export const sendMsgsAPI = async (numbers, msgs) => {
     await axiosMsgs.post("/api/sendMsgs", {
       password: "password",
       numbers: numbers,
-      msg: msgs
+      msg: msgs,
     });
   } catch (e) {
     console.log("error in sendMsgsAPI: ", e);
   }
-}
+};

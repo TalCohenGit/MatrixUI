@@ -5,6 +5,7 @@ import {
   modalAction,
   savingAsAction,
   savingAction,
+  copyMatrixAction
 } from "../../utils/constants";
 
 const SaveModal = ({
@@ -29,7 +30,7 @@ const SaveModal = ({
       modalHeader={"פרטים ל" + modalAction[action]}
     >
       <div className="save-matrix-modal">
-        {action === savingAsAction && (
+        {action === savingAsAction || action === copyMatrixAction&& (
           <input
             style={{ width: "100%" }}
             value={newMatrixName}

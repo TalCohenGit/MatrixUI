@@ -34,6 +34,6 @@ export const savingAction = "savingAction"
 export const produceDocAction = "produceDoc"
 export const copyMatrixAction = "copyMatrix"
 
-export const modalAction = {savingAsAction: "שמירה בשם", savingAction: "שמירה"}
+export const modalAction = {savingAsAction: "שמירה בשם", savingAction: "שמירה", copyMatrix: "שכפול מטריצה"}
 
 export const dateFormat = "mm/dd/yyyy"

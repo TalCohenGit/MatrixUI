@@ -30,13 +30,12 @@ const AmountCell = ({
   const { matrixComments, setMatrixComments } = useContext(DataContext);
 
   useEffect(() => {
-    if(matrixComments[rowIndex-1][colIndex-3])
-    console.log(rowIndex,colIndex)
     setCount(cellValue);
   }, [cellValue]);
 
   useEffect(() => {
-    if (matrixComments[rowIndex-1][colIndex-3] && tableName === "main") {
+    console.log("matrixComments", matrixComments)
+    if (matrixComments?.length && matrixComments[0][0] && matrixComments[rowIndex-1][colIndex-3] && tableName === "main") {
       setComments(matrixComments[rowIndex-1][colIndex-3])
     }
   },[])
@@ -45,6 +44,7 @@ const AmountCell = ({
     const newMatrixComments = [...matrixComments];
     newMatrixComments[rowIndex - 1][colIndex - numOfColBeforeProducts] =
       comments;
+    console.log("saveComments newMatrixComments", newMatrixComments)
     setMatrixComments(newMatrixComments);
   };
 

@@ -7,6 +7,7 @@ import {
   customerNumbers,
   deleteAllTables,
   getActionFromRes,
+  parseStrimingData
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -28,6 +29,7 @@ import {
   savingAsAction,
   produceDocAction,
 } from "../utils/constants";
+import { LinearProgress, Box, Typography } from "@mui/material";
 
 const AddCustomer = ({
   customerName,
@@ -71,6 +73,7 @@ const AddCustomer = ({
   const [matrixesDetails, setMatrixesDetails] = useState([]);
   const [toDeleteDataModal, toggleToDeleteData] = useState(false);
   const [toDeleteMatrixModal, toggleToDeleteMatrix] = useState(false);
+  const [progressValue, setProgressValue] = useState(0);
 
   const intialRangeState = [
     {
@@ -92,6 +95,68 @@ const AddCustomer = ({
       });
     });
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
+
+  const fetchStream = async () => {
+    return await fetch("http://localhost:3000/api/getProgressBar",{
+      method:"POST",
+      cache: "no-cache",
+      headers: {
+        fileName:"filename",
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmZXRjaGVkRGF0YSI6eyJzdGF0dXMiOiJ5ZXMiLCJjb25maWdPYmoiOiJOTyBDT05GSUcgT0JKRUNUIiwidXNlcklEIjoiNjM1ZTNmMDY1ZTQzMDJjYzZjMWNiOTk3In0sImlhdCI6MTY2OTU2NDUyNX0.2OYNlb6xrKoIGHvwL85IAIAB9JlM3UtS5Fv8jY7Rkg4`,
+
+      },
+      // body:JSON.stringify(body)
+    })
+      .then((response) => response.body)
+      .then((rb) => {
+        const reader = rb.getReader();
+
+        return new ReadableStream({
+          start(controller) {
+            // The following function handles each data chunk
+            function push() {
+              // "done" is a Boolean and value a "Uint8Array"
+              reader.read().then(({ done, value }) => {
+                // If there is no more data to read
+                if (done) {
+                  console.log("done", done);
+                  controller.close();
+                  return;
+                }
+                // Get the data and send it to the browser via the controller
+                controller.enqueue(value);
+                // Check chunks by logging to the console
+                const decodedValue = new TextDecoder().decode(value);
+                console.log("dec",decodedValue)
+                const newObj = JSON.parse(decodedValue).stats;
+                const { amountFinished, totalToProcess } = newObj;
+                const newVal = amountFinished * (100 / totalToProcess);
+                setProgressValue(newVal);
+
+                push();
+              });
+            }
+
+            push();
+          },
+        });
+      })
+      .then((stream) =>
+        // Respond with our stream
+        new Response(stream, {
+          headers: { "Content-Type": "text/html" },
+        }).text()
+      )
+      .then((result) => {
+        // Do things with result
+        console.log(result);
+      });
+  };
+
+  
 
   const handleChange = (value) => {
     setCustomerName(value);
@@ -207,12 +272,12 @@ const AddCustomer = ({
         validatedData["metaData"]
       );
     let newMatrixId = matrixID;
-    if (new Date(matrixDate).toDateString() !== new Date().toDateString()) {
-      newMatrixId = await getMatrixIDAPI(axiosPrivate);
-    }
+    // if (new Date(matrixDate).toDateString() !== new Date().toDateString()) {
+    //   newMatrixId = await getMatrixIDAPI(axiosPrivate);
+    // }
     try {
       setDisableProduction(true);
-      const produceRes = await createDocAPI(
+      const produce = createDocAPI(
         axiosPrivate,
         validatedData,
         newMatrixId,
@@ -221,16 +286,25 @@ const AddCustomer = ({
         metaDataToSend,
         productsMap,
         matrixName
-      );
-      const action = getActionFromRes(produceRes);
-      const invoiceDataArr = await getUrlsAPI(axiosPrivate, action);
-      const relavantInvoiceData = invoiceDataArr.slice(
-        invoiceDataArr.length - customerNumbers(matrixData),
-        invoiceDataArr.length
-      );
-      setInvoiceData(relavantInvoiceData);
-      toggleUrlsModal(true);
-      setDisableProduction(false);
+      ).then(async (res) => {
+        const parsedData = parseStrimingData(res.data);
+        const action = getActionFromRes(parsedData);
+        const invoiceDataArr = await getUrlsAPI(axiosPrivate, action);
+        const relavantInvoiceData = invoiceDataArr.slice(
+          invoiceDataArr.length - customerNumbers(matrixData),
+          invoiceDataArr.length
+        );
+        setInvoiceData(relavantInvoiceData);
+        toggleUrlsModal(true);
+        setDisableProduction(false);
+      });
+      // setTimeout(()=>{
+      //   const stream = fetchStream()
+      // },[5000])
+      
+
+    
+    
     } catch (e) {
       console.log("error in produceDoc:", e);
     }
@@ -370,10 +444,25 @@ const AddCustomer = ({
     }),
   };
 
+  const finishProduce = () => {
+    toggleUrlsModal(false)
+
+  } 
+
   return (
     <>
       <div className="addCustomer-wrapper">
         <div className="addCustomer-input-wrapper">
+        {/* <Box sx={{ display: "flex", alignItems: "center" }}>
+        <Box sx={{ width: "100%", mr: 1 }}>
+          <LinearProgress variant="determinate" value={progressValue} />
+        </Box>
+        <Box sx={{ minWidth: 35 }}>
+          <Typography variant="body2" color="text.secondary">{`${Math.round(
+            progressValue
+          )}%`}</Typography>
+        </Box>
+      </Box> */}
           <AreUSureModal
             isOpen={toDeleteMatrixModal}
             toggleModal={toggleToDeleteMatrix}
@@ -401,7 +490,6 @@ const AddCustomer = ({
             handleAction={handleSaving}
             action={savingAsAction}
             matrixName={matrixName}
-            setMatrixName={setMatrixName}
           />
           <SaveModal
             isOpen={toUpdateDataModal}
@@ -409,7 +497,6 @@ const AddCustomer = ({
             handleAction={handleSaving}
             action={savingAction}
             matrixName={matrixName}
-            setMatrixName={setMatrixName}
           />
           <LoadModal
             isOpen={toLoadDataModal}
