@@ -7,7 +7,7 @@ import {
   customerNumbers,
   deleteAllTables,
   getActionFromRes,
-  parseStrimingData
+  parseStrimingData,
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -15,7 +15,7 @@ import {
   getUrlsAPI,
   createDocAPI,
   getTablesByDatesAPI,
-  deleteMatrixAPI
+  deleteMatrixAPI,
 } from "../api";
 import Modal from "../common/components/Modal/Modal";
 import { addDays } from "date-fns";
@@ -24,10 +24,12 @@ import LoaderContainer from "./LoaderContainer/LoaderContainer";
 import SaveModal from "./SaveModal/SaveModal";
 import LoadModal from "./Modals/LoadModal";
 import AreUSureModal from "./Modals/AreUSureModal";
+import CopyDataModal from "./Modals/CopyDataModal";
 import {
   savingAction,
   savingAsAction,
   produceDocAction,
+  copyMatrixAction
 } from "../utils/constants";
 import { LinearProgress, Box, Typography } from "@mui/material";
 
@@ -43,6 +45,7 @@ const AddCustomer = ({
   setMatrixName,
   matrixDate,
   setMatrixDate,
+  copyMatrix
 }) => {
   const {
     toggleList,
@@ -74,6 +77,17 @@ const AddCustomer = ({
   const [toDeleteDataModal, toggleToDeleteData] = useState(false);
   const [toDeleteMatrixModal, toggleToDeleteMatrix] = useState(false);
   const [progressValue, setProgressValue] = useState(0);
+  const [toCopyDataModal, toggleToCopyDataModal] = useState(false);
+  const [detailsToCopyModal, toggleDetailsToCopyModal] = useState(false);
+
+  const handleCopy = () => {
+    toggleToCopyDataModal(false);
+    toggleDetailsToCopyModal(true);
+  };
+
+  const cancelCopyModal = () => {
+    toggleToCopyDataModal(false);
+  };
 
   const intialRangeState = [
     {
@@ -97,16 +111,15 @@ const AddCustomer = ({
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
   const fetchStream = async () => {
-    return await fetch("http://localhost:3000/api/getProgressBar",{
-      method:"POST",
+    return await fetch("http://localhost:3000/api/getProgressBar", {
+      method: "POST",
       cache: "no-cache",
       headers: {
-        fileName:"filename",
+        fileName: "filename",
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
         Connection: "keep-alive",
         Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmZXRjaGVkRGF0YSI6eyJzdGF0dXMiOiJ5ZXMiLCJjb25maWdPYmoiOiJOTyBDT05GSUcgT0JKRUNUIiwidXNlcklEIjoiNjM1ZTNmMDY1ZTQzMDJjYzZjMWNiOTk3In0sImlhdCI6MTY2OTU2NDUyNX0.2OYNlb6xrKoIGHvwL85IAIAB9JlM3UtS5Fv8jY7Rkg4`,
-
       },
       // body:JSON.stringify(body)
     })
@@ -130,7 +143,7 @@ const AddCustomer = ({
                 controller.enqueue(value);
                 // Check chunks by logging to the console
                 const decodedValue = new TextDecoder().decode(value);
-                console.log("dec",decodedValue)
+                console.log("dec", decodedValue);
                 const newObj = JSON.parse(decodedValue).stats;
                 const { amountFinished, totalToProcess } = newObj;
                 const newVal = amountFinished * (100 / totalToProcess);
@@ -155,8 +168,6 @@ const AddCustomer = ({
         console.log(result);
       });
   };
-
-  
 
   const handleChange = (value) => {
     setCustomerName(value);
@@ -229,15 +240,15 @@ const AddCustomer = ({
   };
 
   const deleteMatrix = async () => {
-    await deleteMatrixAPI(axiosPrivate, matrixID)
+    await deleteMatrixAPI(axiosPrivate, matrixID);
     deleteAllTables(
       setMatrixData,
       setBalanceTableData,
       setMatrixComments,
       setSelectedProducts
     );
-    setMatrixName("")
-    setMatrixDate("")
+    setMatrixName("");
+    setMatrixDate("");
     toggleToDeleteMatrix(false);
   };
 
@@ -301,10 +312,6 @@ const AddCustomer = ({
       // setTimeout(()=>{
       //   const stream = fetchStream()
       // },[5000])
-      
-
-    
-    
     } catch (e) {
       console.log("error in produceDoc:", e);
     }
@@ -344,10 +351,12 @@ const AddCustomer = ({
 
   const formatDate2 = (date) => {
     if (date) {
-      date = (new Date(date)).setHours(12)
-      const formatedDate = (new Date(date)).toISOString().substring(0, 10)    
-      return {startDate: new Date(formatedDate).setUTCHours(0, 0, 0, 0), 
-        endDate:  new Date(formatedDate).setUTCHours(23, 59, 59, 999)}
+      date = new Date(date).setHours(12);
+      const formatedDate = new Date(date).toISOString().substring(0, 10);
+      return {
+        startDate: new Date(formatedDate).setUTCHours(0, 0, 0, 0),
+        endDate: new Date(formatedDate).setUTCHours(23, 59, 59, 999),
+      };
     }
   };
 
@@ -360,15 +369,14 @@ const AddCustomer = ({
   const loadTableNames = async () => {
     let startDate, endDate;
     if (dateRanges[0]["startDate"] === dateRanges[0]["endDate"]) {
-      const dates = formatDate2(dateRanges[0]["startDate"])
-      startDate = dates.startDate
-      endDate = dates.endDate
+      const dates = formatDate2(dateRanges[0]["startDate"]);
+      startDate = dates.startDate;
+      endDate = dates.endDate;
     } else {
       startDate = formatDate(dateRanges[0]["startDate"]);
       endDate = formatDate(dateRanges[0]["endDate"]);
-
     }
-    
+
     const matrixesDetails = await getTablesByDatesAPI(
       axiosPrivate,
       startDate,
@@ -445,15 +453,16 @@ const AddCustomer = ({
   };
 
   const finishProduce = () => {
-    toggleUrlsModal(false)
-
-  } 
+    toggleUrlsModal(false);
+    // toggleToCopyDataModal(true);
+    toggleDetailsToCopyModal(true)
+  };
 
   return (
     <>
       <div className="addCustomer-wrapper">
         <div className="addCustomer-input-wrapper">
-        {/* <Box sx={{ display: "flex", alignItems: "center" }}>
+          {/* <Box sx={{ display: "flex", alignItems: "center" }}>
         <Box sx={{ width: "100%", mr: 1 }}>
           <LinearProgress variant="determinate" value={progressValue} />
         </Box>
@@ -481,8 +490,20 @@ const AddCustomer = ({
           />
           <ListModal
             isOpen={isUrlsModalOpen}
-            toggleModal={toggleUrlsModal}
+            toggleModal={finishProduce}
             header={"מסמכים שהופקו"}
+          />
+          {/* <CopyDataModal
+            isOpen={toCopyDataModal}
+            toggleModal={toggleToCopyDataModal}
+            // onCancel={toggleToCopyDataModal}
+            onCopy={handleCopy}
+          /> */}
+          <SaveModal
+            isOpen={detailsToCopyModal}
+            toggleModal={toggleDetailsToCopyModal}
+            handleAction={copyMatrix}
+            action={copyMatrixAction}
           />
           <SaveModal
             isOpen={toSaveDataModal}

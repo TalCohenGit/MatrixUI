@@ -73,9 +73,9 @@ const SaveModal = ({
         <DatePicker dateValue={dateValue} setDateValue={setDateValue} />
       </div>
       <div className="action-buttons">
-        <button className="cancel-button" onClick={() => toggleModal(false)}>
+        {action != copyMatrixAction && <button className="cancel-button" onClick={() => toggleModal(false)}>
           בטל
-        </button>
+        </button>}
         <button
           className={
             "save-button" +

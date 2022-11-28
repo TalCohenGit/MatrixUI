@@ -437,7 +437,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         newMatrixName,
         dateValue
       );
-      toggleDetailsToCopyModal(false);
+      toggleModal(false);
     } catch (e) {
       console.log("copyMatrix: failed to copy ", e);
       toggleDetailsToCopyModal(false);
@@ -566,6 +566,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         setMatrixName={setMatrixName}
         matrixDate={matrixDate}
         setMatrixDate={setMatrixDate}
+        copyMatrix={copyMatrix}
       />
 
       <Table

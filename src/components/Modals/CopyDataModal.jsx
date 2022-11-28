@@ -5,7 +5,7 @@ import Modal from "../../common/components/Modal/Modal";
 const CopyDataModal = ({
   isOpen,
   toggleModal,
-  onCancel,
+  // onCancel,
   onCopy
 }) => {
   return (
@@ -15,7 +15,7 @@ const CopyDataModal = ({
       modalHeader="המטריצה הופקה. האם לשכפל אותה?"
     >
       <div className="action-buttons">
-        <button className="cancel-button" onClick={() => onCancel()}>
+        <button className="cancel-button" onClick={() => toggleModal(false)}>
           בטל
         </button>
         <button className="cancel-button" onClick={() => onCopy()}>
