@@ -147,7 +147,6 @@ const AddCustomer = ({
                 }
 
                 setProgressValue(newValue);
-
                 push();
               });
             }
@@ -309,6 +308,7 @@ const AddCustomer = ({
         setInvoiceData(relavantInvoiceData);
         toggleUrlsModal(true);
         setIsInProgress(false)
+        setProgressValue(0)
       });
       const stream = fetchStream(fileName);
     } catch (e) {
