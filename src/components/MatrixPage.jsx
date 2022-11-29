@@ -45,7 +45,7 @@ import {
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
-// import ProgressBar from "./ProgressBar/ProgressBar";
+import ProgressBar from "./ProgressBar/ProgressBar";
 
 function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const {
@@ -82,6 +82,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     setIsInitiated,
     isInitiated,
     calcProductsSum,
+    isInProgress,
+    progressValue,
   } = useContext(DataContext);
 
   const [isOpenValidationModal, toggleValidationModal] = useState(false);
@@ -553,6 +555,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         handleAction={copyMatrix}
         action={copyMatrixAction}
       />
+      
       <AddCustomer
         customerName={customerName}
         setCustomerName={setCustomerName}
@@ -568,7 +571,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         setMatrixDate={setMatrixDate}
         copyMatrix={copyMatrix}
       />
-
+<ProgressBar isInProgress={isInProgress} progressValue={progressValue}/>
       <Table
         data={matrixData}
         setData={setMatrixData}

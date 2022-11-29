@@ -110,7 +110,8 @@ export const createDocAPI = async (
   docData,
   metaData,
   productsMap,
-  matrixName
+  matrixName,
+  fileName
 ) => {
   try {
     const matrixesData = getMatrixesDataObj(
@@ -132,10 +133,7 @@ export const createDocAPI = async (
     );
     const res = await axiosPrivate.post("/api/createdoc", dataToSend, {
       headers: {
-        // 'application/json' is the modern content-type for JSON, but some
-        // older servers may use 'text/json'.
-        // See: http://bit.ly/text-json
-        fileName: "filename",
+        fileName
       },
     });
     
@@ -403,5 +401,23 @@ export const sendMsgsAPI = async (numbers, msgs) => {
     });
   } catch (e) {
     console.log("error in sendMsgsAPI: ", e);
+  }
+};
+
+export const getProgressBarAPI = async (axiosPrivate, fileName) => {
+  try {
+    return await fetch("http://localhost:3000/api/getProgressBar", {
+      method: "POST",
+      cache: "no-cache",
+      headers: {
+        fileName,
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        mode: "no-cors",
+        timeLimit: 100,
+        Connection: "keep-alive",
+      }})
+  } catch (e) {
+    console.log("error in getProgressBarAPI: ", e);
   }
 };

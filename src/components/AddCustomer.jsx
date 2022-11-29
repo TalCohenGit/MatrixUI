@@ -16,6 +16,7 @@ import {
   createDocAPI,
   getTablesByDatesAPI,
   deleteMatrixAPI,
+  getProgressBarAPI
 } from "../api";
 import Modal from "../common/components/Modal/Modal";
 import { addDays } from "date-fns";
@@ -29,9 +30,9 @@ import {
   savingAction,
   savingAsAction,
   produceDocAction,
-  copyMatrixAction
+  copyMatrixAction,
 } from "../utils/constants";
-import { LinearProgress, Box, Typography } from "@mui/material";
+
 
 const AddCustomer = ({
   customerName,
@@ -45,7 +46,7 @@ const AddCustomer = ({
   setMatrixName,
   matrixDate,
   setMatrixDate,
-  copyMatrix
+  copyMatrix,
 }) => {
   const {
     toggleList,
@@ -61,6 +62,8 @@ const AddCustomer = ({
     matrixID,
     selectedProducts,
     setSelectedProducts,
+    setIsInProgress,
+    setProgressValue
   } = useContext(DataContext);
   const [customerValidationFailed, setCustomerValidationFailed] = useState({
     failure: false,
@@ -76,7 +79,6 @@ const AddCustomer = ({
   const [matrixesDetails, setMatrixesDetails] = useState([]);
   const [toDeleteDataModal, toggleToDeleteData] = useState(false);
   const [toDeleteMatrixModal, toggleToDeleteMatrix] = useState(false);
-  const [progressValue, setProgressValue] = useState(0);
   const [toCopyDataModal, toggleToCopyDataModal] = useState(false);
   const [detailsToCopyModal, toggleDetailsToCopyModal] = useState(false);
 
@@ -110,19 +112,8 @@ const AddCustomer = ({
     });
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
-  const fetchStream = async () => {
-    return await fetch("http://localhost:3000/api/getProgressBar", {
-      method: "POST",
-      cache: "no-cache",
-      headers: {
-        fileName: "filename",
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-        Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmZXRjaGVkRGF0YSI6eyJzdGF0dXMiOiJ5ZXMiLCJjb25maWdPYmoiOiJOTyBDT05GSUcgT0JKRUNUIiwidXNlcklEIjoiNjM1ZTNmMDY1ZTQzMDJjYzZjMWNiOTk3In0sImlhdCI6MTY2OTU2NDUyNX0.2OYNlb6xrKoIGHvwL85IAIAB9JlM3UtS5Fv8jY7Rkg4`,
-      },
-      // body:JSON.stringify(body)
-    })
+  const fetchStream = async (fileName) => {
+    return await getProgressBarAPI(axiosPrivate, fileName)
       .then((response) => response.body)
       .then((rb) => {
         const reader = rb.getReader();
@@ -143,11 +134,19 @@ const AddCustomer = ({
                 controller.enqueue(value);
                 // Check chunks by logging to the console
                 const decodedValue = new TextDecoder().decode(value);
+                let newValue = 0;
                 console.log("dec", decodedValue);
-                const newObj = JSON.parse(decodedValue).stats;
-                const { amountFinished, totalToProcess } = newObj;
-                const newVal = amountFinished * (100 / totalToProcess);
-                setProgressValue(newVal);
+                if (decodedValue === "finish") {
+                  newValue = 100;
+                } else {
+                  const newObj = JSON.parse(decodedValue).stats;
+                  const { amountFinished, totalToProcess } = newObj;
+                  if (totalToProcess > 0) {
+                    newValue = amountFinished * (100 / totalToProcess);
+                  }
+                }
+
+                setProgressValue(newValue);
 
                 push();
               });
@@ -287,7 +286,9 @@ const AddCustomer = ({
     //   newMatrixId = await getMatrixIDAPI(axiosPrivate);
     // }
     try {
+      const fileName = (Math.random()).toString();
       setDisableProduction(true);
+      setIsInProgress(true)
       const produce = createDocAPI(
         axiosPrivate,
         validatedData,
@@ -296,7 +297,8 @@ const AddCustomer = ({
         docCommentsToSend,
         metaDataToSend,
         productsMap,
-        matrixName
+        matrixName,
+        fileName
       ).then(async (res) => {
         const parsedData = parseStrimingData(res.data);
         const action = getActionFromRes(parsedData);
@@ -308,10 +310,9 @@ const AddCustomer = ({
         setInvoiceData(relavantInvoiceData);
         toggleUrlsModal(true);
         setDisableProduction(false);
+        setIsInProgress(false)
       });
-      // setTimeout(()=>{
-      //   const stream = fetchStream()
-      // },[5000])
+      const stream = fetchStream(fileName);
     } catch (e) {
       console.log("error in produceDoc:", e);
     }
@@ -455,23 +456,13 @@ const AddCustomer = ({
   const finishProduce = () => {
     toggleUrlsModal(false);
     // toggleToCopyDataModal(true);
-    toggleDetailsToCopyModal(true)
+    toggleDetailsToCopyModal(true);
   };
 
   return (
     <>
       <div className="addCustomer-wrapper">
         <div className="addCustomer-input-wrapper">
-          {/* <Box sx={{ display: "flex", alignItems: "center" }}>
-        <Box sx={{ width: "100%", mr: 1 }}>
-          <LinearProgress variant="determinate" value={progressValue} />
-        </Box>
-        <Box sx={{ minWidth: 35 }}>
-          <Typography variant="body2" color="text.secondary">{`${Math.round(
-            progressValue
-          )}%`}</Typography>
-        </Box>
-      </Box> */}
           <AreUSureModal
             isOpen={toDeleteMatrixModal}
             toggleModal={toggleToDeleteMatrix}

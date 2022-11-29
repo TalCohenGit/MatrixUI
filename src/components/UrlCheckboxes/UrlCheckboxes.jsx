@@ -96,7 +96,6 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
   }, []);
 
   useEffect(() => {
-    console.log("fffff");
   }, [invoiceData]);
 
   const checkAllHeader = (
