@@ -1,4 +1,4 @@
-import { axiosAuth, axiosRegister, axiosMsgs, axiosDrivers } from "./axios";
+import { axiosAuth, axiosRegister, axiosMsgs, axiosDrivers,matrixServerURL } from "./axios";
 import { getItemNames, parseStrimingData, formatDate } from "./utils/utils";
 import axios from "axios";
 
@@ -406,7 +406,7 @@ export const sendMsgsAPI = async (numbers, msgs) => {
 
 export const getProgressBarAPI = async (axiosPrivate, fileName) => {
   try {
-    return await fetch("http://localhost:3000/api/getProgressBar", {
+    return await fetch(`${matrixServerURL}/api/getProgressBar`, {
       method: "POST",
       cache: "no-cache",
       headers: {

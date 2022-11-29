@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const matrixServerURL = process.env.REACT_APP_MATRIX_URL;
+export const matrixServerURL = process.env.REACT_APP_MATRIX_URL;
 const authServerURL = process.env.REACT_APP_AUTH_URL;
 const msgsServerURL = process.env.REACT_APP_MSGS_URL
 
