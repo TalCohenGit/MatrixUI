@@ -63,7 +63,8 @@ const AddCustomer = ({
     selectedProducts,
     setSelectedProducts,
     setIsInProgress,
-    setProgressValue
+    setProgressValue,
+    isInProgress
   } = useContext(DataContext);
   const [customerValidationFailed, setCustomerValidationFailed] = useState({
     failure: false,
@@ -71,7 +72,6 @@ const AddCustomer = ({
   });
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
   const [invoiceData, setInvoiceData] = useState([]);
-  const [disableProduction, setDisableProduction] = useState(false);
   const [toSaveDataModal, toggleToSaveDataModal] = useState(false);
   const [toUpdateDataModal, toggleToUpdateDataModal] = useState(false);
   const [toLoadDataModal, toggleToLoadDataModal] = useState(false);
@@ -287,7 +287,6 @@ const AddCustomer = ({
     // }
     try {
       const fileName = (Math.random()).toString();
-      setDisableProduction(true);
       setIsInProgress(true)
       const produce = createDocAPI(
         axiosPrivate,
@@ -309,7 +308,6 @@ const AddCustomer = ({
         );
         setInvoiceData(relavantInvoiceData);
         toggleUrlsModal(true);
-        setDisableProduction(false);
         setIsInProgress(false)
       });
       const stream = fetchStream(fileName);
@@ -575,8 +573,8 @@ const AddCustomer = ({
           טעינה
         </button>
         <button
-          className="createInvoice-button"
-          disabled={matrixData.length === 0 || disableProduction}
+          className={"createInvoice-button" + (isInProgress ? " disabled" : "")}
+          disabled={matrixData.length === 0}
           onClick={() => produceDoc(productsMap)}
         >
           הפקת חשבונית
