@@ -406,7 +406,7 @@ export const sendMsgsAPI = async (numbers, msgs) => {
 
 export const getProgressBarAPI = async (axiosPrivate, fileName) => {
   try {
-    return await fetch(`${matrixServerURL}api/getProgressBar`, {
+    return await fetch(`${matrixServerURL}/api/getProgressBar`, {
       method: "POST",
       cache: "no-cache",
       headers: {
