@@ -318,9 +318,13 @@ const AddCustomer = ({
         setIsInProgress(false)
         setProgressValue(0)
       });
-      const stream = fetchStream(fileName);
+
+      fetchStream(fileName);
+      
     } catch (e) {
       console.log("error in produceDoc:", e);
+      setIsInProgress(false)
+      setProgressValue(0)
     }
   };
 
@@ -478,12 +482,6 @@ const AddCustomer = ({
             header={"מסמכים שהופקו"}
             invoices={searchedInvoices}
           />
-          {/* <CopyDataModal
-            isOpen={toCopyDataModal}
-            toggleModal={toggleToCopyDataModal}
-            // onCancel={toggleToCopyDataModal}
-            onCopy={handleCopy}
-          /> */}
           <SaveModal
             isOpen={detailsToCopyModal}
             toggleModal={toggleDetailsToCopyModal}
