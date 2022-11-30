@@ -140,6 +140,7 @@ export const createDocAPI = async (
     return res;
   } catch (e) {
     console.log("error in createDocAPI:", e);
+    throw Error(e)
   }
 };
 
@@ -293,7 +294,7 @@ export const getUrlsAPI = async (axiosPrivate, action) => {
       };
     });
   } catch (e) {
-    console.log("error in createDocAPI:", e);
+    console.log("error in getUrlsAPI:", e);
   }
 };
 

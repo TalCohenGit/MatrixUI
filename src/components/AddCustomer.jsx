@@ -100,15 +100,6 @@ const AddCustomer = ({
   const [checked, setChecked] = useState([]);
   const [errorModal, toggleErrorModal] = useState(false);
 
-  // const handleCopy = () => {
-  //   toggleToCopyDataModal(false);
-  //   toggleDetailsToCopyModal(true);
-  // };
-
-  // const cancelCopyModal = () => {
-  //   toggleToCopyDataModal(false);
-  // };
-
   const productsOptions = [];
 
   products &&
@@ -134,7 +125,6 @@ const AddCustomer = ({
               reader.read().then(({ done, value }) => {
                 // If there is no more data to read
                 if (done) {
-                  console.log("done", done);
                   controller.close();
                   return;
                 }
@@ -143,7 +133,6 @@ const AddCustomer = ({
                 // Check chunks by logging to the console
                 const decodedValue = new TextDecoder().decode(value);
                 let newValue = 0;
-                console.log("dec", decodedValue);
                 if (decodedValue === "finish") {
                   newValue = 100;
                 } else {
