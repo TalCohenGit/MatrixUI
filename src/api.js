@@ -439,7 +439,7 @@ export const sendMsgsAPI = async (numbers, msgs) => {
   }
 };
 
-export const getProgressBarAPI = async (axiosPrivate, fileName) => {
+export const getProgressBarAPI = async (axiosPrivate, fileName,numOfRows) => {
   try {
     return await fetch(`${matrixServerURL}api/getProgressBar`, {
       method: "POST",
@@ -449,7 +449,7 @@ export const getProgressBarAPI = async (axiosPrivate, fileName) => {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
         mode: "no-cors",
-        timeLimit: 100,
+        timeLimit: 10*numOfRows,
         Connection: "keep-alive",
       }})
   } catch (e) {

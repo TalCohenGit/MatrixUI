@@ -38,4 +38,4 @@ export const modalAction = {savingAsAction: "שמירה בשם", savingAction: "
 
 export const dateFormat = "mm/dd/yyyy"
 
-export const produceError = "המטריצה נכשלה בהפקה. נא נסה שנית או פנה לתמיכה הטכנית במייל bizmod.solutions@gmail.com"
+export const produceError = " bizmod.solutions@gmail.com המטריצה נכשלה בהפקה. נא נסה שנית או פנה לתמיכה הטכנית במייל"

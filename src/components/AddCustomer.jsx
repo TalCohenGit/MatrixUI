@@ -118,7 +118,7 @@ const AddCustomer = ({
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
   const fetchStream = async (fileName) => {
-    return await getProgressBarAPI(axiosPrivate, fileName)
+    return await getProgressBarAPI(axiosPrivate, fileName,matrixData.length)
       .then((response) => response.body)
       .then((rb) => {
         const reader = rb.getReader();
