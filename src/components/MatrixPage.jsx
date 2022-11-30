@@ -30,7 +30,7 @@ import {
   loadAllMatrixesData,
   loadData,
   removeProductCol,
-  formatDate,
+  formatDateWhenSaving,
   logout,
   getUserEmail,
 } from "../utils/utils";
@@ -339,7 +339,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   const getMatrixFormatedDate = (matrixDate) => {
     if (matrixDate) {
-      return formatDate(matrixDate);
+      return formatDateWhenSaving(matrixDate);
     }
   };
 

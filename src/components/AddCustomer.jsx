@@ -8,6 +8,7 @@ import {
   deleteAllTables,
   getActionFromRes,
   parseStrimingData,
+  getFormattedDates
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -16,7 +17,8 @@ import {
   createDocAPI,
   getTablesByDatesAPI,
   deleteMatrixAPI,
-  getProgressBarAPI
+  getProgressBarAPI,
+  getUrlsByDatesAPI
 } from "../api";
 import Modal from "../common/components/Modal/Modal";
 import { addDays } from "date-fns";
@@ -66,30 +68,6 @@ const AddCustomer = ({
     setProgressValue,
     isInProgress
   } = useContext(DataContext);
-  const [customerValidationFailed, setCustomerValidationFailed] = useState({
-    failure: false,
-    error: "",
-  });
-  const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
-  const [invoiceData, setInvoiceData] = useState([]);
-  const [toSaveDataModal, toggleToSaveDataModal] = useState(false);
-  const [toUpdateDataModal, toggleToUpdateDataModal] = useState(false);
-  const [toLoadDataModal, toggleToLoadDataModal] = useState(false);
-  const [isMatrixNames, toggleMatrixNames] = useState(false);
-  const [matrixesDetails, setMatrixesDetails] = useState([]);
-  const [toDeleteDataModal, toggleToDeleteData] = useState(false);
-  const [toDeleteMatrixModal, toggleToDeleteMatrix] = useState(false);
-  const [toCopyDataModal, toggleToCopyDataModal] = useState(false);
-  const [detailsToCopyModal, toggleDetailsToCopyModal] = useState(false);
-
-  const handleCopy = () => {
-    toggleToCopyDataModal(false);
-    toggleDetailsToCopyModal(true);
-  };
-
-  const cancelCopyModal = () => {
-    toggleToCopyDataModal(false);
-  };
 
   const intialRangeState = [
     {
@@ -98,8 +76,38 @@ const AddCustomer = ({
       key: "selection",
     },
   ];
-  const [dateRanges, setDateRanges] = useState(intialRangeState);
+
+  const [customerValidationFailed, setCustomerValidationFailed] = useState({
+    failure: false,
+    error: "",
+  });
+  const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
+  const [isUrlModalSearch, toggleUrlsSearchModal] = useState(false)
+  const [invoiceData, setInvoiceData] = useState([]);
+  const [searchedInvoices, setSearchedInvoices] = useState([]);
+  const [disableProduction, setDisableProduction] = useState(false);
+  const [toSaveDataModal, toggleToSaveDataModal] = useState(false);
+  const [toUpdateDataModal, toggleToUpdateDataModal] = useState(false);
+  const [toLoadDataModal, toggleToLoadDataModal] = useState(false);
+  const [toSearchDocsModal, toggleToSearchDocs] = useState(false);
+  const [isMatrixNames, toggleMatrixNames] = useState(false);
+  const [matrixesDetails, setMatrixesDetails] = useState([]);
+  const [toDeleteDataModal, toggleToDeleteData] = useState(false);
+  const [toDeleteMatrixModal, toggleToDeleteMatrix] = useState(false);
+  const [toCopyDataModal, toggleToCopyDataModal] = useState(false);
+  const [detailsToCopyModal, toggleDetailsToCopyModal] = useState(false);
+  const [dateRangesLoad, setDateRangesLoad] = useState(intialRangeState);
+  const [dateRangesSearch, setDateRangesSearch] = useState(intialRangeState);
   const [checked, setChecked] = useState([]);
+
+  // const handleCopy = () => {
+  //   toggleToCopyDataModal(false);
+  //   toggleDetailsToCopyModal(true);
+  // };
+
+  // const cancelCopyModal = () => {
+  //   toggleToCopyDataModal(false);
+  // };
 
   const productsOptions = [];
 
@@ -348,34 +356,8 @@ const AddCustomer = ({
     toggleModal(false);
   };
 
-  const formatDate2 = (date) => {
-    if (date) {
-      date = new Date(date).setHours(12);
-      const formatedDate = new Date(date).toISOString().substring(0, 10);
-      return {
-        startDate: new Date(formatedDate).setUTCHours(0, 0, 0, 0),
-        endDate: new Date(formatedDate).setUTCHours(23, 59, 59, 999),
-      };
-    }
-  };
-
-  const formatDate = (date) => {
-    if (date) {
-      return date.toLocaleDateString("en-us");
-    }
-  };
-
   const loadTableNames = async () => {
-    let startDate, endDate;
-    if (dateRanges[0]["startDate"] === dateRanges[0]["endDate"]) {
-      const dates = formatDate2(dateRanges[0]["startDate"]);
-      startDate = dates.startDate;
-      endDate = dates.endDate;
-    } else {
-      startDate = formatDate(dateRanges[0]["startDate"]);
-      endDate = formatDate(dateRanges[0]["endDate"]);
-    }
-
+    const {startDate, endDate} = getFormattedDates(dateRangesLoad[0]["startDate"], dateRangesLoad[0]["endDate"])
     const matrixesDetails = await getTablesByDatesAPI(
       axiosPrivate,
       startDate,
@@ -389,37 +371,40 @@ const AddCustomer = ({
     }
   };
 
+  const loadUrls = async () => {
+    const {startDate, endDate} = getFormattedDates(dateRangesSearch[0]["startDate"], dateRangesSearch[0]["endDate"])
+    const invoices = await getUrlsByDatesAPI(axiosPrivate, startDate, endDate)
+    setSearchedInvoices(invoices)
+    toggleToSearchDocs(false)
+    toggleUrlsSearchModal(true)
+  };
+
   const loadTablesByID = async (matrixID) => {
     await loadTables(matrixID);
     cancelLoading();
-  };
-
-  const cancelSave = () => {
-    toggleToSaveDataModal(false);
-    // setDateValue(new Date());
-  };
-
-  const cancelUpdate = () => {
-    toggleToUpdateDataModal(false);
   };
 
   const cancelLoading = () => {
     toggleToLoadDataModal(false);
     toggleMatrixNames(false);
     setMatrixesDetails([]);
-    setDateRanges(intialRangeState);
+    setDateRangesLoad(intialRangeState);
   };
 
-  const ListModal = ({ isOpen, toggleModal, header }) => {
+  const cancleSearch = () => {
+    toggleToSearchDocs(false);
+  };
+
+  const ListModal = ({ isOpen, toggleModal, header, invoices }) => {
     return (
       isOpen &&
-      (invoiceData?.length ? (
+      (invoices?.length ? (
         <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={header}>
           {/* <div>{dataToShow}</div> */}
           <React.Fragment>
             <UrlCheckboxes
               axiosPrivate={axiosPrivate}
-              invoiceData={invoiceData}
+              invoiceData={invoices}
               toggleModal={toggleModal}
             />
           </React.Fragment>
@@ -449,6 +434,10 @@ const AddCustomer = ({
     input: () => ({
       fontSize: "40px",
     }),
+  };
+
+  const handleSearchDocs = () => {
+    toggleToSearchDocs(true)
   };
 
   const finishProduce = () => {
@@ -481,6 +470,13 @@ const AddCustomer = ({
             isOpen={isUrlsModalOpen}
             toggleModal={finishProduce}
             header={"מסמכים שהופקו"}
+            invoices={invoiceData}
+          />
+          <ListModal
+            isOpen={isUrlModalSearch}
+            toggleModal={toggleUrlsSearchModal}
+            header={"מסמכים שהופקו"}
+            invoices={searchedInvoices}
           />
           {/* <CopyDataModal
             isOpen={toCopyDataModal}
@@ -511,13 +507,26 @@ const AddCustomer = ({
           <LoadModal
             isOpen={toLoadDataModal}
             toggleModal={cancelLoading}
-            dateRanges={dateRanges}
-            setDateRanges={setDateRanges}
+            dateRanges={dateRangesLoad}
+            setDateRanges={setDateRangesLoad}
             onCancel={cancelLoading}
             onSearch={loadTableNames}
             isMatrixNames={isMatrixNames}
             matrixesDetails={matrixesDetails}
             loadTablesByID={loadTablesByID}
+            modalHeader={"טעינת מטריצות"}
+          />
+          <LoadModal
+            isOpen={toSearchDocsModal}
+            toggleModal={toggleToSearchDocs}
+            dateRanges={dateRangesSearch}
+            setDateRanges={setDateRangesSearch}
+            onCancel={cancleSearch}
+            onSearch={loadUrls}
+            isMatrixNames={isMatrixNames}
+            matrixesDetails={matrixesDetails}
+            loadTablesByID={loadTablesByID}
+            modalHeader={"חיפוש מסמכים לפי תאריכים"}
           />
           <input
             type="text"
@@ -591,6 +600,9 @@ const AddCustomer = ({
           onClick={() => handleDeleteMatrix()}
         >
           מחק מטריצה
+        </button>
+        <button className="deleteAll-button" onClick={() => handleSearchDocs()}>
+          חיפוש מסמכים
         </button>
       </div>
       {errorMessage?.length ? (

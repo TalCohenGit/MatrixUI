@@ -12,13 +12,14 @@ const LoadModal = ({
   onSearch,
   isMatrixNames,
   matrixesDetails,
-  loadTablesByID
+  loadTablesByID,
+  modalHeader
 }) => {
   return (
     <Modal
       isOpen={isOpen}
       toggleModal={toggleModal}
-      modalHeader="טעינה"
+      modalHeader={modalHeader}
     >
       <div className="LoadModal">
         <h3>בחירת טווח תאריכים</h3>

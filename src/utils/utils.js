@@ -254,7 +254,7 @@ export const getActionFromRes = (dataRes) => {
   return producedObj?.Action
 }
 
-export const formatDate = (matrixDate) => {
+export const formatDateWhenSaving = (matrixDate) => {
   // return format(new Date(matrixDate), "MM/dd/yyyy"
    return new Date(matrixDate).toLocaleString('en', {  timeZone: "Asia/Jerusalem", })
 }
@@ -365,6 +365,37 @@ export const loadAllMatrixesData = (
     });
   }
 };
+
+
+const formatDate2 = (date) => {
+  if (date) {
+    date = new Date(date).setHours(12);
+    const formatedDate = new Date(date).toISOString().substring(0, 10);
+    return {
+      startDate: new Date(formatedDate).setUTCHours(0, 0, 0, 0),
+      endDate: new Date(formatedDate).setUTCHours(23, 59, 59, 999),
+    };
+  }
+};
+
+const formatDate = (date) => {
+  if (date) {
+    return date.toLocaleDateString("en-us");
+  }
+};
+
+export const getFormattedDates = (fromDate, toDate) => {
+  let startDate, endDate;
+  if (fromDate === toDate) {
+    const dates = formatDate2(fromDate);
+    startDate = dates.startDate;
+    endDate = dates.endDate;
+  } else {
+    startDate = formatDate(fromDate);
+    endDate = formatDate(toDate);
+  }
+  return {startDate, endDate}
+}
 
 const handleComments = (comments) => {
   const commentsObj = {};
