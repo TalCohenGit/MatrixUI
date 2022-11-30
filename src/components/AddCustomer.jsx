@@ -34,6 +34,8 @@ import {
   produceDocAction,
   copyMatrixAction,
 } from "../utils/constants";
+import { produceError } from "../utils/constants";
+import Toast from "./Toast/Toast";
 
 const AddCustomer = ({
   customerName,
@@ -80,6 +82,10 @@ const AddCustomer = ({
     failure: false,
     error: "",
   });
+  const [errorMsg,setErrorMsg] = useState({
+    show: false,
+    text: produceError,
+  })
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
   const [isUrlModalSearch, toggleUrlsSearchModal] = useState(false);
   const [invoiceData, setInvoiceData] = useState([]);
@@ -271,7 +277,7 @@ const AddCustomer = ({
     if (!validatedData) {
       return;
     }
-    setCustomerValidationFailed("");
+    setCustomerValidationFailed({...customerValidationFailed,failure:false});
     const { cellsData, docCommentsToSend, metaDataToSend } =
       handleCommentMatrixData(
         matrixComments,
@@ -295,27 +301,31 @@ const AddCustomer = ({
         productsMap,
         matrixName,
         fileName
-      ).then(async (res) => {
-        const parsedData = parseStrimingData(res.data);
-        const action = getActionFromRes(parsedData);
-        const invoiceDataArr = await getUrlsAPI(axiosPrivate, action);
-        const relavantInvoiceData = invoiceDataArr.slice(
-          invoiceDataArr.length - customerNumbers(matrixData),
-          invoiceDataArr.length
-        );
-        setInvoiceData(relavantInvoiceData);
-        toggleUrlsModal(true);
-        setIsInProgress(false);
-        setProgressValue(0);
-      }).catch((error) => {
-        console.log("error in produceDoc:", error);
-        setIsInProgress(false);
-        setProgressValue(0);
-        toggleErrorModal(true);
-      })
+      )
+        .then(async (res) => {
+          const parsedData = parseStrimingData(res.data);
+          const action = getActionFromRes(parsedData);
+          const invoiceDataArr = await getUrlsAPI(axiosPrivate, action);
+          const relavantInvoiceData = invoiceDataArr.slice(
+            invoiceDataArr.length - customerNumbers(matrixData),
+            invoiceDataArr.length
+          );
+          setInvoiceData(relavantInvoiceData);
+          toggleUrlsModal(true);
+          setIsInProgress(false);
+          setProgressValue(0);
+        })
+        .catch((error) => {
+          setIsInProgress(false);
+          setProgressValue(0);
+          // toggleErrorModal(true);
+          setErrorMsg({
+            show: true,
+            text: produceError,
+          });
+        });
       fetchStream(fileName);
     } catch (e) {
-      console.log("error in produceDoc:", e);
       setIsInProgress(false);
       setProgressValue(0);
       toggleErrorModal(true);
@@ -454,6 +464,16 @@ const AddCustomer = ({
     <>
       <div className="addCustomer-wrapper">
         <div className="addCustomer-input-wrapper">
+          <Toast
+            isOpen={errorMsg.show}
+            text={errorMsg.text}
+            handleClose={() => {
+              setErrorMsg({
+                ...errorMsg,
+                show: false,
+              });
+            }}
+          />
           <AreUSureModal
             isOpen={toDeleteMatrixModal}
             toggleModal={toggleToDeleteMatrix}
@@ -526,11 +546,11 @@ const AddCustomer = ({
             loadTablesByID={loadTablesByID}
             modalHeader={"חיפוש מסמכים לפי תאריכים"}
           />
-          <ErrorModal
+          {/* <ErrorModal
             isOpen={errorModal}
             toggleModal={toggleErrorModal}
             error={"המטריצה נכשלה בהפקה. נא נסה שנית או פנה לתמיכה הטכנית במייל bizmod.solutions@gmail.com"}
-          />
+          /> */}
           <input
             type="text"
             value={customerName}
