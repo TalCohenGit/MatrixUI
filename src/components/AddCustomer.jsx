@@ -8,7 +8,7 @@ import {
   deleteAllTables,
   getActionFromRes,
   parseStrimingData,
-  getFormattedDates
+  getFormattedDates,
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -18,7 +18,7 @@ import {
   getTablesByDatesAPI,
   deleteMatrixAPI,
   getProgressBarAPI,
-  getUrlsByDatesAPI
+  getUrlsByDatesAPI,
 } from "../api";
 import Modal from "../common/components/Modal/Modal";
 import { addDays } from "date-fns";
@@ -27,14 +27,13 @@ import LoaderContainer from "./LoaderContainer/LoaderContainer";
 import SaveModal from "./SaveModal/SaveModal";
 import LoadModal from "./Modals/LoadModal";
 import AreUSureModal from "./Modals/AreUSureModal";
-import CopyDataModal from "./Modals/CopyDataModal";
+import ErrorModal from "./Modals/ErrorModal";
 import {
   savingAction,
   savingAsAction,
   produceDocAction,
   copyMatrixAction,
 } from "../utils/constants";
-
 
 const AddCustomer = ({
   customerName,
@@ -66,7 +65,7 @@ const AddCustomer = ({
     setSelectedProducts,
     setIsInProgress,
     setProgressValue,
-    isInProgress
+    isInProgress,
   } = useContext(DataContext);
 
   const intialRangeState = [
@@ -82,7 +81,7 @@ const AddCustomer = ({
     error: "",
   });
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
-  const [isUrlModalSearch, toggleUrlsSearchModal] = useState(false)
+  const [isUrlModalSearch, toggleUrlsSearchModal] = useState(false);
   const [invoiceData, setInvoiceData] = useState([]);
   const [searchedInvoices, setSearchedInvoices] = useState([]);
   const [disableProduction, setDisableProduction] = useState(false);
@@ -99,6 +98,7 @@ const AddCustomer = ({
   const [dateRangesLoad, setDateRangesLoad] = useState(intialRangeState);
   const [dateRangesSearch, setDateRangesSearch] = useState(intialRangeState);
   const [checked, setChecked] = useState([]);
+  const [errorModal, toggleErrorModal] = useState(false);
 
   // const handleCopy = () => {
   //   toggleToCopyDataModal(false);
@@ -293,9 +293,9 @@ const AddCustomer = ({
     //   newMatrixId = await getMatrixIDAPI(axiosPrivate);
     // }
     try {
-      const fileName = (Math.random()).toString();
-      setIsInProgress(true)
-      const produce = createDocAPI(
+      const fileName = Math.random().toString();
+      setIsInProgress(true);
+      createDocAPI(
         axiosPrivate,
         validatedData,
         newMatrixId,
@@ -315,16 +315,16 @@ const AddCustomer = ({
         );
         setInvoiceData(relavantInvoiceData);
         toggleUrlsModal(true);
-        setIsInProgress(false)
-        setProgressValue(0)
+        setIsInProgress(false);
+        setProgressValue(0);
       });
 
       fetchStream(fileName);
-      
     } catch (e) {
       console.log("error in produceDoc:", e);
-      setIsInProgress(false)
-      setProgressValue(0)
+      setIsInProgress(false);
+      setProgressValue(0);
+      toggleErrorModal(true);
     }
   };
 
@@ -361,7 +361,10 @@ const AddCustomer = ({
   };
 
   const loadTableNames = async () => {
-    const {startDate, endDate} = getFormattedDates(dateRangesLoad[0]["startDate"], dateRangesLoad[0]["endDate"])
+    const { startDate, endDate } = getFormattedDates(
+      dateRangesLoad[0]["startDate"],
+      dateRangesLoad[0]["endDate"]
+    );
     const matrixesDetails = await getTablesByDatesAPI(
       axiosPrivate,
       startDate,
@@ -376,11 +379,14 @@ const AddCustomer = ({
   };
 
   const loadUrls = async () => {
-    const {startDate, endDate} = getFormattedDates(dateRangesSearch[0]["startDate"], dateRangesSearch[0]["endDate"])
-    const invoices = await getUrlsByDatesAPI(axiosPrivate, startDate, endDate)
-    setSearchedInvoices(invoices)
-    toggleToSearchDocs(false)
-    toggleUrlsSearchModal(true)
+    const { startDate, endDate } = getFormattedDates(
+      dateRangesSearch[0]["startDate"],
+      dateRangesSearch[0]["endDate"]
+    );
+    const invoices = await getUrlsByDatesAPI(axiosPrivate, startDate, endDate);
+    setSearchedInvoices(invoices);
+    toggleToSearchDocs(false);
+    toggleUrlsSearchModal(true);
   };
 
   const loadTablesByID = async (matrixID) => {
@@ -441,7 +447,7 @@ const AddCustomer = ({
   };
 
   const handleSearchDocs = () => {
-    toggleToSearchDocs(true)
+    toggleToSearchDocs(true);
   };
 
   const finishProduce = () => {
@@ -525,6 +531,11 @@ const AddCustomer = ({
             matrixesDetails={matrixesDetails}
             loadTablesByID={loadTablesByID}
             modalHeader={"חיפוש מסמכים לפי תאריכים"}
+          />
+          <ErrorModal
+            isOpen={errorModal}
+            toggleModal={toggleErrorModal}
+            error={"המטריצה נכשלה בהפקה. נא נסה שנית או פנה לתמיכה הטכנית במייל bizmod.solutions@gmail.com"}
           />
           <input
             type="text"
