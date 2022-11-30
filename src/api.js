@@ -136,7 +136,6 @@ export const createDocAPI = async (
         fileName
       },
     });
-
     return res;
   } catch (e) {
     console.log("error in createDocAPI:", e);

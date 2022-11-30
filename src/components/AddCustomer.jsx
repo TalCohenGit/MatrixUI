@@ -125,6 +125,7 @@ const AddCustomer = ({
               reader.read().then(({ done, value }) => {
                 // If there is no more data to read
                 if (done) {
+                  console.log("done", done);
                   controller.close();
                   return;
                 }
@@ -306,8 +307,12 @@ const AddCustomer = ({
         toggleUrlsModal(true);
         setIsInProgress(false);
         setProgressValue(0);
-      });
-
+      }).catch((error) => {
+        console.log("error in produceDoc:", error);
+        setIsInProgress(false);
+        setProgressValue(0);
+        toggleErrorModal(true);
+      })
       fetchStream(fileName);
     } catch (e) {
       console.log("error in produceDoc:", e);
