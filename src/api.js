@@ -1,5 +1,5 @@
 import { axiosAuth, axiosRegister, axiosMsgs, axiosDrivers } from "./axios";
-import { getItemNames, parseStrimingData, formatDate } from "./utils/utils";
+import { getItemNames, parseStrimingData, formatDateWhenSaving } from "./utils/utils";
 import axios from "axios";
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
@@ -121,7 +121,7 @@ export const createDocAPI = async (
       metaData,
       productsMap
     );
-    const date = formatDate(new Date());
+    const date = formatDateWhenSaving(new Date());
     const isBI = true;
     const dataToSend = getMatrixObject(
       date,
@@ -138,7 +138,7 @@ export const createDocAPI = async (
         fileName: "filename",
       },
     });
-    
+
     return res;
   } catch (e) {
     console.log("error in createDocAPI:", e);
@@ -321,19 +321,23 @@ export const mergePdfAPI = async (axiosPrivate, filteredUrl) => {
   }
 };
 
+const getData = async (axiosPrivate, fromDate, toDate, collection, date) => {
+  const dates = {
+    ValueDate: {
+      $gte: fromDate,
+      $lte: toDate,
+    },
+  };
+
+  return await axiosPrivate.post("/api/getdata", {
+    collection: collection,
+    searchParams: dates,
+  });
+};
+
 export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
-    const dates = {
-      Date: {
-        $gte: fromDate,
-        $lte: toDate,
-      },
-    };
-
-    const res = await axiosPrivate.post("/api/getdata", {
-      collection: "MtxLog",
-      searchParams: dates,
-    });
+    const res = await getData(axiosPrivate, fromDate, toDate, "MtxLog");
 
     const data = res.data.result.data;
     if (data?.length) {
@@ -344,6 +348,36 @@ export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
         };
       });
     }
+  } catch (e) {
+    console.log("error in getTablesByDatesAPI:", e);
+  }
+};
+
+export const getUrlsByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
+  try {
+    const res = await getData(axiosPrivate, fromDate, toDate, "DocData");
+
+    const data = res.data.result.data;
+    return data.map((element) => {
+      const {
+        DocUrl,
+        DocNumber,
+        Accountname,
+        ValueDate,
+        Action,
+        TotalCost,
+        DocumentDetails,
+      } = element;
+      return {
+        DocUrl,
+        Accountname,
+        Action,
+        ValueDate,
+        TotalCost,
+        DocNumber,
+        DocumentDetails,
+      };
+    })
   } catch (e) {
     console.log("error in getTablesByDatesAPI:", e);
   }

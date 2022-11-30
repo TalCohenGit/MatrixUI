@@ -8,6 +8,7 @@ import {
   deleteAllTables,
   getActionFromRes,
   parseStrimingData,
+  getFormattedDates
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -16,6 +17,7 @@ import {
   createDocAPI,
   getTablesByDatesAPI,
   deleteMatrixAPI,
+  getUrlsByDatesAPI
 } from "../api";
 import Modal from "../common/components/Modal/Modal";
 import { addDays } from "date-fns";
@@ -78,6 +80,7 @@ const AddCustomer = ({
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
   const [isUrlModalSearch, toggleUrlsSearchModal] = useState(false)
   const [invoiceData, setInvoiceData] = useState([]);
+  const [searchedInvoices, setSearchedInvoices] = useState([]);
   const [disableProduction, setDisableProduction] = useState(false);
   const [toSaveDataModal, toggleToSaveDataModal] = useState(false);
   const [toUpdateDataModal, toggleToUpdateDataModal] = useState(false);
@@ -353,34 +356,8 @@ const AddCustomer = ({
     toggleModal(false);
   };
 
-  const formatDate2 = (date) => {
-    if (date) {
-      date = new Date(date).setHours(12);
-      const formatedDate = new Date(date).toISOString().substring(0, 10);
-      return {
-        startDate: new Date(formatedDate).setUTCHours(0, 0, 0, 0),
-        endDate: new Date(formatedDate).setUTCHours(23, 59, 59, 999),
-      };
-    }
-  };
-
-  const formatDate = (date) => {
-    if (date) {
-      return date.toLocaleDateString("en-us");
-    }
-  };
-
   const loadTableNames = async () => {
-    let startDate, endDate;
-    if (dateRangesLoad[0]["startDate"] === dateRangesLoad[0]["endDate"]) {
-      const dates = formatDate2(dateRangesLoad[0]["startDate"]);
-      startDate = dates.startDate;
-      endDate = dates.endDate;
-    } else {
-      startDate = formatDate(dateRangesLoad[0]["startDate"]);
-      endDate = formatDate(dateRangesLoad[0]["endDate"]);
-    }
-
+    const {startDate, endDate} = getFormattedDates(dateRangesLoad[0]["startDate"], dateRangesLoad[0]["endDate"])
     const matrixesDetails = await getTablesByDatesAPI(
       axiosPrivate,
       startDate,
@@ -394,7 +371,10 @@ const AddCustomer = ({
     }
   };
 
-  const loadUrls = () => {
+  const loadUrls = async () => {
+    const {startDate, endDate} = getFormattedDates(dateRangesSearch[0]["startDate"], dateRangesSearch[0]["endDate"])
+    const invoices = await getUrlsByDatesAPI(axiosPrivate, startDate, endDate)
+    setSearchedInvoices(invoices)
     toggleToSearchDocs(false)
     toggleUrlsSearchModal(true)
   };
@@ -415,16 +395,16 @@ const AddCustomer = ({
     toggleToSearchDocs(false);
   };
 
-  const ListModal = ({ isOpen, toggleModal, header }) => {
+  const ListModal = ({ isOpen, toggleModal, header, invoices }) => {
     return (
       isOpen &&
-      (invoiceData?.length ? (
+      (invoices?.length ? (
         <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={header}>
           {/* <div>{dataToShow}</div> */}
           <React.Fragment>
             <UrlCheckboxes
               axiosPrivate={axiosPrivate}
-              invoiceData={invoiceData}
+              invoiceData={invoices}
               toggleModal={toggleModal}
             />
           </React.Fragment>
@@ -500,11 +480,13 @@ const AddCustomer = ({
             isOpen={isUrlsModalOpen}
             toggleModal={finishProduce}
             header={"מסמכים שהופקו"}
+            invoices={invoiceData}
           />
           <ListModal
             isOpen={isUrlModalSearch}
             toggleModal={toggleUrlsSearchModal}
             header={"מסמכים שהופקו"}
+            invoices={searchedInvoices}
           />
           {/* <CopyDataModal
             isOpen={toCopyDataModal}
