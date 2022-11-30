@@ -37,3 +37,5 @@ export const copyMatrixAction = "copyMatrix"
 export const modalAction = {savingAsAction: "שמירה בשם", savingAction: "שמירה", copyMatrix: "שכפול מטריצה"}
 
 export const dateFormat = "mm/dd/yyyy"
+
+export const produceError = "המטריצה נכשלה בהפקה. נא נסה שנית או פנה לתמיכה הטכנית במייל bizmod.solutions@gmail.com"
