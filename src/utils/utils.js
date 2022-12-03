@@ -3,9 +3,9 @@ import {
   numOfColAfterProducts,
   titleWithoutProduct,
   savingAsAction,
-  produceDocAction
+  produceDocAction,
 } from "./constants";
-import { logoutAPI } from "../api"
+import { logoutAPI } from "../api";
 import _ from "lodash";
 import { format } from "date-fns";
 
@@ -115,39 +115,51 @@ export const updateBalanceTable = (
   }
 };
 
-export const removeColFromTable = (colIndex, numOfColBeforeProducts, matrix) => {
- return matrix.map((row) => {
+export const removeColFromTable = (
+  colIndex,
+  numOfColBeforeProducts,
+  matrix
+) => {
+  return matrix.map((row) => {
     let newArr;
     newArr = [
       ...row.slice(0, colIndex - numOfColBeforeProducts),
-      ...row.slice(colIndex + 1 - numOfColBeforeProducts, row.length)
+      ...row.slice(colIndex + 1 - numOfColBeforeProducts, row.length),
     ];
     return newArr;
   });
-}
+};
 
-export const removeProductCol = (productIndx, currentMatrix, currentMatrixComments) => {
-  const newMatrixData = removeColFromTable(productIndx, 0, currentMatrix)
-  const newMatrixComments = removeColFromTable(productIndx, numOfColBeforeProducts, currentMatrixComments)
-  return {newMatrixData, newMatrixComments}
-}
+export const removeProductCol = (
+  productIndx,
+  currentMatrix,
+  currentMatrixComments
+) => {
+  const newMatrixData = removeColFromTable(productIndx, 0, currentMatrix);
+  const newMatrixComments = removeColFromTable(
+    productIndx,
+    numOfColBeforeProducts,
+    currentMatrixComments
+  );
+  return { newMatrixData, newMatrixComments };
+};
 
 export const logout = async (setAccessToken, setRefreshToken) => {
   setAccessToken("");
   setRefreshToken("");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("timeLimit");
-  localStorage.removeItem("userEmail")
+  localStorage.removeItem("userEmail");
   await logoutAPI();
-}
+};
 
 export const getUserEmail = () => {
-  return localStorage.getItem("userEmail")
-}
+  return localStorage.getItem("userEmail");
+};
 
 export const getInternationalNum = (phoneNum) => {
-  return "972" + phoneNum.substring(1)
-}
+  return "972" + phoneNum.substring(1);
+};
 
 export const removeColFromBalanceTable = (
   currentBalanceTable,
@@ -157,8 +169,10 @@ export const removeColFromBalanceTable = (
   const selectedProduct = productsData.filter(
     (product) => productName === product["שם פריט"]
   )[0];
-  const colIndexToRemove = currentBalanceTable[0].indexOf(selectedProduct["מפתח פריט אב"]);
-  return removeColFromTable(colIndexToRemove, 0, currentBalanceTable)
+  const colIndexToRemove = currentBalanceTable[0].indexOf(
+    selectedProduct["מפתח פריט אב"]
+  );
+  return removeColFromTable(colIndexToRemove, 0, currentBalanceTable);
 };
 export const numOfProducts = (matrixLength) =>
   matrixLength - titleWithoutProduct;
@@ -204,7 +218,6 @@ export const getMatrixesData = async (
   action,
   setCustomerValidationFailed
 ) => {
-
   const validatedData = handleMatrixData(
     matrixData,
     productsMap,
@@ -234,30 +247,32 @@ export const getRefreshToken = () => {
 };
 
 export const parseStrimingData = (dataToParse) => {
-    let str = "["
-  
-    for (let i = 0; i <= dataToParse.length - 1; i++) {
-      if (dataToParse[i] == "}" && dataToParse[i + 1] == "{") {
-        str += dataToParse[i]
-        str += ","
-      } else {
-        str += dataToParse[i]
-      }
+  let str = "[";
+
+  for (let i = 0; i <= dataToParse.length - 1; i++) {
+    if (dataToParse[i] == "}" && dataToParse[i + 1] == "{") {
+      str += dataToParse[i];
+      str += ",";
+    } else {
+      str += dataToParse[i];
     }
-    str += "]"
-    return JSON.parse(str, null, 2)
-}
+  }
+  str += "]";
+  return JSON.parse(str, null, 2);
+};
 
 export const getActionFromRes = (dataRes) => {
-  const dataObj = dataRes?.length > 0 && dataRes[dataRes.length - 1]
-  const producedObj = dataObj?.data?.resultData?.data[0]
-  return producedObj?.Action
-}
+  const dataObj = dataRes?.length > 0 && dataRes[dataRes.length - 1];
+  const producedObj = dataObj?.data?.resultData?.data[0];
+  return producedObj?.Action;
+};
 
 export const formatDateWhenSaving = (matrixDate) => {
   // return format(new Date(matrixDate), "MM/dd/yyyy"
-   return new Date(matrixDate).toLocaleString('en', {  timeZone: "Asia/Jerusalem", })
-}
+  return new Date(matrixDate).toLocaleString("en", {
+    timeZone: "Asia/Jerusalem",
+  });
+};
 
 const setError = (setCustomerValidationFailed, errorMsg, customerName) => {
   if (setCustomerValidationFailed) {
@@ -354,11 +369,7 @@ export const loadData = (matrixesUiData, stateToChange, index) => {
   }
 };
 
-
-export const loadAllMatrixesData = (
-  matrixesUiData,
-  setArr
-) => {
+export const loadAllMatrixesData = (matrixesUiData, setArr) => {
   if (matrixesUiData) {
     setArr.forEach((setAction, index) => {
       loadData(matrixesUiData, setAction, index);
@@ -366,6 +377,34 @@ export const loadAllMatrixesData = (
   }
 };
 
+const formatDateSearch = (startDate, endDate) => {
+  startDate = new Date(startDate);
+  endDate = new Date(endDate);
+  const [sYear, sMonth, sDay] = [
+    startDate.getFullYear(),
+    startDate.getMonth() + 1,
+    startDate.getDate(),
+  ];
+
+  const [eYear, eMonth, eDay] = [
+    endDate.getFullYear(),
+    endDate.getMonth() + 1,
+    endDate.getDate(),
+  ];
+  const startDateFormatted = `${sYear}-${sMonth}-${sDay}`;
+  const endDateFormatted = `${eYear}-${eMonth}-${eDay}`;
+  startDate = new Date(new Date(startDateFormatted).setUTCHours(0, 0, 0, 0));
+  if (startDateFormatted === endDateFormatted) {
+    endDate = new Date(new Date(endDateFormatted).setUTCHours(0, 0, 0, 0));
+  } else {
+    endDate = new Date(new Date(endDateFormatted).setHours(23, 59, 59));
+  }
+  
+  return {
+    startDate,
+    endDate,
+  };
+};
 
 const formatDate2 = (date) => {
   if (date) {
@@ -394,8 +433,13 @@ export const getFormattedDates = (fromDate, toDate) => {
     startDate = formatDate(fromDate);
     endDate = formatDate(toDate);
   }
-  return {startDate, endDate}
-}
+  return { startDate, endDate };
+};
+
+export const getFormattedDatesSearch = (fromDate, toDate) => {
+  const { startDate, endDate } = formatDateSearch(fromDate, toDate);
+  return { startDate, endDate };
+};
 
 const handleComments = (comments) => {
   const commentsObj = {};
@@ -448,9 +492,11 @@ export const getProductsNameKeyMap = (products) => {
 
 export const getItemNames = (itemsKeys, productsMap) => {
   const itemsNameArr = [];
-  
+
   itemsKeys.forEach((itemKey) => {
-    const productName = Object.keys(productsMap).find(key => productsMap[key] === itemKey);
+    const productName = Object.keys(productsMap).find(
+      (key) => productsMap[key] === itemKey
+    );
     itemsNameArr.push(productName);
   });
   return itemsNameArr;

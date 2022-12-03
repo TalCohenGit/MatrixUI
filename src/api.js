@@ -322,7 +322,7 @@ export const mergePdfAPI = async (axiosPrivate, filteredUrl) => {
 
 const getData = async (axiosPrivate, fromDate, toDate, collection, date) => {
   const dates = {
-    ValueDate: {
+    [date]: {
       $gte: fromDate,
       $lte: toDate,
     },
@@ -336,7 +336,7 @@ const getData = async (axiosPrivate, fromDate, toDate, collection, date) => {
 
 export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
-    const res = await getData(axiosPrivate, fromDate, toDate, "MtxLog");
+    const res = await getData(axiosPrivate, fromDate, toDate, "MtxLog", "Date");
 
     const data = res.data.result.data;
     if (data?.length) {
@@ -354,7 +354,7 @@ export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
 
 export const getUrlsByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
-    const res = await getData(axiosPrivate, fromDate, toDate, "DocData");
+    const res = await getData(axiosPrivate, fromDate, toDate, "DocData", "ValueDate");
 
     const data = res.data.result.data;
     return data.map((element) => {

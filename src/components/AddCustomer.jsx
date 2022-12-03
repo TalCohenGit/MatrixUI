@@ -9,6 +9,7 @@ import {
   getActionFromRes,
   parseStrimingData,
   getFormattedDates,
+  getFormattedDatesSearch,
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -383,11 +384,11 @@ const AddCustomer = ({
   };
 
   const loadUrls = async () => {
-    const { startDate, endDate } = getFormattedDates(
+    const { startDate, endDate } = getFormattedDatesSearch(
       dateRangesSearch[0]["startDate"],
       dateRangesSearch[0]["endDate"]
     );
-    const invoices = await getUrlsByDatesAPI(axiosPrivate, startDate, endDate);
+    const invoices = await getUrlsByDatesAPI(axiosPrivate, startDate.toString(), endDate.toString());
     setSearchedInvoices(invoices);
     toggleToSearchDocs(false);
     toggleUrlsSearchModal(true);
