@@ -425,7 +425,7 @@ const AddCustomer = ({
           </React.Fragment>
         </Modal>
       ) : (
-        <LoaderContainer />
+        <div/>
       ))
     );
   };
