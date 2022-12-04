@@ -117,7 +117,8 @@ const AddCustomer = ({
     });
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
-  const fetchStream = async (fileName) => {
+  const getProgressBar = async (fileName) => {
+    let newValue = 0;
     return await getProgressBarAPI(axiosPrivate, fileName)
       .then((response) => response.body)
       .then((rb) => {
@@ -139,13 +140,12 @@ const AddCustomer = ({
                 controller.enqueue(value);
                 // Check chunks by logging to the console
                 const decodedValue = new TextDecoder().decode(value);
-                let newValue = 0;
                 if (decodedValue === "finish") {
                   newValue = 100;
                 } else {
-                  const newObj = JSON.parse(decodedValue).stats;
-                  const { amountFinished, totalToProcess } = newObj;
-                  if (totalToProcess > 0) {
+                  const {stats,gotStats} = JSON.parse(decodedValue);
+                  const { amountFinished, totalToProcess } = stats;
+                  if (totalToProcess > 0 && gotStats) {
                     newValue = amountFinished * (100 / totalToProcess);
                   }
                 }
@@ -303,9 +303,8 @@ const AddCustomer = ({
         fileName
       )
         .then(async (res) => {
-          const parsedData = parseStrimingData(res.data);
-          const action = getActionFromRes(parsedData);
-          const invoiceDataArr = await getUrlsAPI(axiosPrivate, action);
+          await getProgressBar(fileName)
+          const invoiceDataArr = await getUrlsAPI(axiosPrivate);
           const relavantInvoiceData = invoiceDataArr.slice(
             invoiceDataArr.length - customerNumbers(matrixData),
             invoiceDataArr.length
@@ -324,7 +323,6 @@ const AddCustomer = ({
             text: produceError,
           });
         });
-      fetchStream(fileName);
     } catch (e) {
       setIsInProgress(false);
       setProgressValue(0);

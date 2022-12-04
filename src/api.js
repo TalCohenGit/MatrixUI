@@ -131,7 +131,7 @@ export const createDocAPI = async (
       isBI,
       matrixName
     );
-    const res = await axiosPrivate.post("/api/createdoc", dataToSend, {
+    const res = await axiosPrivate.post("/api/createdoc2", dataToSend, {
       headers: {
         fileName
       },

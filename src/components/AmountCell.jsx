@@ -34,7 +34,6 @@ const AmountCell = ({
   }, [cellValue]);
 
   useEffect(() => {
-    console.log("matrixComments", matrixComments)
     if (matrixComments?.length && matrixComments[0][0] && matrixComments[rowIndex-1][colIndex-3] && tableName === "main") {
       setComments(matrixComments[rowIndex-1][colIndex-3])
     }
