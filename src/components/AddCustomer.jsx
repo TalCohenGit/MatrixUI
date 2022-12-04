@@ -8,8 +8,7 @@ import {
   deleteAllTables,
   getActionFromRes,
   parseStrimingData,
-  getFormattedDates,
-  getFormattedDatesSearch,
+  getFormattedDates
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -384,7 +383,7 @@ const AddCustomer = ({
   };
 
   const loadUrls = async () => {
-    const { startDate, endDate } = getFormattedDatesSearch(
+    const { startDate, endDate } = getFormattedDates(
       dateRangesSearch[0]["startDate"],
       dateRangesSearch[0]["endDate"]
     );

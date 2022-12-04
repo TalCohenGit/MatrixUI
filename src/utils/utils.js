@@ -380,17 +380,19 @@ export const loadAllMatrixesData = (matrixesUiData, setArr) => {
 const formatDateSearch = (startDate, endDate) => {
   startDate = new Date(startDate);
   endDate = new Date(endDate);
-  const [sYear, sMonth, sDay] = [
+  let [sYear, sMonth, sDay] = [
     startDate.getFullYear(),
     startDate.getMonth() + 1,
     startDate.getDate(),
   ];
 
-  const [eYear, eMonth, eDay] = [
+  let [eYear, eMonth, eDay] = [
     endDate.getFullYear(),
     endDate.getMonth() + 1,
     endDate.getDate(),
   ];
+  sDay = sDay === 1? "01" : sDay
+  eDay = eDay === 1? "01" : eDay
   const startDateFormatted = `${sYear}-${sMonth}-${sDay}`;
   const endDateFormatted = `${eYear}-${eMonth}-${eDay}`;
   startDate = new Date(new Date(startDateFormatted).setUTCHours(0, 0, 0, 0));
@@ -399,7 +401,7 @@ const formatDateSearch = (startDate, endDate) => {
   } else {
     endDate = new Date(new Date(endDateFormatted).setHours(23, 59, 59));
   }
-  
+
   return {
     startDate,
     endDate,
@@ -424,19 +426,6 @@ const formatDate = (date) => {
 };
 
 export const getFormattedDates = (fromDate, toDate) => {
-  let startDate, endDate;
-  if (fromDate === toDate) {
-    const dates = formatDate2(fromDate);
-    startDate = dates.startDate;
-    endDate = dates.endDate;
-  } else {
-    startDate = formatDate(fromDate);
-    endDate = formatDate(toDate);
-  }
-  return { startDate, endDate };
-};
-
-export const getFormattedDatesSearch = (fromDate, toDate) => {
   const { startDate, endDate } = formatDateSearch(fromDate, toDate);
   return { startDate, endDate };
 };
