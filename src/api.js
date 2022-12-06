@@ -303,7 +303,7 @@ export const deleteMatrixAPI = async (axiosPrivate, matrixID) => {
     await axiosPrivate.post("/api/deletedata", {
       collection: "MtxLog",
       indentifierValue: matrixID,
-      indentifier: "matrixID",
+      indentifier: matrixID,
     });
   } catch (e) {
     console.log("error in deleteMatrixAPI:", e);

@@ -12,10 +12,12 @@ const Logout = ({setAccessToken, setRefreshToken}) => {
     localStorage.removeItem("timeLimit");
     localStorage.removeItem("userEmail")
     await logoutAPI();
+    window.location = window.location.href 
   }
 
   const handleLogout = async () => {
-      await logout(setAccessToken, setRefreshToken)        
+      await logout(setAccessToken, setRefreshToken) 
+           
   }
 
   return (
