@@ -284,10 +284,12 @@ const AddCustomer = ({
         validatedData["docComments"],
         validatedData["metaData"]
       );
+  
     let newMatrixId = matrixID;
-    // if (new Date(matrixDate).toDateString() !== new Date().toDateString()) {
-    //   newMatrixId = await getMatrixIDAPI(axiosPrivate);
-    // }
+    if (!newMatrixId) {
+      newMatrixId = await getMatrixIDAPI(axiosPrivate);
+    }
+
     try {
       const fileName = Math.random().toString();
       setIsInProgress(true);
@@ -426,6 +428,10 @@ const AddCustomer = ({
       ))
     );
   };
+
+  // const isProducedDisabled = () => {
+  //   return isInProgress || !matrixName
+  // }
 
   const customStyles = {
     option: () => ({
