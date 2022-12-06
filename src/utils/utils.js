@@ -391,16 +391,12 @@ const formatDateSearch = (startDate, endDate) => {
     endDate.getMonth() + 1,
     endDate.getDate(),
   ];
-  sDay = sDay === 1? "01" : sDay
-  eDay = eDay === 1? "01" : eDay
+  sDay = sDay < 10 ? "0" + sDay : sDay
+  eDay = sDay < 10 ? "0" + eDay : eDay
   const startDateFormatted = `${sYear}-${sMonth}-${sDay}`;
   const endDateFormatted = `${eYear}-${eMonth}-${eDay}`;
   startDate = new Date(new Date(startDateFormatted).setUTCHours(0, 0, 0, 0));
-  if (startDateFormatted === endDateFormatted) {
-    endDate = new Date(new Date(endDateFormatted).setUTCHours(0, 0, 0, 0));
-  } else {
-    endDate = new Date(new Date(endDateFormatted).setHours(23, 59, 59));
-  }
+  endDate = new Date(new Date(endDateFormatted).setHours(23, 59, 59));
 
   return {
     startDate,
