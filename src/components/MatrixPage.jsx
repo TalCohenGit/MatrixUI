@@ -347,7 +347,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     let newMatrixId = matrixID;
     if (
       (action === savingAsAction && isInitiated) ||
-      action === copyMatrixAction ||
+      action === copyMatrixAction || !newMatrixId ||
       (action === savingAction && !isInitiated)
     ) {
       newMatrixId = await getMatrixIDAPI(axiosPrivate);
@@ -366,6 +366,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   ) => {
     const date = getMatrixFormatedDate(matrixDate);
     const newMatrixId = await getMatrixID(action);
+    localStorage.setItem("newMatrixId", newMatrixId)
 
     const { validatedData, cellsData, docCommentsToSend, metaDataToSend } =
       await getMatrixesData(
@@ -470,6 +471,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     if (!isInitiated) {
       action = savingAsAction;
     }
+    localStorage.setItem("action", action)
+    localStorage.setItem("isInitiated", isInitiated)
+
     const newIsInitiated = isInitiated;
     await saveTables(matrixDate, isBI, action, newIsInitiated, matrixName);
     // ev.preventDefault();
