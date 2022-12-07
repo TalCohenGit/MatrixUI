@@ -79,7 +79,7 @@ const SaveModal = ({
         <button
           className={
             "save-button" +
-            (action === savingAsAction && !newMatrixName?.length
+            ((action === savingAsAction || action === copyMatrixAction) && !newMatrixName?.length
               ? " disabled"
               : "")
           }

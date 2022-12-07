@@ -5,7 +5,8 @@ import Modal from "../../common/components/Modal/Modal";
 const CopyDataModal = ({
   isOpen,
   toggleModal,
-  onCopy
+  onCopy,
+  matrixName
 }) => {
   return (
     <Modal

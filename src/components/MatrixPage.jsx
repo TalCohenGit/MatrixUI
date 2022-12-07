@@ -552,6 +552,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         toggleModal={toggleToCopyDataModal}
         onCancel={cancelCopyModal}
         onCopy={handleCopy}
+        matrixName={matrixName}
       />
       <SaveModal
         isOpen={detailsToCopyModal}

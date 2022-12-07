@@ -265,7 +265,12 @@ const AddCustomer = ({
   };
 
   const produceDoc = async (productsMap) => {
-    if (matrixData.length <= 1) {
+    if (matrixData.length < 1) {
+      return;
+    }
+    if (!matrixName?.length) {
+      setCustomerValidationFailed({failure: true,
+        error: "על מנת להפיק יש לבחור שם למטריצה בשמירה בשם"})
       return;
     }
     const validatedData = handleMatrixData(

@@ -1,5 +1,15 @@
-import { axiosAuth, axiosRegister, axiosMsgs, axiosDrivers, matrixServerURL } from "./axios";
-import { getItemNames, parseStrimingData, formatDateWhenSaving } from "./utils/utils";
+import {
+  axiosAuth,
+  axiosRegister,
+  axiosMsgs,
+  axiosDrivers,
+  matrixServerURL,
+} from "./axios";
+import {
+  getItemNames,
+  parseStrimingData,
+  formatDateWhenSaving,
+} from "./utils/utils";
 import axios from "axios";
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
@@ -133,14 +143,14 @@ export const createDocAPI = async (
     );
     const res = await axiosPrivate.post("/api/createdoc2", dataToSend, {
       headers: {
-        fileName
+        fileName,
       },
     });
     // throw Error("error")
     return res;
   } catch (e) {
     console.log("error in createDocAPI:", e);
-    throw Error(e)
+    throw Error(e);
   }
 };
 
@@ -354,7 +364,13 @@ export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
 
 export const getUrlsByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
-    const res = await getData(axiosPrivate, fromDate, toDate, "DocData", "ValueDate");
+    const res = await getData(
+      axiosPrivate,
+      fromDate,
+      toDate,
+      "DocData",
+      "ValueDate"
+    );
 
     const data = res.data.result.data;
     return data.map((element) => {
@@ -376,7 +392,7 @@ export const getUrlsByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
         DocNumber,
         DocumentDetails,
       };
-    })
+    });
   } catch (e) {
     console.log("error in getTablesByDatesAPI:", e);
   }
@@ -451,7 +467,8 @@ export const getProgressBarAPI = async (axiosPrivate, fileName) => {
         mode: "no-cors",
         timeLimit: 500,
         Connection: "keep-alive",
-      }})
+      },
+    });
   } catch (e) {
     console.log("error in getProgressBarAPI: ", e);
   }
