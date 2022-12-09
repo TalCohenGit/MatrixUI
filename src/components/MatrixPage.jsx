@@ -347,7 +347,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     let newMatrixId = matrixID;
     if (
       (action === savingAsAction && isInitiated) ||
-      action === copyMatrixAction || !newMatrixId ||
+      action === copyMatrixAction ||
+      !newMatrixId ||
       (action === savingAction && !isInitiated)
     ) {
       newMatrixId = await getMatrixIDAPI(axiosPrivate);
@@ -366,7 +367,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   ) => {
     const date = getMatrixFormatedDate(matrixDate);
     const newMatrixId = await getMatrixID(action);
-    localStorage.setItem("newMatrixId", newMatrixId)
+    localStorage.setItem("newMatrixId", newMatrixId);
 
     const { validatedData, cellsData, docCommentsToSend, metaDataToSend } =
       await getMatrixesData(
@@ -398,7 +399,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       productsMap,
       newIsInitiated
     );
-    return newMatrixId
+    return newMatrixId;
   };
 
   const setMatrixesDetails = (matrixID, matrixName, matrixDate) => {
@@ -416,7 +417,13 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     toggleDetailsToCopyModal(true);
   };
 
-  const copyMatrix = async (action, toggleModal, isBi, newMatrixName, dateValue) => {
+  const copyMatrix = async (
+    action,
+    toggleModal,
+    isBi,
+    newMatrixName,
+    dateValue
+  ) => {
     try {
       loadAllMatrixesData(dataToLoad["matrixesUiData"], [
         setMatrixData,
@@ -425,7 +432,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         setBalanceTableData,
       ]);
 
-      const newIsInitiated = false
+      const newIsInitiated = false;
       const newMatrixID = await saveTables(
         dateValue,
         isBi,
@@ -435,11 +442,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       );
 
       setIsInitiated(false);
-      setMatrixesDetails(
-        newMatrixID,
-        newMatrixName,
-        dateValue
-      );
+      setMatrixesDetails(newMatrixID, newMatrixName, dateValue);
       toggleModal(false);
     } catch (e) {
       console.log("copyMatrix: failed to copy ", e);
@@ -471,8 +474,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     if (!isInitiated) {
       action = savingAsAction;
     }
-    localStorage.setItem("action", action)
-    localStorage.setItem("isInitiated", isInitiated)
+    localStorage.setItem("action", action);
+    localStorage.setItem("isInitiated", isInitiated);
 
     const newIsInitiated = isInitiated;
     await saveTables(matrixDate, isBI, action, newIsInitiated, matrixName);
@@ -560,7 +563,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         handleAction={copyMatrix}
         action={copyMatrixAction}
       />
-      
+
       <AddCustomer
         customerName={customerName}
         setCustomerName={setCustomerName}
@@ -576,7 +579,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         setMatrixDate={setMatrixDate}
         copyMatrix={copyMatrix}
       />
-<ProgressBar isInProgress={isInProgress} progressValue={progressValue}/>
+      <ProgressBar isInProgress={isInProgress} progressValue={progressValue} />
       <Table
         data={matrixData}
         setData={setMatrixData}
@@ -593,6 +596,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         bgColor="#F0FFFF"
         missingProductsCol={missingProductCol}
         cb={calcProductsSum}
+        sticky={true}
       />
     </div>
   ) : (

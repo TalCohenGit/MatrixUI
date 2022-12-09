@@ -17,6 +17,7 @@ const TableCell = (props) => {
     disabled,
     bgColor,
     tableName,
+    sticky
   } = props;
   const { drivers, balanceTableData } = useContext(DataContext);
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import CommentsModal from "./CommentsModal";
-import {docInformationOptions} from "../utils/constants"
+import { docInformationOptions } from "../utils/constants";
 
 const CommentCell = ({ rowIndex, colIndex, data, setData }) => {
   const [isOpen, toggleModal] = useState(false);
@@ -18,22 +18,31 @@ const CommentCell = ({ rowIndex, colIndex, data, setData }) => {
   };
 
   const loadOldComments = () => {
-    const commentsInCell = data[rowIndex][colIndex]
-    if(commentsInCell){
-      setComments(commentsInCell) 
-    }
-  }
-
-  useEffect(() => {
     const commentsInCell = data[rowIndex][colIndex];
     if (commentsInCell) {
       setComments(commentsInCell);
     }
+  };
+
+  const onCancel = () => {
+    loadOldComments();
+    toggleModal(false);
+  };
+
+  useEffect(() => {
+    loadOldComments();
   }, []);
+
+  const isCommented = 
+      comments[0]?.inputValue?.length > 0 &&
+      comments[0]?.selectValue?.length > 0;
 
   return (
     <div>
-      <button className="createInvoice-button" onClick={() => addComments()}>
+      <button
+        className={"createInvoice-button" + (isCommented ? " commented" : "")}
+        onClick={() => addComments()}
+      >
         הוסף
       </button>
       {isOpen && (
@@ -46,6 +55,7 @@ const CommentCell = ({ rowIndex, colIndex, data, setData }) => {
           setComments={setComments}
           loadOldComments={loadOldComments}
           commentsCellOptions={docInformationOptions}
+          onCancel={onCancel}
         />
       )}
     </div>

@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import Modal from "../common/components/Modal/Modal";
 
 
-const DocCommentModal = ({ isOpen, toggleModal, rowIndex, colIndex, data, setData }) => {
-  const [comment, setComment] = useState("");
+const DocCommentModal = ({ isOpen, toggleModal, rowIndex, colIndex, data, setData, comment, setComment,onCancel }) => {
+  
   const customerName = data[rowIndex][0]
   return (
     <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={customerName}>
@@ -17,7 +17,7 @@ const DocCommentModal = ({ isOpen, toggleModal, rowIndex, colIndex, data, setDat
         />
       </div>
       <div className="action-buttons">
-        <button className="cancel-button" onClick={() => toggleModal(false)}>
+        <button className="cancel-button" onClick={() => onCancel()}>
           בטל
         </button>
         <button

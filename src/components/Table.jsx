@@ -14,6 +14,7 @@ const Table = ({
   cb,
   bgColor,
   missingProductsCol,
+  sticky = false
 }) => {
   const {
     balanceTableData,
@@ -66,7 +67,7 @@ const Table = ({
     ? data.map((rowData, rowIndex) => {
         return (
           <div style={{ display: "flex" }} key={rowIndex}>
-            <div className="table-row" key={`${tableName},${rowIndex}`}>
+            <div className={"table-row" + (sticky ? " stick-to-bottom" : "")} key={`${tableName},${rowIndex}`}>
               {rowData.map((cellValue, colIndex) => {
                 return (
                   <TableCell
@@ -84,6 +85,7 @@ const Table = ({
                     missingProductsCol={missingProductsCol}
                     isFocus={isFocus}
                     setFocus={setFocus}
+                    sticky={rowIndex === 0 && sticky}
                   />
                 );
               })}
@@ -103,9 +105,8 @@ const Table = ({
       })
     : null;
   return (
-    <div>
+    <div className={sticky ? "stick-to-bottom" : ""}>
       {
-      // tableName === "main" &&
        (
         <div
           className="edit-table"
