@@ -1,6 +1,6 @@
 import React from "react";
 import Modal from "../../common/components/Modal/Modal";
-import DropDownMatrixNames from "../DropDownMatrixNames";
+import SearchMatrixes from "../SearchMatrixes";
 import DateRangePickerToLoad from "../DateRangePickerToLoad";
 
 const LoadModal = ({
@@ -13,14 +13,12 @@ const LoadModal = ({
   isMatrixNames,
   matrixesDetails,
   loadTablesByID,
-  modalHeader
+  modalHeader,
+  noResults,
+  Component
 }) => {
   return (
-    <Modal
-      isOpen={isOpen}
-      toggleModal={toggleModal}
-      modalHeader={modalHeader}
-    >
+    <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={modalHeader}>
       <div className="LoadModal">
         <h3>בחירת טווח תאריכים</h3>
         <DateRangePickerToLoad
@@ -36,12 +34,7 @@ const LoadModal = ({
           חיפוש
         </button>
       </div>
-      {isMatrixNames && matrixesDetails?.length ? (
-        <DropDownMatrixNames
-          matrixesDetails={matrixesDetails}
-          loadTablesByID={loadTablesByID}
-        />
-      ) : null}
+       {Component}
     </Modal>
   );
 };

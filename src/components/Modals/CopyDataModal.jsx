@@ -18,7 +18,7 @@ const CopyDataModal = ({
         <button className="cancel-button" onClick={() => toggleModal(false)}>
           בטל
         </button>
-        <button className="cancel-button" onClick={() => onCopy()}>
+        <button className="save-button" onClick={() => onCopy()}>
           שכפל מטריצה
         </button>
       </div>

@@ -7,7 +7,6 @@ import {
 } from "./axios";
 import {
   getItemNames,
-  parseStrimingData,
   formatDateWhenSaving,
 } from "./utils/utils";
 import axios from "axios";

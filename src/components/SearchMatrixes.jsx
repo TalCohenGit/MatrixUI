@@ -1,7 +1,13 @@
 import React, { useState } from "react";
 import Select from "react-select";
+import NoResults from "./NoResults";
 
-const DropDownMatrixNames = ({ matrixesDetails, loadTablesByID }) => {
+const SearchMatrixes = ({
+  matrixesDetails,
+  loadTablesByID,
+  noResults,
+  isMatrixNames,
+}) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedMatrix, setSelectedMatrix] = useState({});
 
@@ -17,14 +23,15 @@ const DropDownMatrixNames = ({ matrixesDetails, loadTablesByID }) => {
     });
   }
 
-  return (
-    <>
+  return noResults ? (
+    <NoResults>לא נמצאו מטריצות</NoResults>
+  ) : matrixesDetails?.length && isMatrixNames ? (
+    <React.Fragment>
       <div className="search-dropdown-wrapper">
         <Select
           defaultValue={selectedOption}
           onChange={(e) => handleSelect(e)}
           options={options}
-          // styles={customStyles}
           placeholder={"בחירה"}
         />
       </div>
@@ -33,9 +40,11 @@ const DropDownMatrixNames = ({ matrixesDetails, loadTablesByID }) => {
         onClick={() => loadTablesByID(selectedMatrix)}
       >
         טען מטריצה
-      </button>
-    </>
+      </button>{" "}
+    </React.Fragment>
+  ) : (
+    <div />
   );
 };
 
-export default DropDownMatrixNames;
+export default SearchMatrixes;

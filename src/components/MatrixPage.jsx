@@ -593,7 +593,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         setData={setBalanceTableData}
         tableName="balance"
         disabled
-        bgColor="#F0FFFF"
+        bgColor="#d0bdf4"
         missingProductsCol={missingProductCol}
         cb={calcProductsSum}
         sticky={true}

@@ -6,9 +6,7 @@ import {
   handleCommentMatrixData,
   customerNumbers,
   deleteAllTables,
-  getActionFromRes,
-  parseStrimingData,
-  getFormattedDates
+  getFormattedDates,
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -23,11 +21,9 @@ import {
 import Modal from "../common/components/Modal/Modal";
 import { addDays } from "date-fns";
 import UrlCheckboxes from "./UrlCheckboxes/UrlCheckboxes";
-import LoaderContainer from "./LoaderContainer/LoaderContainer";
 import SaveModal from "./SaveModal/SaveModal";
 import LoadModal from "./Modals/LoadModal";
 import AreUSureModal from "./Modals/AreUSureModal";
-import ErrorModal from "./Modals/ErrorModal";
 import {
   savingAction,
   savingAsAction,
@@ -36,6 +32,8 @@ import {
 } from "../utils/constants";
 import { produceError } from "../utils/constants";
 import Toast from "./Toast/Toast";
+import SearchMatrixes from "./SearchMatrixes";
+import SearchDocs from "./SearchDocs";
 
 const AddCustomer = ({
   customerName,
@@ -82,15 +80,14 @@ const AddCustomer = ({
     failure: false,
     error: "",
   });
-  const [errorMsg,setErrorMsg] = useState({
+  const [errorMsg, setErrorMsg] = useState({
     show: false,
     text: produceError,
-  })
+  });
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
   const [isUrlModalSearch, toggleUrlsSearchModal] = useState(false);
   const [invoiceData, setInvoiceData] = useState([]);
   const [searchedInvoices, setSearchedInvoices] = useState([]);
-  const [disableProduction, setDisableProduction] = useState(false);
   const [toSaveDataModal, toggleToSaveDataModal] = useState(false);
   const [toUpdateDataModal, toggleToUpdateDataModal] = useState(false);
   const [toLoadDataModal, toggleToLoadDataModal] = useState(false);
@@ -99,12 +96,12 @@ const AddCustomer = ({
   const [matrixesDetails, setMatrixesDetails] = useState([]);
   const [toDeleteDataModal, toggleToDeleteData] = useState(false);
   const [toDeleteMatrixModal, toggleToDeleteMatrix] = useState(false);
-  const [toCopyDataModal, toggleToCopyDataModal] = useState(false);
   const [detailsToCopyModal, toggleDetailsToCopyModal] = useState(false);
   const [dateRangesLoad, setDateRangesLoad] = useState(intialRangeState);
   const [dateRangesSearch, setDateRangesSearch] = useState(intialRangeState);
   const [checked, setChecked] = useState([]);
   const [errorModal, toggleErrorModal] = useState(false);
+  const [noResults, setNoResults] = useState(false);
 
   const productsOptions = [];
 
@@ -143,7 +140,7 @@ const AddCustomer = ({
                 if (decodedValue === "finish") {
                   newValue = 100;
                 } else {
-                  const {stats,gotStats} = JSON.parse(decodedValue);
+                  const { stats, gotStats } = JSON.parse(decodedValue);
                   const { amountFinished, totalToProcess } = stats;
                   if (totalToProcess > 0 && gotStats) {
                     newValue = amountFinished * (100 / totalToProcess);
@@ -269,8 +266,10 @@ const AddCustomer = ({
       return;
     }
     if (!matrixName?.length) {
-      setCustomerValidationFailed({failure: true,
-        error: "על מנת להפיק יש לבחור שם למטריצה בשמירה בשם"})
+      setCustomerValidationFailed({
+        failure: true,
+        error: "על מנת להפיק יש לבחור שם למטריצה בשמירה בשם",
+      });
       return;
     }
     const validatedData = handleMatrixData(
@@ -282,14 +281,17 @@ const AddCustomer = ({
     if (!validatedData) {
       return;
     }
-    setCustomerValidationFailed({...customerValidationFailed,failure:false});
+    setCustomerValidationFailed({
+      ...customerValidationFailed,
+      failure: false,
+    });
     const { cellsData, docCommentsToSend, metaDataToSend } =
       handleCommentMatrixData(
         matrixComments,
         validatedData["docComments"],
         validatedData["metaData"]
       );
-  
+
     let newMatrixId = matrixID;
     if (!newMatrixId) {
       newMatrixId = await getMatrixIDAPI(axiosPrivate);
@@ -310,7 +312,7 @@ const AddCustomer = ({
         fileName
       )
         .then(async (res) => {
-          await getProgressBar(fileName)
+          await getProgressBar(fileName);
           const invoiceDataArr = await getUrlsAPI(axiosPrivate);
           const relavantInvoiceData = invoiceDataArr.slice(
             invoiceDataArr.length - customerNumbers(matrixData),
@@ -380,10 +382,14 @@ const AddCustomer = ({
       endDate
     );
     if (matrixesDetails?.length) {
+      if (noResults) {
+        setNoResults(false);
+      }
       setMatrixesDetails(matrixesDetails);
       toggleMatrixNames(true);
     } else {
       setMatrixesDetails([]);
+      setNoResults(true);
     }
   };
 
@@ -392,10 +398,22 @@ const AddCustomer = ({
       dateRangesSearch[0]["startDate"],
       dateRangesSearch[0]["endDate"]
     );
-    const invoices = await getUrlsByDatesAPI(axiosPrivate, startDate.toString(), endDate.toString());
-    setSearchedInvoices(invoices);
-    toggleToSearchDocs(false);
-    toggleUrlsSearchModal(true);
+
+    const invoices = await getUrlsByDatesAPI(
+      axiosPrivate,
+      startDate.toString(),
+      endDate.toString()
+    );
+    if (invoices?.length) {
+      if(noResults){
+        setNoResults(false)
+      }
+      setSearchedInvoices(invoices);
+      toggleToSearchDocs(false);
+      toggleUrlsSearchModal(true);
+    } else {
+      setNoResults(true);
+    }
   };
 
   const loadTablesByID = async (matrixID) => {
@@ -405,12 +423,16 @@ const AddCustomer = ({
 
   const cancelLoading = () => {
     toggleToLoadDataModal(false);
+    setNoResults(false);
     toggleMatrixNames(false);
     setMatrixesDetails([]);
     setDateRangesLoad(intialRangeState);
   };
 
-  const cancleSearch = () => {
+  const cancelSearch = () => {
+    if(noResults){
+      setNoResults(false)
+    }
     toggleToSearchDocs(false);
   };
 
@@ -429,7 +451,7 @@ const AddCustomer = ({
           </React.Fragment>
         </Modal>
       ) : (
-        <div/>
+        <div />
       ))
     );
   };
@@ -465,7 +487,6 @@ const AddCustomer = ({
 
   const finishProduce = () => {
     toggleUrlsModal(false);
-    // toggleToCopyDataModal(true);
     toggleDetailsToCopyModal(true);
   };
 
@@ -542,18 +563,26 @@ const AddCustomer = ({
             matrixesDetails={matrixesDetails}
             loadTablesByID={loadTablesByID}
             modalHeader={"טעינת מטריצות"}
+            noResults={noResults}
+            setNoResults={setNoResults}
+            Component={
+              <SearchMatrixes
+                matrixesDetails={matrixesDetails}
+                loadTablesByID={loadTablesByID}
+                noResults={noResults}
+                isMatrixNames={isMatrixNames}
+              />
+            }
           />
           <LoadModal
             isOpen={toSearchDocsModal}
             toggleModal={toggleToSearchDocs}
             dateRanges={dateRangesSearch}
             setDateRanges={setDateRangesSearch}
-            onCancel={cancleSearch}
+            onCancel={cancelSearch}
             onSearch={loadUrls}
-            isMatrixNames={isMatrixNames}
-            matrixesDetails={matrixesDetails}
-            loadTablesByID={loadTablesByID}
             modalHeader={"חיפוש מסמכים לפי תאריכים"}
+            Component={<SearchDocs noResults={noResults}/>}
           />
           {/* <ErrorModal
             isOpen={errorModal}

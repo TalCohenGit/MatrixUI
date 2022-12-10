@@ -2,12 +2,10 @@ import {
   numOfColBeforeProducts,
   numOfColAfterProducts,
   titleWithoutProduct,
-  savingAsAction,
   produceDocAction,
 } from "./constants";
 import { logoutAPI } from "../api";
 import _ from "lodash";
-import { format } from "date-fns";
 
 export const filterCustomers = (parsedName, input) => {
   return input.length && parsedName?.length && parsedName.includes(input);
@@ -205,12 +203,6 @@ export const getUniqProducts = (productsData) => {
   return _.uniqBy(productsData, "שם פריט");
 };
 
-const validateValueExist = (valueToCheck, setComment) => {
-  if (!valueToCheck) {
-    setComment();
-  }
-};
-
 export const getMatrixesData = async (
   matrixData,
   productsMap,
@@ -246,21 +238,6 @@ export const getRefreshToken = () => {
   return localStorage.getItem("refreshToken");
 };
 
-export const parseStrimingData = (dataToParse) => {
-  let str = "[";
-
-  for (let i = 0; i <= dataToParse.length - 1; i++) {
-    if (dataToParse[i] == "}" && dataToParse[i + 1] == "{") {
-      str += dataToParse[i];
-      str += ",";
-    } else {
-      str += dataToParse[i];
-    }
-  }
-  str += "]";
-  return JSON.parse(str, null, 2);
-};
-
 export const getActionFromRes = (dataRes) => {
   const dataObj = dataRes?.length > 0 && dataRes[dataRes.length - 1];
   const producedObj = dataObj?.data?.resultData?.data[0];
@@ -268,7 +245,6 @@ export const getActionFromRes = (dataRes) => {
 };
 
 export const formatDateWhenSaving = (matrixDate) => {
-  // return format(new Date(matrixDate), "MM/dd/yyyy"
   return new Date(matrixDate).toLocaleString("en", {
     timeZone: "Asia/Jerusalem",
   });
@@ -404,22 +380,7 @@ const formatDateSearch = (startDate, endDate) => {
   };
 };
 
-const formatDate2 = (date) => {
-  if (date) {
-    date = new Date(date).setHours(12);
-    const formatedDate = new Date(date).toISOString().substring(0, 10);
-    return {
-      startDate: new Date(formatedDate).setUTCHours(0, 0, 0, 0),
-      endDate: new Date(formatedDate).setUTCHours(23, 59, 59, 999),
-    };
-  }
-};
 
-const formatDate = (date) => {
-  if (date) {
-    return date.toLocaleDateString("en-us");
-  }
-};
 
 export const getFormattedDates = (fromDate, toDate) => {
   const { startDate, endDate } = formatDateSearch(fromDate, toDate);
