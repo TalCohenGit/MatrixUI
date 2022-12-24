@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { loginUserAPI } from "../api";
 import { DataContext } from "../context/DataContext";
 import Register from "./Register";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = ({setSeconds, setRefreshToken}) => {
   const [userEmail, setUserEmail] = useState("");
@@ -11,6 +12,8 @@ const Login = ({setSeconds, setRefreshToken}) => {
   const [errMsg, setErrMsg] = useState("");
   const [needToRegister, setNeedToRegister] = useState(false);
   const { setAccessToken, setTimelimit, setUserID } = useContext(DataContext);
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     setErrMsg("");
@@ -45,12 +48,11 @@ const Login = ({setSeconds, setRefreshToken}) => {
   };
 
   const register = () => {
-    setNeedToRegister(true);
+navigate("/register")
+    // setNeedToRegister(true);
   };
 
-  return needToRegister ? (
-    <Register setNeedToRegister={setNeedToRegister} />
-  ) : (
+  return (
     <div className="login-part">
       <h1>נא להכניס את הפרטים להזדהות</h1>
       <form onSubmit={handleSubmit}>
@@ -74,7 +76,7 @@ const Login = ({setSeconds, setRefreshToken}) => {
           </button>
         </div>
         <p>משתמש חדש?</p>
-        <button className="createInvoice-button" onClick={() => register()}>
+          <button className="createInvoice-button" onClick={() => register()}>
           הרשמה
         </button>
       </form>

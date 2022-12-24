@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
-import MatrixPage from "./components/MatrixPage";
-import Login from "./components/Login";
+import { Routes, Route } from "react-router-dom";
+import MatrixPage from "./pages/MatrixPage";
+import Login from "./pages/Login";
+import ErpSelect from "./pages/ErpSelect";
+import Register from "./pages/Register";
+import ConfigPage from "./pages/ConfigPage";
 
 const App = () => {
   const [refreshToken, setRefreshToken] = useState("");
@@ -16,15 +20,26 @@ const App = () => {
 
   // useEffect(() => {}, [refreshToken]);
 
-  if (!refreshToken && !getRefreshToken()) {
-    return <Login setSeconds={setSeconds} setRefreshToken={setRefreshToken} />;
-  }
+  const MainPage =
+    !refreshToken && !getRefreshToken() ? (
+      <Login setSeconds={setSeconds} setRefreshToken={setRefreshToken} />
+    ) : (
+      <MatrixPage
+        seconds={seconds}
+        setSeconds={setSeconds}
+        setRefreshToken={setRefreshToken}
+      />
+    );
+
   return (
-    <MatrixPage
-      seconds={seconds}
-      setSeconds={setSeconds}
-      setRefreshToken={setRefreshToken}
-    />
+    <div>
+      <Routes>
+        <Route exact path="/" element={MainPage} />
+        <Route path="/erp" element={<ErpSelect/>}/>
+        <Route path="/register" element={<Register/>}/>
+        <Route path="/config" element={<ConfigPage/>}/>
+      </Routes>
+    </div>
   );
 };
 

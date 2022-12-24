@@ -6,7 +6,7 @@ import AddCustomer from "../components/AddCustomer";
 import Table from "../components/Table";
 import CopyDataModal from "../components/Modals/CopyDataModal";
 import Logout from "../components/Logout";
-import SaveModal from "./SaveModal/SaveModal";
+import SaveModal from "../components/SaveModal/SaveModal";
 import {
   getCustomersAPI,
   getProductsAPI,
@@ -45,7 +45,7 @@ import {
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
-import ProgressBar from "./ProgressBar/ProgressBar";
+import ProgressBar from "../components/ProgressBar/ProgressBar";
 
 function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const {

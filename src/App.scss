@@ -490,3 +490,100 @@ input[type="checkbox"] {
   margin-top: 10px;
   font-size: 18px;
 }
+
+.ErpSelect-wrapper {
+  position: relative;
+  margin-top: 350px;
+  width: 440px;
+  margin-right: auto;
+  margin-left: auto;
+  text-align: center;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  display: grid;
+  
+}
+
+
+.next-button {
+  background: #1976d2;
+  color: #FFFAFA;
+  border: 0;
+  cursor: pointer;
+  padding: 10px;
+  font-size: 20px;
+
+  &:hover {
+    filter: brightness(95%);
+
+  }
+}
+
+.MuiFormControl-root {
+  display: flex;
+  padding: 15px !important;
+  label {
+    
+    font-size: 20px;
+    span {
+      font-size: 18px;
+    }
+  
+  }
+}
+
+.details-box {
+  position: absolute;
+  padding: 15px;
+  bottom: 300px;
+  text-align: start;
+  right: -300px;
+  font-size: 18px;
+  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  p {
+    span {
+      font-weight: 600;
+    }
+  }
+}
+
+
+.hashvsevet-inputs {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 200px;
+  margin-bottom: 25px;
+  margin-right: 45px;
+}
+
+.config-page {
+  @extend .ErpSelect-wrapper;
+  direction: ltr;
+  min-height: 500px;
+  min-width: 550px;
+  display: block;
+  padding: 15px;
+  &-row {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    &-select-wrapper {
+      min-width: 200px;
+    }
+
+    &-table {
+      display: flex;
+      justify-content: center;
+      flex-direction: row-reverse;
+
+      &-cell {
+        border: 1px solid black;
+        min-width: 250px;
+      }
+    }
+  }
+}
+

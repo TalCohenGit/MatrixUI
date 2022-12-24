@@ -5,10 +5,7 @@ import {
   axiosDrivers,
   matrixServerURL,
 } from "./axios";
-import {
-  getItemNames,
-  formatDateWhenSaving,
-} from "./utils/utils";
+import { getItemNames, formatDateWhenSaving } from "./utils/utils";
 import axios from "axios";
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {

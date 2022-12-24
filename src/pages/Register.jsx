@@ -7,6 +7,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { registerAPI } from "../api";
 import { DataContext } from "../context/DataContext";
+import { useNavigate } from "react-router-dom";
 
 const USER_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
@@ -14,6 +15,7 @@ const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
 const Register = ({ setNeedToRegister }) => {
   const {businessName, setBusinessName} = useContext(DataContext)
+  const navigate = useNavigate();
   
   const [userEmail, setUserEmail] = useState("");
   const [validUser, setValidUser] = useState(false);
@@ -58,9 +60,10 @@ const Register = ({ setNeedToRegister }) => {
     value ? setValidation(true) : setValidation(false);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault()
     try {
-      await registerAPI(
+      const resi = await registerAPI(
         firstName,
         lastName,
         phone,
@@ -68,9 +71,11 @@ const Register = ({ setNeedToRegister }) => {
         userPass,
         accountName
       );
-      setSuccess(true);
+      console.log("resi",resi)
+      // setSuccess(true);
       localStorage.setItem("businessName", businessName)
-    } catch (e) {
+      navigate("/erp",{state:{firstName,lastName,userEmail}})
+   } catch (e) {
       console.log("error in handleSubmit: ", e);
       setErrMsg(e);
     }
@@ -86,14 +91,7 @@ const Register = ({ setNeedToRegister }) => {
     return validation
   };
 
-  return success ? (
-    <div>
-      <h1> הרישום בוצע בהצלחה! </h1>
-      <a href="#" onClick={() => setNeedToRegister(false)}>
-        התחבר למערכת
-      </a>
-    </div>
-  ) : (
+  return  (
     <div className="login-part">
       <h1>נא להכניס את הפרטים לרישום למערכת</h1>
       {/* <form onSubmit={handleSubmit}> */}
@@ -219,7 +217,7 @@ const Register = ({ setNeedToRegister }) => {
           <button
             disabled={disableRegistration() ? true : false}
             className="login-button"
-            onClick={() => handleSubmit()}
+            onClick={(e) => handleSubmit(e)}
           >
             הירשם
           </button>
