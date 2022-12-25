@@ -84,7 +84,11 @@ const SaveModal = ({
               : "")
           }
           onClick={() => {
-            handleAction(action, toggleModal, isBi, newMatrixName, dateValue)
+            let martrixNameToSave = newMatrixName
+            if (!martrixNameToSave) {
+              martrixNameToSave = matrixName
+            }
+            handleAction(action, toggleModal, isBi, martrixNameToSave, dateValue)
             setNewMatrixName("")
           }
           }>
