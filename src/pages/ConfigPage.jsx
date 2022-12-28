@@ -18,10 +18,36 @@ const ConfigPage = () => {
   const [canMakeRefound, setCanMakeRefound] = useState(false);
   const [isRefoundMaxAmount, setIsRefoundMaxAmount] = useState(false);
   const [refoundMaxAmount, setRefoundMaxAmount] = useState(null);
-
+  const [value, setValue] = useState({
+    warehouse: { radio: "singleChoice", input: "" },
+    detailsCode: { radio: "singleChoice", input: "" },
+    customersCode: { radio: "singleChoice", input: "" },
+  });
+  
   const location = useLocation();
+  const { inputs,from } = location.state || {};
+  console.log("location",location?.state)
+  const saveConfig = () => {
+    const configData = {
+      selectedDoc: selectedDoc["value"], //string
+      selectedAction: selectedAction["value"], //string
+      docsAmount: docsAmount ? Number(docsAmount) : null, // number
+      refoundMaxAmount: refoundMaxAmount ? Number(refoundMaxAmount) : null, // number
+      warehouse: value.warehouse.input.split('-').map(el=>Number(el)), // array of numbers
+      detailsCode: value.detailsCode.input.split('-').map(el=>Number(el)), // array of numbers
+      customersCode: value.customersCode.input.split('-').map(el=>Number(el)), // array of numbers
+      erpSelect: {
+        ...inputs
+      }
 
-  console.log("ttttt", selectedAction, selectedDoc, docsAmount, canMakeRefound);
+    };
+    console.log("configData",configData,from.pathname)
+  };
+
+  if(location?.state?.from?.pathname !== "/erp") {
+    return <h1 style={{textAlign:"center"}}>Please go to login page and start the registration process</h1>
+  }
+
 
   return (
     <div className="config-page">
@@ -70,8 +96,19 @@ const ConfigPage = () => {
           />
         )}
       </div>
-      <ConfigPageTable/>
+      <ConfigPageTable
+        value={value}
+        setValue={setValue}
+      />
       <RegisterConfigUserDetails location={location} />
+      <button
+        className="next-button"
+        onClick={(e) => {
+          saveConfig()
+        }}
+      >
+        המשך לעמוד הבא
+      </button>
     </div>
   );
 };

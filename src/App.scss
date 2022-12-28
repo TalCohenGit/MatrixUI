@@ -500,13 +500,11 @@ input[type="checkbox"] {
   text-align: center;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
   display: grid;
-  
 }
-
 
 .next-button {
   background: #1976d2;
-  color: #FFFAFA;
+  color: #fffafa;
   border: 0;
   cursor: pointer;
   padding: 10px;
@@ -514,7 +512,6 @@ input[type="checkbox"] {
 
   &:hover {
     filter: brightness(95%);
-
   }
 }
 
@@ -522,12 +519,10 @@ input[type="checkbox"] {
   display: flex;
   padding: 15px !important;
   label {
-    
     font-size: 20px;
     span {
       font-size: 18px;
     }
-  
   }
 }
 
@@ -538,14 +533,13 @@ input[type="checkbox"] {
   text-align: start;
   right: -300px;
   font-size: 18px;
-  font-family: "Roboto","Helvetica","Arial",sans-serif;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   p {
     span {
       font-weight: 600;
     }
   }
 }
-
 
 .hashvsevet-inputs {
   display: flex;
@@ -562,8 +556,15 @@ input[type="checkbox"] {
   direction: ltr;
   min-height: 500px;
   min-width: 550px;
+  margin-top: 110px;
   display: block;
   padding: 15px;
+
+  &-range-cell {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   &-row {
     display: flex;
     flex-direction: row-reverse;
@@ -580,10 +581,15 @@ input[type="checkbox"] {
       flex-direction: row-reverse;
 
       &-cell {
-        border: 1px solid black;
         min-width: 250px;
+        border: 1px solid black;
+
+        &-inputs {
+          display: flex;
+          margin: 10px;
+          justify-content: center;
+        }
       }
     }
   }
 }
-

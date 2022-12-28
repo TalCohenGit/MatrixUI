@@ -33,7 +33,7 @@ const ErpSelect = () => {
   const handleNextClick = (event) => {
     event.preventDefault();
     
-    navigate("/config",{state:{firstName,lastName,userEmail}});
+    navigate("/config",{state:{firstName,lastName,userEmail,from:location,inputs}});
   };
 
   return (
@@ -61,7 +61,7 @@ const ErpSelect = () => {
           <FormLabel>נא למלא את הפרטים הבאים:</FormLabel>
           <Input
             value={inputs.hToken}
-            name="htoken"
+            name="hToken"
             onChange={(e) => handleInputChange(e)}
             placeholder="token"
           />
@@ -96,21 +96,6 @@ const ErpSelect = () => {
         המשך לעמוד הבא
       </button>
       <RegisterConfigUserDetails location={location} />
-
-      {/* {location?.state ? (
-        <div className="details-box">
-          <p>
-            <span>שם : </span>
-            {firstName + " " + lastName}
-          </p>
-          <p>
-            <span>כתובת אימייל : </span>
-            {userEmail}
-          </p>
-        </div>
-      ) : (
-        <div />
-      )} */}
     </div>
   );
 };

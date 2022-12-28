@@ -1,26 +1,14 @@
 import React, { useState } from "react";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
 import ConfigPageTableRow from "./ConfigPageTableRow";
 import ConfigPageRadioCell from "./ConfigPageRadioCell";
 
-const ConfigPageTable = () => {
-  //   const [value, setValue] = useState("singleChoice");
-  const [value, setValue] = useState({
-    warehouse: {radio:"singleChoice",input:null},
-    detailsCode:{radio:"singleChoice",input:null},
-    customersCode: {radio:"singleChoice",input:null},
-  });
-
-  const { warehouse, detailsCode, customersCode } = value;
-
-  console.log("value",value)
-
+const ConfigPageTable = ({ value, setValue }) => {
+ 
   const handleRadioChange = (e) => {
     const { value: newValue, name } = e.target;
-    setValue({ ...value, [name]: {...value[name],radio:newValue }});
+    setValue({ ...value, [name]: {input:"",radio:newValue }});
   };
+
   const handleInputChange = (e) => {
     const { value: newValue, name } = e.target;
     setValue({ ...value, [name]: {...value[name],input:newValue }});
@@ -35,11 +23,13 @@ const ConfigPageTable = () => {
         firstCell={"פריטים"}
         secondCell={
           <ConfigPageRadioCell
-            value={warehouse}
+            value={value}
             onChange={handleRadioChange}
             label="מחסן"
             name="warehouse"
             onInputChange={handleInputChange}
+            setValue={setValue}
+          
           />
         }
       />
@@ -47,11 +37,13 @@ const ConfigPageTable = () => {
         firstCell={"פריטים"}
         secondCell={
           <ConfigPageRadioCell
-            value={detailsCode}
+            value={value}
             onChange={handleRadioChange}
             label="קוד מיון"
             name="detailsCode"
             onInputChange={handleInputChange}
+            setValue={setValue}
+          
           />
         }
       />
@@ -59,11 +51,13 @@ const ConfigPageTable = () => {
         firstCell={"לקוחות"}
         secondCell={
           <ConfigPageRadioCell
-            value={customersCode}
+            value={value}
             onChange={handleRadioChange}
             label="קוד מיון"
             name="customersCode"
             onInputChange={handleInputChange}
+            setValue={setValue}
+        
           />
         }
       />
