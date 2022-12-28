@@ -28,6 +28,7 @@ const SaveModal = ({
       isOpen={isOpen}
       toggleModal={toggleModal}
       modalHeader={"פרטים ל" + modalAction[action]}
+      action={action}
     >
       <div className="save-matrix-modal">
         {(action === savingAsAction || action === copyMatrixAction) && (
