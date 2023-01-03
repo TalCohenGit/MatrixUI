@@ -8,6 +8,7 @@ import {
 import {
   getItemNames,
   formatDateWhenSaving,
+  getMatrixesDataObj
 } from "./utils/utils";
 import axios from "axios";
 
@@ -72,65 +73,35 @@ export const getMatrixIDAPI = async (axiosPrivate) => {
   }
 };
 
-const getMatrixesDataObj = (
+const getMatrixObject = (
+  date,
   matrixID,
-  tableData,
-  cellsData,
-  docData,
-  metaData,
-  productsMap
+  matrixesData,
+  isBI,
+  matrixName,
+  matrixesUiData,
+  isInitiated
 ) => {
-  const { matrix, driverIDs, actionIDs, documentIDs, acountKeys } = tableData;
-  const actionAutho = [];
-  // const documentIDsMock = [];
-  for (var i = 0; i < driverIDs.length; i++) {
-    actionAutho.push("Default");
-    // documentIDsMock.push(1);
-  }
-  const itemHeaders = matrix[0];
-
   return {
-    mainMatrix: {
-      matrixID,
-      ActionID: actionIDs,
-      AccountKey: acountKeys,
-      DocumentID: documentIDs,
-      DriverID: driverIDs,
-      ActionAutho: actionAutho,
-      itemsHeaders: itemHeaders,
-      itemsNames: getItemNames(itemHeaders, productsMap),
-      cellsData: matrix.slice(1),
-    },
-    changesMatrix: {
-      matrixConfig: null,
-      matrixGlobalData: null,
-      cellsData,
-      docData,
-      metaData,
-    },
+    matrixID,
+    matrixName,
+    matrixesData,
+    matrixesUiData,
+    Date: date,
+    isBI,
+    isInitiated,
   };
 };
 
 export const createDocAPI = async (
-  axiosPrivate,
-  tableData,
+  axiosPrivate, 
   matrixID,
-  cellsData,
-  docData,
-  metaData,
-  productsMap,
   matrixName,
-  fileName
+  fileName,
+  matrixesData
 ) => {
   try {
-    const matrixesData = getMatrixesDataObj(
-      matrixID,
-      tableData,
-      cellsData,
-      docData,
-      metaData,
-      productsMap
-    );
+
     const date = formatDateWhenSaving(new Date());
     const isBI = true;
     const dataToSend = getMatrixObject(
@@ -151,26 +122,6 @@ export const createDocAPI = async (
     console.log("error in createDocAPI:", e);
     throw Error(e);
   }
-};
-
-const getMatrixObject = (
-  date,
-  matrixID,
-  matrixesData,
-  isBI,
-  matrixName,
-  matrixesUiData,
-  isInitiated
-) => {
-  return {
-    matrixID,
-    matrixName,
-    matrixesData,
-    matrixesUiData,
-    Date: date,
-    isBI,
-    isInitiated,
-  };
 };
 
 export const saveTablesAPI = async (
@@ -195,6 +146,10 @@ export const saveTablesAPI = async (
     metaData,
     productsMap
   );
+  if (!matrixesData) {
+    console.log("error in saveTablesAPI: ", "no matrixesData");
+    return
+  }
   try {
     const res = await axiosPrivate.post(
       "/api/savematrix",
@@ -275,11 +230,12 @@ export const logoutAPI = async () => {
   }
 };
 
-export const getUrlsAPI = async (axiosPrivate, action) => {
+export const getUrlsAPI = async (axiosPrivate, fileName) => {
   try {
+    console.log("fileName.substring(2)", fileName.substring(2))
     const res = await axiosPrivate.post("/api/getdata", {
       collection: "DocData",
-      searchParams: { Action: action },
+      searchParams: { Action: fileName.substring(2) },
     });
     const data = res.data.result.data;
     return data.map((element) => {

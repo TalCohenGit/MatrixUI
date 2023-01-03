@@ -17,7 +17,6 @@ const useAxiosPrivate = () => {
                         validAccessToken = await refreshTokenAPI(refreshToken);
                       }
                     config.headers['Authorization'] = `Bearer ${validAccessToken}`;
-                    console.log("validAccessToken", validAccessToken)
                     setAccessToken(validAccessToken);
                 }
                 return config;

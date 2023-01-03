@@ -14,7 +14,7 @@ const Table = ({
   cb,
   bgColor,
   missingProductsCol,
-  sticky = false
+  sticky = false,
 }) => {
   const {
     balanceTableData,
@@ -24,6 +24,7 @@ const Table = ({
   } = useContext(DataContext);
 
   const [isFocus, setFocus] = useState(false);
+  const [isMinimized, minimize] = useState(false);
 
   const editTableToggle = () => {
     // if (isFocus && tableName === "balance") {
@@ -66,8 +67,12 @@ const Table = ({
   const tableData = data?.length
     ? data.map((rowData, rowIndex) => {
         return (
-          <div style={{ display: "flex" }} key={rowIndex}>
-            <div className={"table-row" + (sticky ? " stick-to-bottom" : "")} key={`${tableName},${rowIndex}`}>
+          <div
+            style={{ display: "flex" }}
+            key={`${tableName}-${rowIndex}`}
+            className={tableName !== "main" && "stick-to-bottom"}
+          >
+            <div className={"table-row"} key={`${tableName},${rowIndex}`} style={{display: (rowIndex !== data.length - 1) && isMinimized ? "none" : "flex"}}>
               {rowData.map((cellValue, colIndex) => {
                 return (
                   <TableCell
@@ -86,6 +91,8 @@ const Table = ({
                     isFocus={isFocus}
                     setFocus={setFocus}
                     sticky={rowIndex === 0 && sticky}
+                    minimize={minimize}
+                    isMinimized={isMinimized}
                   />
                 );
               })}
@@ -106,21 +113,20 @@ const Table = ({
     : null;
   return (
     <div className={sticky ? "stick-to-bottom" : ""}>
-      {
-       (
-        <div
-          className="edit-table"
-          onClick={() => {
-            editTableToggle();
-          }}
-        >
-          <FontAwesomeIcon
-            icon={!isFocus ? faPenToSquare : faSave}
-            color="#00308F"
-            size="3x"
-          />
-        </div>
-      )}
+      <div
+        className="edit-table"
+        onClick={() => {
+          editTableToggle();
+        }}
+        style={{display: isMinimized ? "none" : "block"}}
+      >
+        <FontAwesomeIcon
+          icon={!isFocus ? faPenToSquare : faSave}
+          color="#00308F"
+          size="3x"
+        />
+      </div>
+      {/* {tableName !== "main" && <div onClick={() => minimize(!isMinimized)}>minimize</div>} */}
       <div className="table">{tableData}</div>
     </div>
   );

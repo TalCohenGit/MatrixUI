@@ -7,6 +7,7 @@ import {
   customerNumbers,
   deleteAllTables,
   getFormattedDates,
+  getMatrixesDataObj
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -137,6 +138,7 @@ const AddCustomer = ({
                 controller.enqueue(value);
                 // Check chunks by logging to the console
                 const decodedValue = new TextDecoder().decode(value);
+                console.log("decodedValue", decodedValue)
                 if (decodedValue === "finish") {
                   newValue = 100;
                 } else {
@@ -165,7 +167,11 @@ const AddCustomer = ({
       .then((result) => {
         // Do things with result
         console.log(result);
-      });
+      }).catch(() => {
+        setIsInProgress(false);
+        setProgressValue(0);
+        toggleErrorModal(true);      
+      })
   };
 
   const handleChange = (value) => {
@@ -300,20 +306,31 @@ const AddCustomer = ({
     try {
       const fileName = Math.random().toString();
       setIsInProgress(true);
-      createDocAPI(
-        axiosPrivate,
-        validatedData,
+      const matrixesData = getMatrixesDataObj(
         newMatrixId,
+        validatedData,
         cellsData,
         docCommentsToSend,
         metaDataToSend,
-        productsMap,
+        productsMap
+      );
+      if (!matrixesData) {
+        setCustomerValidationFailed({
+          failure: true,
+          error: "תקלה בהפקה",
+        });
+        return;
+      }
+      createDocAPI(
+        axiosPrivate,
+        newMatrixId,
         matrixName,
-        fileName
+        fileName,
+        matrixesData
       )
         .then(async (res) => {
           await getProgressBar(fileName);
-          const invoiceDataArr = await getUrlsAPI(axiosPrivate);
+          const invoiceDataArr = await getUrlsAPI(axiosPrivate, fileName);
           const relavantInvoiceData = invoiceDataArr.slice(
             invoiceDataArr.length - customerNumbers(matrixData),
             invoiceDataArr.length

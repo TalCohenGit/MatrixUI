@@ -6,6 +6,7 @@ import {
 } from "./constants";
 import { logoutAPI } from "../api";
 import _ from "lodash";
+import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 
 export const filterCustomers = (parsedName, input) => {
   return input.length && parsedName?.length && parsedName.includes(input);
@@ -437,6 +438,9 @@ export const getProductsNameKeyMap = (products) => {
 };
 
 export const getItemNames = (itemsKeys, productsMap) => {
+  console.log("productsMap", productsMap)
+  console.log("itemsKeys", itemsKeys)
+
   const itemsNameArr = [];
 
   itemsKeys.forEach((itemKey) => {
@@ -446,4 +450,49 @@ export const getItemNames = (itemsKeys, productsMap) => {
     itemsNameArr.push(productName);
   });
   return itemsNameArr;
+};
+
+
+export const getMatrixesDataObj = (
+  matrixID,
+  tableData,
+  cellsData,
+  docData,
+  metaData,
+  productsMap
+) => {
+  const { matrix, driverIDs, actionIDs, documentIDs, acountKeys } = tableData;
+  const actionAutho = [];
+  // const documentIDsMock = [];
+  for (var i = 0; i < driverIDs.length; i++) {
+    actionAutho.push("Default");
+    // documentIDsMock.push(1);
+  }
+  console.log("getMatrixesDataObj matrix", matrix)
+
+  const itemHeaders = matrix[0];
+  if (itemHeaders?.length && itemHeaders[0] === null) {
+    return
+  }
+
+  return {
+    mainMatrix: {
+      matrixID,
+      ActionID: actionIDs,
+      AccountKey: acountKeys,
+      DocumentID: documentIDs,
+      DriverID: driverIDs,
+      ActionAutho: actionAutho,
+      itemsHeaders: itemHeaders,
+      itemsNames: getItemNames(itemHeaders, productsMap),
+      cellsData: matrix.slice(1),
+    },
+    changesMatrix: {
+      matrixConfig: null,
+      matrixGlobalData: null,
+      cellsData,
+      docData,
+      metaData,
+    },
+  };
 };
