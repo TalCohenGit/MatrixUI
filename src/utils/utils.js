@@ -472,6 +472,13 @@ export const getMatrixesDataObj = (
 
   const itemHeaders = matrix[0];
   if (itemHeaders?.length && itemHeaders[0] === null) {
+    console.log("problem with itemHeaders:", itemHeaders)
+    return
+  }
+
+  const itemsNames = getItemNames(itemHeaders, productsMap)
+  if (itemsNames?.length && (itemsNames[0] === null || itemsNames[0] === "לקוח")) {
+    console.log("problem with itemsNames:", itemsNames)
     return
   }
 
@@ -484,7 +491,7 @@ export const getMatrixesDataObj = (
       DriverID: driverIDs,
       ActionAutho: actionAutho,
       itemsHeaders: itemHeaders,
-      itemsNames: getItemNames(itemHeaders, productsMap),
+      itemsNames: ,
       cellsData: matrix.slice(1),
     },
     changesMatrix: {
