@@ -491,7 +491,7 @@ export const getMatrixesDataObj = (
       DriverID: driverIDs,
       ActionAutho: actionAutho,
       itemsHeaders: itemHeaders,
-      itemsNames: ,
+      itemsNames,
       cellsData: matrix.slice(1),
     },
     changesMatrix: {
