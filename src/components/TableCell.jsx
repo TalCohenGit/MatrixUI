@@ -18,7 +18,7 @@ const TableCell = (props) => {
     bgColor,
     tableName,
     minimize,
-    isMinimized
+    isMinimized,
   } = props;
   const { drivers, balanceTableData } = useContext(DataContext);
 
@@ -39,10 +39,21 @@ const TableCell = (props) => {
         />
       );
     }
-  } else if(tableName!== "main" && rowIndex === data.length - 1 && colIndex === 1){
-    cellType = <div onClick={() => {
-      console.log("clickkkkkkkkkk",minimize,isMinimized)
-      minimize(!isMinimized)}}>minimize</div>
+  } else if (
+    tableName !== "main" &&
+    rowIndex === data.length - 1 &&
+    colIndex === 1
+  ) {
+    cellType = (
+      <div
+        onClick={() => {
+          console.log("clickkkkkkkkkk", minimize, isMinimized);
+          minimize(!isMinimized);
+        }}
+      >
+        minimize
+      </div>
+    );
   } else if (colIndex < 3) {
     cellType = cellValue;
   } else if (colIndex === rowLength - 1) {
@@ -66,6 +77,7 @@ const TableCell = (props) => {
   } else if (colIndex === rowLength - 3) {
     cellType = (
       <DropDownCell
+        key={"actions"}
         dropdownOptions={[
           { name: "להפקה", key: 1 },
           { name: "ללא", key: 2 },
@@ -80,6 +92,7 @@ const TableCell = (props) => {
   } else if (colIndex === rowLength - 4) {
     cellType = (
       <DropDownCell
+        key={"drivers"}
         dropdownOptions={drivers}
         rowIndex={rowIndex}
         colIndex={colIndex}
@@ -90,6 +103,7 @@ const TableCell = (props) => {
   } else if (colIndex === rowLength - 5) {
     cellType = (
       <DropDownCell
+        key={"docType"}
         dropdownOptions={[
           { name: "חשבונית מס", key: 1 },
           { name: "חשבונית מס זיכוי", key: 3 },
@@ -101,7 +115,6 @@ const TableCell = (props) => {
         setData={setData}
       />
     );
-
   } else {
     cellType = <AmountCell {...props} />;
   }
@@ -110,11 +123,22 @@ const TableCell = (props) => {
     <div
       className="table-cell"
       style={{
-        opacity: cellValue === null && (rowIndex !== data.length - 1 || colIndex !== 1) ? "0" : "1",
-        pointerEvents: disabled && rowIndex !== 1 && (rowIndex !== data.length - 1 || colIndex !== 1) ? "none" : "auto",
+        opacity:
+          cellValue === null && (rowIndex !== data.length - 1 || colIndex !== 1)
+            ? "0"
+            : "1",
+        pointerEvents:
+          disabled &&
+          rowIndex !== 1 &&
+          (rowIndex !== data.length - 1 || colIndex !== 1)
+            ? "none"
+            : "auto",
         backgroundColor: cellValue === "" ? "none" : bgColor,
         border: colIndex === rowLength - 1 ? "0" : "1px solid #a9a9a9",
-        color: balanceTableData?.length > 0 && balanceTableData[3][colIndex] < 0 ? "red" : "black",
+        color:
+          balanceTableData?.length > 0 && balanceTableData[3][colIndex] < 0
+            ? "red"
+            : "black",
       }}
     >
       {cellType}

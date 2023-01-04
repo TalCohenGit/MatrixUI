@@ -2,7 +2,7 @@ import React, { useEffect, useState, useContext } from "react";
 import Select from "react-select";
 
 
-const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData }) => {
+const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData, key }) => {
   const [loadedKey, setLoadedKey] = useState("")
   useEffect(() => {
     (async() => {
@@ -34,6 +34,7 @@ const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData }) =>
 
   return (
     <Select
+      key={key}
       defaultValue={selectedOption}
       onChange={(e) => handleSelect(e)}
       options={options}

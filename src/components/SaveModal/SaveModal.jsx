@@ -15,7 +15,7 @@ const SaveModal = ({
   action,
   matrixName
 }) => {
-  const [isBi, setIsBi] = useState(true);
+  const [isBi, setIsBi] = useState(false);
   const [newMatrixName, setNewMatrixName] = useState("");
   const [dateValue, setDateValue] = useState(new Date())
 
@@ -61,7 +61,7 @@ const SaveModal = ({
           </div>
         )}
 
-        <label>
+        {action !== copyMatrixAction && <label>
           <input
             type="checkbox"
             checked={isBi}
@@ -69,7 +69,7 @@ const SaveModal = ({
             onChange={() => handleChange()}
           />
           שלח לדו"חות
-        </label>
+        </label>}
         <h3>בחר תאריך ערך</h3>
         <DatePicker dateValue={dateValue} setDateValue={setDateValue} />
       </div>
