@@ -6,21 +6,28 @@ const CopyDataModal = ({
   isOpen,
   toggleModal,
   onCopy,
-  matrixName
+  modalHeader,
+  afterProduce,
+  onNewMatrix,
+  action
 }) => {
   return (
     <Modal
       isOpen={isOpen}
       toggleModal={toggleModal}
-      modalHeader="המטריצה הופקה. האם לשכפל אותה?"
+      modalHeader={modalHeader}
+      action={action}
     >
       <div className="action-buttons">
-        <button className="cancel-button" onClick={() => toggleModal(false)}>
+        {!afterProduce && <button className="cancel-button" onClick={() => toggleModal(false)}>
           בטל
-        </button>
+        </button>}
         <button className="save-button" onClick={() => onCopy()}>
           שכפל מטריצה
         </button>
+        {afterProduce && <button className="save-button" onClick={() => onNewMatrix()}>
+          צור מטריצה חדשה
+        </button>}
       </div>
     </Modal>
   );

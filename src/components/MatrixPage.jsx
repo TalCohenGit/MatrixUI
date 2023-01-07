@@ -555,7 +555,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         toggleModal={toggleToCopyDataModal}
         onCancel={cancelCopyModal}
         onCopy={handleCopy}
-        matrixName={matrixName}
+        modalHeader={"המטריצה הופקה. האם לשכפל אותה?"}
       />
       <SaveModal
         isOpen={detailsToCopyModal}

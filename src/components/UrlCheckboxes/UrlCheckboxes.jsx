@@ -73,6 +73,8 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     await sendMsgsAPI(numbers, msgs);
   };
 
+  console.log("invoiceTableData",invoiceTableData)
+
   const invoiceDataToShow = invoiceTableData.map((invoice) => {
     const { DocUrl, checked } = invoice;
     return {
@@ -116,7 +118,7 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
 
   return (
     <>
-      <InvoiceTable
+      {invoiceDataToShow?.length ? <InvoiceTable
         tableData={invoiceDataToShow}
         tableHeader={[
           checkAllHeader,
@@ -128,7 +130,7 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
           "מס' מסמך",
           "מס' טלפון",
         ]}
-      />
+      /> : null}
       <div className="action-buttons">
         <button className="cancel-button" onClick={() => toggleModal(false)}>
           בטל

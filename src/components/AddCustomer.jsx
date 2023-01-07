@@ -7,7 +7,7 @@ import {
   customerNumbers,
   deleteAllTables,
   getFormattedDates,
-  getMatrixesDataObj
+  getMatrixesDataObj,
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -35,6 +35,8 @@ import { produceError } from "../utils/constants";
 import Toast from "./Toast/Toast";
 import SearchMatrixes from "./SearchMatrixes";
 import SearchDocs from "./SearchDocs";
+import CopyDataModal from "../components/Modals/CopyDataModal";
+
 
 const AddCustomer = ({
   customerName,
@@ -103,6 +105,7 @@ const AddCustomer = ({
   const [checked, setChecked] = useState([]);
   const [errorModal, toggleErrorModal] = useState(false);
   const [noResults, setNoResults] = useState(false);
+  const [stepsAfterProduce, toggleStepsAfterProduce] = useState(false);
 
   const productsOptions = [];
 
@@ -130,7 +133,7 @@ const AddCustomer = ({
               reader.read().then(({ done, value }) => {
                 // If there is no more data to read
                 if (done) {
-                  console.log("done", done);
+                  console.log("done", value);
                   controller.close();
                   return;
                 }
@@ -138,11 +141,39 @@ const AddCustomer = ({
                 controller.enqueue(value);
                 // Check chunks by logging to the console
                 const decodedValue = new TextDecoder().decode(value);
-                console.log("decodedValue", decodedValue)
+                console.log("decodedValue", decodedValue);
                 if (decodedValue === "finish") {
                   newValue = 100;
                 } else {
-                  const { stats, gotStats } = JSON.parse(decodedValue);
+                  const { stats, gotStats, data } = JSON.parse(decodedValue);
+                  console.log("getProgressBar data", data);
+
+                  if (data?.length) {
+                    setInvoiceData(
+                      data.map((el) => {
+                        const {
+                          Accountname,
+                          Action,
+                          DocNumber,
+                          DocUrl,
+                          DocumentDetails,
+                          TotalCost,
+                          ValueDate,
+                        } = el;
+                        return {
+                          DocUrl,
+                          Accountname,
+                          Action,
+                          ValueDate,
+                          TotalCost,
+                          DocNumber,
+                          DocumentDetails,
+                        };
+                      })
+                    );
+                    toggleUrlsModal(true);
+                  }
+
                   const { amountFinished, totalToProcess } = stats;
                   if (totalToProcess > 0 && gotStats) {
                     newValue = amountFinished * (100 / totalToProcess);
@@ -167,11 +198,7 @@ const AddCustomer = ({
       .then((result) => {
         // Do things with result
         console.log(result);
-      }).catch(() => {
-        setIsInProgress(false);
-        setProgressValue(0);
-        toggleErrorModal(true);      
-      })
+      });
   };
 
   const handleChange = (value) => {
@@ -244,8 +271,7 @@ const AddCustomer = ({
     toggleToDeleteMatrix(false);
   };
 
-  const deleteMatrix = async () => {
-    await deleteMatrixAPI(axiosPrivate, matrixID);
+  const deleteAllMatrixDate = () => {
     deleteAllTables(
       setMatrixData,
       setBalanceTableData,
@@ -254,6 +280,11 @@ const AddCustomer = ({
     );
     setMatrixName("");
     setMatrixDate("");
+  }
+
+  const deleteMatrix = async () => {
+    await deleteMatrixAPI(axiosPrivate, matrixID);
+    deleteAllMatrixDate()
     toggleToDeleteMatrix(false);
   };
 
@@ -328,15 +359,8 @@ const AddCustomer = ({
         fileName,
         matrixesData
       )
-        .then(async (res) => {
+        .then(async () => {
           await getProgressBar(fileName);
-          const invoiceDataArr = await getUrlsAPI(axiosPrivate, fileName);
-          const relavantInvoiceData = invoiceDataArr.slice(
-            invoiceDataArr.length - customerNumbers(matrixData),
-            invoiceDataArr.length
-          );
-          setInvoiceData(relavantInvoiceData);
-          toggleUrlsModal(true);
           setIsInProgress(false);
           setProgressValue(0);
         })
@@ -353,6 +377,10 @@ const AddCustomer = ({
       setIsInProgress(false);
       setProgressValue(0);
       toggleErrorModal(true);
+      setErrorMsg({
+        show: true,
+        text: produceError,
+      });
     }
   };
 
@@ -422,8 +450,8 @@ const AddCustomer = ({
       endDate.toString()
     );
     if (invoices?.length) {
-      if(noResults){
-        setNoResults(false)
+      if (noResults) {
+        setNoResults(false);
       }
       setSearchedInvoices(invoices);
       toggleToSearchDocs(false);
@@ -447,13 +475,14 @@ const AddCustomer = ({
   };
 
   const cancelSearch = () => {
-    if(noResults){
-      setNoResults(false)
+    if (noResults) {
+      setNoResults(false);
     }
     toggleToSearchDocs(false);
   };
 
   const ListModal = ({ isOpen, toggleModal, header, invoices }) => {
+    console.log("invoices".invoices);
     return (
       isOpen &&
       (invoices?.length ? (
@@ -504,8 +533,19 @@ const AddCustomer = ({
 
   const finishProduce = () => {
     toggleUrlsModal(false);
-    toggleDetailsToCopyModal(true);
+    toggleStepsAfterProduce(true);
   };
+
+  const handleCopy = () => {
+    toggleDetailsToCopyModal(true);
+    toggleStepsAfterProduce(false);
+  }
+
+  const createNewMatrix = () => {
+    console.log("creating new matrix")
+    deleteAllMatrixDate()
+    toggleStepsAfterProduce(false);
+  }
 
   return (
     <>
@@ -536,6 +576,15 @@ const AddCustomer = ({
             onDelete={deleteData}
             header={"האם אתה בטוח שברצונך למחוק נתונים?"}
             deleteBtnText={"מחק נתונים"}
+          />
+          <CopyDataModal
+            isOpen={stepsAfterProduce}
+            toggleModal={toggleStepsAfterProduce}
+            onCopy={handleCopy}
+            modalHeader={"בשביל להמשיך ניתן לשכפל את המטריצה או ליצור מטריצה חדשה"}
+            afterProduce={true}
+            onNewMatrix={createNewMatrix}
+            action={copyMatrixAction}
           />
           <ListModal
             isOpen={isUrlsModalOpen}
@@ -599,7 +648,7 @@ const AddCustomer = ({
             onCancel={cancelSearch}
             onSearch={loadUrls}
             modalHeader={"חיפוש מסמכים לפי תאריכים"}
-            Component={<SearchDocs noResults={noResults}/>}
+            Component={<SearchDocs noResults={noResults} />}
           />
           {/* <ErrorModal
             isOpen={errorModal}
