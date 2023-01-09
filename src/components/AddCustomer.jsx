@@ -64,6 +64,7 @@ const AddCustomer = ({
     matrixComments,
     products,
     matrixID,
+    setMatrixID,
     selectedProducts,
     setSelectedProducts,
     setIsInProgress,
@@ -446,8 +447,8 @@ const AddCustomer = ({
 
     const invoices = await getUrlsByDatesAPI(
       axiosPrivate,
-      startDate.toString(),
-      endDate.toString()
+      startDate,
+      endDate
     );
     if (invoices?.length) {
       if (noResults) {
@@ -544,6 +545,7 @@ const AddCustomer = ({
   const createNewMatrix = () => {
     console.log("creating new matrix")
     deleteAllMatrixDate()
+    setMatrixID("")
     toggleStepsAfterProduce(false);
   }
 

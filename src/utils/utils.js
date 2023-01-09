@@ -368,8 +368,10 @@ const formatDateSearch = (startDate, endDate) => {
     endDate.getMonth() + 1,
     endDate.getDate(),
   ];
-  sDay = sDay < 10 ? "0" + sDay : sDay
-  eDay = sDay < 10 ? "0" + eDay : eDay
+  sDay = sDay < 10 ? "0" + sDay : sDay;
+  eDay = sDay < 10 ? "0" + eDay : eDay;
+  sMonth = sMonth < 10 ? "0" + sMonth : sMonth;
+  eMonth = sDay < 10 ? "0" + eMonth : eMonth;
   const startDateFormatted = `${sYear}-${sMonth}-${sDay}`;
   const endDateFormatted = `${eYear}-${eMonth}-${eDay}`;
   startDate = new Date(new Date(startDateFormatted).setUTCHours(0, 0, 0, 0));
@@ -438,9 +440,6 @@ export const getProductsNameKeyMap = (products) => {
 };
 
 export const getItemNames = (itemsKeys, productsMap) => {
-  console.log("productsMap", productsMap)
-  console.log("itemsKeys", itemsKeys)
-
   const itemsNameArr = [];
 
   itemsKeys.forEach((itemKey) => {
