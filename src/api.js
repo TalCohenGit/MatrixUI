@@ -1,15 +1,5 @@
-import {
-  axiosAuth,
-  axiosRegister,
-  axiosMsgs,
-  axiosDrivers,
-  matrixServerURL,
-} from "./axios";
-import {
-  getItemNames,
-  formatDateWhenSaving,
-  getMatrixesDataObj
-} from "./utils/utils";
+import { axiosAuth, axiosRegister, axiosMsgs, axiosDrivers, matrixServerURL } from "./axios";
+import { getItemNames, formatDateWhenSaving, getMatrixesDataObj } from "./utils/utils";
 import axios from "axios";
 
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
@@ -73,15 +63,7 @@ export const getMatrixIDAPI = async (axiosPrivate) => {
   }
 };
 
-const getMatrixObject = (
-  date,
-  matrixID,
-  matrixesData,
-  isBI,
-  matrixName,
-  matrixesUiData,
-  isInitiated
-) => {
+const getMatrixObject = (date, matrixID, matrixesData, isBI, matrixName, matrixesUiData, isInitiated) => {
   return {
     matrixID,
     matrixName,
@@ -93,24 +75,11 @@ const getMatrixObject = (
   };
 };
 
-export const createDocAPI = async (
-  axiosPrivate, 
-  matrixID,
-  matrixName,
-  fileName,
-  matrixesData
-) => {
+export const createDocAPI = async (axiosPrivate, matrixID, matrixName, fileName, matrixesData) => {
   try {
-
     const date = formatDateWhenSaving(new Date());
     const isBI = true;
-    const dataToSend = getMatrixObject(
-      date,
-      matrixID,
-      matrixesData,
-      isBI,
-      matrixName
-    );
+    const dataToSend = getMatrixObject(date, matrixID, matrixesData, isBI, matrixName);
     const res = await axiosPrivate.post("/api/createdoc2", dataToSend, {
       headers: {
         fileName,
@@ -138,30 +107,15 @@ export const saveTablesAPI = async (
   productsMap,
   isInitiated
 ) => {
-  const matrixesData = getMatrixesDataObj(
-    matrixID,
-    tableData,
-    cellsData,
-    docData,
-    metaData,
-    productsMap
-  );
+  const matrixesData = getMatrixesDataObj(matrixID, tableData, cellsData, docData, metaData, productsMap);
   if (!matrixesData) {
     console.log("error in saveTablesAPI: ", "no matrixesData");
-    return
+    return;
   }
   try {
     const res = await axiosPrivate.post(
       "/api/savematrix",
-      getMatrixObject(
-        date,
-        matrixID,
-        matrixesData,
-        isBI,
-        matrixName,
-        matrixesUiData,
-        isInitiated
-      )
+      getMatrixObject(date, matrixID, matrixesData, isBI, matrixName, matrixesUiData, isInitiated)
     );
     return matrixID;
   } catch (e) {
@@ -181,14 +135,7 @@ export const loginUserAPI = async (userEmail, password) => {
   }
 };
 
-export const registerAPI = async (
-  firstName,
-  lastName,
-  phone,
-  email,
-  userPassword,
-  accountName
-) => {
+export const registerAPI = async (firstName, lastName, phone, email, userPassword, accountName) => {
   try {
     const res = await axiosRegister.post("/api/Register", {
       FirstName: firstName,
@@ -232,22 +179,14 @@ export const logoutAPI = async () => {
 
 export const getUrlsAPI = async (axiosPrivate, fileName) => {
   try {
-    console.log("fileName.substring(2)", fileName.substring(2))
+    console.log("fileName.substring(2)", fileName.substring(2));
     const res = await axiosPrivate.post("/api/getdata", {
       collection: "DocData",
       searchParams: { Action: fileName.substring(2) },
     });
     const data = res.data.result.data;
     return data.map((element) => {
-      const {
-        DocUrl,
-        DocNumber,
-        Accountname,
-        ValueDate,
-        Action,
-        TotalCost,
-        DocumentDetails,
-      } = element;
+      const { DocUrl, DocNumber, Accountname, ValueDate, Action, TotalCost, DocumentDetails } = element;
       return {
         DocUrl,
         Accountname,
@@ -319,25 +258,11 @@ export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
 
 export const getUrlsByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
-    const res = await getData(
-      axiosPrivate,
-      fromDate,
-      toDate,
-      "DocData",
-      "ValueDate"
-    );
+    const res = await getData(axiosPrivate, fromDate, toDate, "DocData", "ValueDate");
 
     const data = res.data.result.data;
     return data.map((element) => {
-      const {
-        DocUrl,
-        DocNumber,
-        Accountname,
-        ValueDate,
-        Action,
-        TotalCost,
-        DocumentDetails,
-      } = element;
+      const { DocUrl, DocNumber, Accountname, ValueDate, Action, TotalCost, DocumentDetails } = element;
       return {
         DocUrl,
         Accountname,
@@ -410,7 +335,8 @@ export const sendMsgsAPI = async (numbers, msgs) => {
   }
 };
 
-export const getProgressBarAPI = async (axiosPrivate, fileName) => {
+export const getProgressBarAPI = async (rowsNumber, fileName) => {
+  console.log({ rowsNumber, fileName });
   try {
     return await fetch(`${matrixServerURL}api/getProgressBar`, {
       method: "POST",
@@ -420,7 +346,7 @@ export const getProgressBarAPI = async (axiosPrivate, fileName) => {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache",
         mode: "no-cors",
-        timeLimit: 500,
+        timeLimit: 33333 + rowsNumber * 50,
         Connection: "keep-alive",
       },
     });

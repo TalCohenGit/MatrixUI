@@ -25,18 +25,12 @@ import UrlCheckboxes from "./UrlCheckboxes/UrlCheckboxes";
 import SaveModal from "./SaveModal/SaveModal";
 import LoadModal from "./Modals/LoadModal";
 import AreUSureModal from "./Modals/AreUSureModal";
-import {
-  savingAction,
-  savingAsAction,
-  produceDocAction,
-  copyMatrixAction,
-} from "../utils/constants";
+import { savingAction, savingAsAction, produceDocAction, copyMatrixAction } from "../utils/constants";
 import { produceError } from "../utils/constants";
 import Toast from "./Toast/Toast";
 import SearchMatrixes from "./SearchMatrixes";
 import SearchDocs from "./SearchDocs";
 import CopyDataModal from "../components/Modals/CopyDataModal";
-
 
 const AddCustomer = ({
   customerName,
@@ -119,9 +113,12 @@ const AddCustomer = ({
     });
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
-  const getProgressBar = async (fileName) => {
+  const getProgressBar = async (rowsNumber, fileName) => {
+    let combinedData;
+    let isPreperd = false;
     let newValue = 0;
-    return await getProgressBarAPI(axiosPrivate, fileName)
+    let chunks;
+    return await getProgressBarAPI(rowsNumber, fileName)
       .then((response) => response.body)
       .then((rb) => {
         const reader = rb.getReader();
@@ -141,26 +138,30 @@ const AddCustomer = ({
                 // Get the data and send it to the browser via the controller
                 controller.enqueue(value);
                 // Check chunks by logging to the console
-                const decodedValue = new TextDecoder().decode(value);
+
+                const decodedValue = new TextDecoder("utf-8").decode(value);
                 console.log("decodedValue", decodedValue);
                 if (decodedValue === "finish") {
                   newValue = 100;
                 } else {
-                  const { stats, gotStats, data } = JSON.parse(decodedValue);
-                  console.log("getProgressBar data", data);
+                  console.log("type of decoded value", typeof decodedValue);
+                  let { stats, gotStats, data, stageName } = JSON.parse(decodedValue);
 
-                  if (data?.length) {
+                  console.log("getProgressBar data", data);
+                  if (!isPreperd) {
+                    if (combinedData || (data && stageName == "חלקים")) {
+                      if (stageName === "חלקים") chunks = data;
+                      else {
+                        if (data.chunkNumber <= chunks) combinedData.push([...data.partialArray]);
+                        else isPreperd = true;
+                      }
+                    }
+                  }
+                  if (isPreperd && combinedData?.length) {
                     setInvoiceData(
-                      data.map((el) => {
-                        const {
-                          Accountname,
-                          Action,
-                          DocNumber,
-                          DocUrl,
-                          DocumentDetails,
-                          TotalCost,
-                          ValueDate,
-                        } = el;
+                      //  data.map((el) => {
+                      combinedData.map((el) => {
+                        const { Accountname, Action, DocNumber, DocUrl, DocumentDetails, TotalCost, ValueDate } = el;
                         return {
                           DocUrl,
                           Accountname,
@@ -219,10 +220,7 @@ const AddCustomer = ({
     if (event.action === "select-option" && event.option.value === "*") {
       setSelectedProducts(options);
       selectedValues = productsOptions.map((element) => element.value);
-    } else if (
-      event.action === "deselect-option" &&
-      event.option.value === "*"
-    ) {
+    } else if (event.action === "deselect-option" && event.option.value === "*") {
       setSelectedProducts([]);
     } else if (event.action === "deselect-option") {
       const values = value.filter((o) => o.value !== "*");
@@ -248,12 +246,7 @@ const AddCustomer = ({
   };
 
   const deleteAll = () => {
-    deleteAllTables(
-      setMatrixData,
-      setBalanceTableData,
-      setMatrixComments,
-      setSelectedProducts
-    );
+    deleteAllTables(setMatrixData, setBalanceTableData, setMatrixComments, setSelectedProducts);
   };
 
   const handleDeleteData = () => {
@@ -273,29 +266,19 @@ const AddCustomer = ({
   };
 
   const deleteAllMatrixDate = () => {
-    deleteAllTables(
-      setMatrixData,
-      setBalanceTableData,
-      setMatrixComments,
-      setSelectedProducts
-    );
+    deleteAllTables(setMatrixData, setBalanceTableData, setMatrixComments, setSelectedProducts);
     setMatrixName("");
     setMatrixDate("");
-  }
+  };
 
   const deleteMatrix = async () => {
     await deleteMatrixAPI(axiosPrivate, matrixID);
-    deleteAllMatrixDate()
+    deleteAllMatrixDate();
     toggleToDeleteMatrix(false);
   };
 
   const deleteData = () => {
-    deleteAllTables(
-      setMatrixData,
-      setBalanceTableData,
-      setMatrixComments,
-      setSelectedProducts
-    );
+    deleteAllTables(setMatrixData, setBalanceTableData, setMatrixComments, setSelectedProducts);
     toggleToDeleteData(false);
   };
 
@@ -310,12 +293,7 @@ const AddCustomer = ({
       });
       return;
     }
-    const validatedData = handleMatrixData(
-      matrixData,
-      productsMap,
-      setCustomerValidationFailed,
-      produceDocAction
-    );
+    const validatedData = handleMatrixData(matrixData, productsMap, setCustomerValidationFailed, produceDocAction);
     if (!validatedData) {
       return;
     }
@@ -323,12 +301,11 @@ const AddCustomer = ({
       ...customerValidationFailed,
       failure: false,
     });
-    const { cellsData, docCommentsToSend, metaDataToSend } =
-      handleCommentMatrixData(
-        matrixComments,
-        validatedData["docComments"],
-        validatedData["metaData"]
-      );
+    const { cellsData, docCommentsToSend, metaDataToSend } = handleCommentMatrixData(
+      matrixComments,
+      validatedData["docComments"],
+      validatedData["metaData"]
+    );
 
     let newMatrixId = matrixID;
     if (!newMatrixId) {
@@ -353,15 +330,9 @@ const AddCustomer = ({
         });
         return;
       }
-      createDocAPI(
-        axiosPrivate,
-        newMatrixId,
-        matrixName,
-        fileName,
-        matrixesData
-      )
+      createDocAPI(axiosPrivate, newMatrixId, matrixName, fileName, matrixesData)
         .then(async () => {
-          await getProgressBar(fileName);
+          await getProgressBar(matrixesData.mainMatrix.AccountKey.length, fileName);
           setIsInProgress(false);
           setProgressValue(0);
         })
@@ -403,13 +374,7 @@ const AddCustomer = ({
     toggleToLoadDataModal(true);
   };
 
-  const handleSaving = async (
-    action,
-    toggleModal,
-    isBI,
-    newMatrixName,
-    dateValue
-  ) => {
+  const handleSaving = async (action, toggleModal, isBI, newMatrixName, dateValue) => {
     const newIsInitiated = true;
     await saveTables(dateValue, isBI, action, newIsInitiated, newMatrixName);
     setMatrixName(newMatrixName);
@@ -418,15 +383,8 @@ const AddCustomer = ({
   };
 
   const loadTableNames = async () => {
-    const { startDate, endDate } = getFormattedDates(
-      dateRangesLoad[0]["startDate"],
-      dateRangesLoad[0]["endDate"]
-    );
-    const matrixesDetails = await getTablesByDatesAPI(
-      axiosPrivate,
-      startDate,
-      endDate
-    );
+    const { startDate, endDate } = getFormattedDates(dateRangesLoad[0]["startDate"], dateRangesLoad[0]["endDate"]);
+    const matrixesDetails = await getTablesByDatesAPI(axiosPrivate, startDate, endDate);
     if (matrixesDetails?.length) {
       if (noResults) {
         setNoResults(false);
@@ -440,16 +398,9 @@ const AddCustomer = ({
   };
 
   const loadUrls = async () => {
-    const { startDate, endDate } = getFormattedDates(
-      dateRangesSearch[0]["startDate"],
-      dateRangesSearch[0]["endDate"]
-    );
+    const { startDate, endDate } = getFormattedDates(dateRangesSearch[0]["startDate"], dateRangesSearch[0]["endDate"]);
 
-    const invoices = await getUrlsByDatesAPI(
-      axiosPrivate,
-      startDate,
-      endDate
-    );
+    const invoices = await getUrlsByDatesAPI(axiosPrivate, startDate, endDate);
     if (invoices?.length) {
       if (noResults) {
         setNoResults(false);
@@ -490,11 +441,7 @@ const AddCustomer = ({
         <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={header}>
           {/* <div>{dataToShow}</div> */}
           <React.Fragment>
-            <UrlCheckboxes
-              axiosPrivate={axiosPrivate}
-              invoiceData={invoices}
-              toggleModal={toggleModal}
-            />
+            <UrlCheckboxes axiosPrivate={axiosPrivate} invoiceData={invoices} toggleModal={toggleModal} />
           </React.Fragment>
         </Modal>
       ) : (
@@ -540,14 +487,14 @@ const AddCustomer = ({
   const handleCopy = () => {
     toggleDetailsToCopyModal(true);
     toggleStepsAfterProduce(false);
-  }
+  };
 
   const createNewMatrix = () => {
-    console.log("creating new matrix")
-    deleteAllMatrixDate()
-    setMatrixID("")
+    console.log("creating new matrix");
+    deleteAllMatrixDate();
+    setMatrixID("");
     toggleStepsAfterProduce(false);
-  }
+  };
 
   return (
     <>
@@ -689,22 +636,13 @@ const AddCustomer = ({
         {customerValidationFailed.failure ? (
           <p className="validationComment">
             {" "}
-            הפקת חשבונית לא בוצעה! {customerValidationFailed.error}{" "}
-            {customerValidationFailed.customerName}
+            הפקת חשבונית לא בוצעה! {customerValidationFailed.error} {customerValidationFailed.customerName}
           </p>
         ) : null}
-        <button
-          className="save-tables"
-          disabled={matrixData?.length === 0 || !matrixID}
-          onClick={() => savingMatrix()}
-        >
+        <button className="save-tables" disabled={matrixData?.length === 0 || !matrixID} onClick={() => savingMatrix()}>
           שמירה
         </button>
-        <button
-          className="save-tables"
-          disabled={matrixData.length === 0}
-          onClick={() => saveWithNameData()}
-        >
+        <button className="save-tables" disabled={matrixData.length === 0} onClick={() => saveWithNameData()}>
           שמירה בשם
         </button>
         <button className="save-tables" onClick={() => loadData()}>
@@ -717,26 +655,17 @@ const AddCustomer = ({
         >
           הפקת חשבונית
         </button>
-        <button
-          className="deleteAll-button"
-          disabled={matrixData.length === 0}
-          onClick={() => handleDeleteData()}
-        >
+        <button className="deleteAll-button" disabled={matrixData.length === 0} onClick={() => handleDeleteData()}>
           מחק נתונים
         </button>
-        <button
-          className="deleteAll-button"
-          onClick={() => handleDeleteMatrix()}
-        >
+        <button className="deleteAll-button" onClick={() => handleDeleteMatrix()}>
           מחק מטריצה
         </button>
         <button className="deleteAll-button" onClick={() => handleSearchDocs()}>
           חיפוש מסמכים
         </button>
       </div>
-      {errorMessage?.length ? (
-        <p className="error-message">{errorMessage}</p>
-      ) : null}
+      {errorMessage?.length ? <p className="error-message">{errorMessage}</p> : null}
     </>
   );
 };
