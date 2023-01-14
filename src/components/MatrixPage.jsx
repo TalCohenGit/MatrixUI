@@ -101,16 +101,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   let interval;
   const getTableTitle = () => {
-    const tableTitle = [
-      "שם לקוח",
-      "מזהה",
-      "טלפון",
-      "סוג מסמך",
-      "איסוף",
-      "מאושר",
-      "מידע למסמך",
-      "",
-    ];
+    const tableTitle = ["שם לקוח", "מזהה", "טלפון", "סוג מסמך", "איסוף", "מאושר", "מידע למסמך", ""];
     return tableTitle;
   };
 
@@ -120,13 +111,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       if (!currentMatrixData.length) {
         currentMatrixData.push(getTableTitle());
       }
-      const numOfColAfterCustomerData =
-        currentMatrixData[0].length - numOfColBeforeProducts;
+      const numOfColAfterCustomerData = currentMatrixData[0].length - numOfColBeforeProducts;
       const newCustomerData = getNewCustomerData();
-      currentMatrixData.push([
-        ...newCustomerData,
-        ...Array(numOfColAfterCustomerData).fill(0),
-      ]);
+      currentMatrixData.push([...newCustomerData, ...Array(numOfColAfterCustomerData).fill(0)]);
       setMatrixData(currentMatrixData);
       const productsNumber = numOfColAfterCustomerData - numOfColAfterProducts;
       if (productsNumber > 0) {
@@ -154,27 +141,16 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         newArr = [
           ...row.slice(0, numOfColBeforeProducts + numCurrentProducts),
           ...productsToAdd,
-          ...row.slice(
-            numOfColBeforeProducts + numCurrentProducts,
-            currentMatrix[0].length
-          ),
+          ...row.slice(numOfColBeforeProducts + numCurrentProducts, currentMatrix[0].length),
         ];
       } else {
         newArr = [
           ...row.slice(0, numOfColBeforeProducts + numCurrentProducts),
           ...Array(productsToAdd.length).fill(0),
-          ...row.slice(
-            numOfColBeforeProducts + numCurrentProducts,
-            currentMatrix[0].length
-          ),
+          ...row.slice(numOfColBeforeProducts + numCurrentProducts, currentMatrix[0].length),
         ];
-        if (
-          newMatrixComment[rowIndex - 1] &&
-          newMatrixComment[rowIndex - 1].length > 0
-        ) {
-          newMatrixComment[rowIndex - 1].push(
-            ...Array(productsToAdd.length).fill(null)
-          );
+        if (newMatrixComment[rowIndex - 1] && newMatrixComment[rowIndex - 1].length > 0) {
+          newMatrixComment[rowIndex - 1].push(...Array(productsToAdd.length).fill(null));
         } else {
           const arrToAdd = Array(productsToAdd.length).fill(null);
           newMatrixComment[rowIndex - 1] = arrToAdd;
@@ -200,10 +176,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       let newArr;
       newArr = [
         ...row.slice(0, numOfColBeforeProducts),
-        ...row.slice(
-          numOfColBeforeProducts + numCurrentProducts,
-          currentMatrix[0].length
-        ),
+        ...row.slice(numOfColBeforeProducts + numCurrentProducts, currentMatrix[0].length),
       ];
       return newArr;
     });
@@ -228,49 +201,22 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
             numOfColBeforeProducts,
             numOfColBeforeProducts + numCurrentProducts
           );
-          productsToAdd = selectedProductNames.filter(
-            (product) => !currentProducts.includes(product)
-          );
+          productsToAdd = selectedProductNames.filter((product) => !currentProducts.includes(product));
         }
-        newMatrix = addProducts(
-          productsToAdd,
-          currentMatrix,
-          numCurrentProducts
-        );
-        newBalanceTable = updateBalanceTable(
-          currentBalanceTable,
-          productsToAdd,
-          products,
-          numCurrentProducts
-        );
+        newMatrix = addProducts(productsToAdd, currentMatrix, numCurrentProducts);
+        newBalanceTable = updateBalanceTable(currentBalanceTable, productsToAdd, products, numCurrentProducts);
       } else {
-        newMatrix = addProducts(
-          [event.option.value],
-          currentMatrix,
-          numCurrentProducts
-        );
-        newBalanceTable = updateBalanceTable(
-          currentBalanceTable,
-          [event.option.value],
-          products,
-          numCurrentProducts
-        );
+        newMatrix = addProducts([event.option.value], currentMatrix, numCurrentProducts);
+        newBalanceTable = updateBalanceTable(currentBalanceTable, [event.option.value], products, numCurrentProducts);
       }
     } else if (event.action === "deselect-option") {
       if (event.option.value === "*") {
         newMatrix = removeAllProducts(currentMatrix, numCurrentProducts);
       } else {
-        const { newMatrixData, newMatrixComments } = removeProduct(
-          event.option.value,
-          currentMatrix
-        );
+        const { newMatrixData, newMatrixComments } = removeProduct(event.option.value, currentMatrix);
         newMatrix = newMatrixData;
         setMatrixComments(newMatrixComments);
-        newBalanceTable = removeColFromBalanceTable(
-          currentBalanceTable,
-          products,
-          event.option.value
-        );
+        newBalanceTable = removeColFromBalanceTable(currentBalanceTable, products, event.option.value);
       }
     }
     setMatrixData(newMatrix);
@@ -358,32 +304,20 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     return newMatrixId;
   };
 
-  const saveTables = async (
-    matrixDate,
-    isBI,
-    action,
-    newIsInitiated,
-    newMatrixName
-  ) => {
+  const saveTables = async (matrixDate, isBI, action, newIsInitiated, newMatrixName) => {
     const date = getMatrixFormatedDate(matrixDate);
     const newMatrixId = await getMatrixID(action);
     localStorage.setItem("newMatrixId", newMatrixId);
 
-    const { validatedData, cellsData, docCommentsToSend, metaDataToSend } =
-      await getMatrixesData(
-        matrixData,
-        productsMap,
-        matrixComments,
-        matrixID,
-        action
-      );
-
-    const matrixesUiData = JSON.stringify([
+    const { validatedData, cellsData, docCommentsToSend, metaDataToSend } = await getMatrixesData(
       matrixData,
+      productsMap,
       matrixComments,
-      selectedProducts,
-      balanceTableData,
-    ]);
+      matrixID,
+      action
+    );
+
+    const matrixesUiData = JSON.stringify([matrixData, matrixComments, selectedProducts, balanceTableData]);
 
     await saveTablesAPI(
       axiosPrivate,
@@ -417,13 +351,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     toggleDetailsToCopyModal(true);
   };
 
-  const copyMatrix = async (
-    action,
-    toggleModal,
-    isBi,
-    newMatrixName,
-    dateValue
-  ) => {
+  const copyMatrix = async (action, toggleModal, isBi, newMatrixName, dateValue) => {
     try {
       loadAllMatrixesData(dataToLoad["matrixesUiData"], [
         setMatrixData,
@@ -433,13 +361,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       ]);
 
       const newIsInitiated = false;
-      const newMatrixID = await saveTables(
-        dateValue,
-        isBi,
-        copyMatrixAction,
-        newIsInitiated,
-        newMatrixName
-      );
+      const newMatrixID = await saveTables(dateValue, isBi, copyMatrixAction, newIsInitiated, newMatrixName);
 
       setIsInitiated(false);
       setMatrixesDetails(newMatrixID, newMatrixName, dateValue);
@@ -451,18 +373,12 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const loadTables = async (matrixID) => {
-    const { matrixesUiData, isProduced, matrixName, date, isBI } =
-      await getMatrixByIDAPI(axiosPrivate, matrixID);
+    const { matrixesUiData, isProduced, matrixName, date, isBI } = await getMatrixByIDAPI(axiosPrivate, matrixID);
     if (isProduced) {
       toggleToCopyDataModal(true);
       setDataToLoad({ matrixName, date, matrixesUiData, isBI });
     } else {
-      loadAllMatrixesData(matrixesUiData, [
-        setMatrixData,
-        setMatrixComments,
-        setSelectedProducts,
-        setBalanceTableData,
-      ]);
+      loadAllMatrixesData(matrixesUiData, [setMatrixData, setMatrixComments, setSelectedProducts, setBalanceTableData]);
       setMatrixesDetails(matrixID, matrixName, date);
     }
     return { matrixName, date, matrixesUiData };
@@ -504,13 +420,10 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         getDriversAPI(),
       ]);
       setCustomers(customerList);
-      const uniqProducts =
-        productsData?.length > 0 ? getUniqProducts(productsData) : undefined;
+      const uniqProducts = productsData?.length > 0 ? getUniqProducts(productsData) : undefined;
       setProducts(uniqProducts);
       setDrivers(driverList);
-      const productsMap = uniqProducts
-        ? getProductsNameKeyMap(uniqProducts)
-        : undefined;
+      const productsMap = uniqProducts ? getProductsNameKeyMap(uniqProducts) : undefined;
       setProductsMap(productsMap);
     })();
   }, []);
@@ -523,18 +436,11 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   return drivers?.length ? (
     <div className="matrix-page">
       <h1 className="login-details">שלום {getUserEmail()}</h1>
-      <Logout
-        setAccessToken={setAccessToken}
-        setRefreshToken={setRefreshToken}
-      />
+      <Logout setAccessToken={setAccessToken} setRefreshToken={setRefreshToken} />
       {/* <ProgressBar /> */}
       <h1> MatrixUi </h1>
       <h2> שם המטריצה: {matrixName}</h2>
-      <h3>
-        {" "}
-        תאריך ערך למטריצה:{" "}
-        {matrixDate && new Date(matrixDate).toLocaleDateString()}
-      </h3>
+      <h3> תאריך ערך למטריצה: {matrixDate && new Date(matrixDate).toLocaleDateString()}</h3>
       <Modal
         isOpen={isOpenValidationModal}
         toggleModal={toggleValidationModal}
@@ -542,10 +448,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       >
         <div>{dataDoubles}</div>
         <div className="action-buttons">
-          <button
-            className="cancel-button"
-            onClick={() => toggleValidationModal(false)}
-          >
+          <button className="cancel-button" onClick={() => toggleValidationModal(false)}>
             בטל
           </button>
         </div>
@@ -562,6 +465,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         toggleModal={toggleDetailsToCopyModal}
         handleAction={copyMatrix}
         action={copyMatrixAction}
+        matrixName={matrixName}
       />
 
       <AddCustomer

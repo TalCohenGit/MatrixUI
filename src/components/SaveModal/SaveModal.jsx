@@ -1,35 +1,35 @@
 import React, { useEffect, useState } from "react";
 import DatePicker from "../DatePicker";
 import Modal from "../../common/components/Modal/Modal";
-import {
-  modalAction,
-  savingAsAction,
-  savingAction,
-  copyMatrixAction
-} from "../../utils/constants";
+import { modalAction, savingAsAction, savingAction, copyMatrixAction } from "../../utils/constants";
+import { set } from "lodash";
+const assignFileVersion = (fileName) => {
+  const fileLan = fileName?.length;
+  if (!fileLan) return "";
+  const last9 = fileName.slice(fileLan - 9, fileLan);
+  const isDuplicated = last9.slice(0, 7) === "משוכפל_" ? true : false;
+  if (!isDuplicated) return `${fileName.slice(0, fileLan - 9)} משוכפל_01`;
 
-const SaveModal = ({
-  isOpen,
-  toggleModal,
-  handleAction,
-  action,
-  matrixName
-}) => {
+  const versionStr = last9.slice(7, 9);
+  const newVersionInt = parseInt(versionStr) + 1;
+
+  return `${fileName.slice(0, fileLan - 9)} משוכפל_${newVersionInt}`;
+};
+
+const SaveModal = ({ isOpen, toggleModal, handleAction, action, matrixName }) => {
+  console.log({ matrixName, action });
   const [isBi, setIsBi] = useState(false);
   const [newMatrixName, setNewMatrixName] = useState("");
-  const [dateValue, setDateValue] = useState(new Date())
+  const [dateValue, setDateValue] = useState(new Date());
+
+  useNameChecker(matrixName, setNewMatrixName, newMatrixName, assignFileVersion);
 
   const handleChange = () => {
     setIsBi(!isBi);
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      toggleModal={toggleModal}
-      modalHeader={"פרטים ל" + modalAction[action]}
-      action={action}
-    >
+    <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={"פרטים ל" + modalAction[action]} action={action}>
       <div className="save-matrix-modal">
         {(action === savingAsAction || action === copyMatrixAction) && (
           <input
@@ -57,42 +57,44 @@ const SaveModal = ({
         )}
         {action === savingAction && matrixName && (
           <div>
-          <p>שם המטריצה: {matrixName}</p>
+            <p>שם המטריצה: {matrixName}</p>
           </div>
         )}
 
-        {action !== copyMatrixAction && <label>
-          <input
-            type="checkbox"
-            checked={isBi}
-            // defaultChecked={true}
-            onChange={() => handleChange()}
-          />
-          שלח לדו"חות
-        </label>}
+        {action !== copyMatrixAction && (
+          <label>
+            <input
+              type="checkbox"
+              checked={isBi}
+              // defaultChecked={true}
+              onChange={() => handleChange()}
+            />
+            שלח לדו"חות
+          </label>
+        )}
         <h3>בחר תאריך ערך</h3>
         <DatePicker dateValue={dateValue} setDateValue={setDateValue} />
       </div>
       <div className="action-buttons">
-        {action != copyMatrixAction && <button className="cancel-button" onClick={() => toggleModal(false)}>
-          בטל
-        </button>}
+        {action != copyMatrixAction && (
+          <button className="cancel-button" onClick={() => toggleModal(false)}>
+            בטל
+          </button>
+        )}
         <button
           className={
             "save-button" +
-            ((action === savingAsAction || action === copyMatrixAction) && !newMatrixName?.length
-              ? " disabled"
-              : "")
+            ((action === savingAsAction || action === copyMatrixAction) && !newMatrixName?.length ? " disabled" : "")
           }
           onClick={() => {
-            let martrixNameToSave = newMatrixName
+            let martrixNameToSave = newMatrixName;
             if (!martrixNameToSave) {
-              martrixNameToSave = matrixName
+              martrixNameToSave = matrixName;
             }
-            handleAction(action, toggleModal, isBi, martrixNameToSave, dateValue)
-            setNewMatrixName("")
-          }
-          }>
+            handleAction(action, toggleModal, isBi, martrixNameToSave, dateValue);
+            setNewMatrixName("");
+          }}
+        >
           {modalAction[action]}
         </button>
       </div>
@@ -101,3 +103,12 @@ const SaveModal = ({
 };
 
 export default SaveModal;
+
+export const useNameChecker = (matrixName, setNewMatrixName, newMatrixName, assignFileVersion) => {
+  useEffect(() => {
+    if (matrixName && newMatrixName == "") {
+      console.log({ matrixName, newMatrixName });
+      setNewMatrixName(assignFileVersion(matrixName));
+    }
+  }, [matrixName]);
+};
