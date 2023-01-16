@@ -313,8 +313,8 @@ const AddCustomer = ({
     const validatedData = handleMatrixData(
       matrixData,
       productsMap,
-      setCustomerValidationFailed,
-      produceDocAction
+      produceDocAction,
+      setCustomerValidationFailed
     );
     if (!validatedData) {
       return;
