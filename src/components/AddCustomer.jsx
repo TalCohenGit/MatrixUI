@@ -154,7 +154,6 @@ const AddCustomer = ({
                   setUrlsTableValues(combinedData);
                   console.log("done", value);
                   controller.close();
-                  return;
                 }
                 // Get the data and send it to the browser via the controller
                 controller.enqueue(value);
