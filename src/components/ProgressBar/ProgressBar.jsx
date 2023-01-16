@@ -6,17 +6,11 @@ const ProgressBar = ({ isInProgress, progressValue }) => {
     isInProgress && (
       <>
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          <Box sx={{ width: "100%", mr: 1}} >
-            <LinearProgress
-              variant="determinate"
-              value={progressValue}
-            
-            />
+          <Box sx={{ width: "100%", mr: 1 }}>
+            <LinearProgress variant="determinate" value={progressValue} />
           </Box>
           <Box sx={{ minWidth: 35 }}>
-            <Typography variant="body2" color="text.secondary">{`${Math.round(
-              progressValue
-            )}%`}</Typography>
+            <Typography variant="body2" color="text.secondary">{`${Math.round(progressValue)}%`}</Typography>
           </Box>
         </Box>
       </>

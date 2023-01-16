@@ -33,6 +33,7 @@ import SearchDocs from "./SearchDocs";
 import CopyDataModal from "../components/Modals/CopyDataModal";
 
 const AddCustomer = ({
+  savedData,
   customerName,
   setCustomerName,
   addCustomerToTable,
@@ -65,7 +66,7 @@ const AddCustomer = ({
     setProgressValue,
     isInProgress,
   } = useContext(DataContext);
-
+  console.log("mmmmma", { matrixData, savedData });
   const intialRangeState = [
     {
       startDate: new Date(),
@@ -104,6 +105,25 @@ const AddCustomer = ({
 
   const productsOptions = [];
 
+  const setUrlsTableValues = (combinedData) => {
+    setInvoiceData(
+      //  data.map((el) => {
+      combinedData.map((el) => {
+        const { Accountname, Action, DocNumber, DocUrl, DocumentDetails, TotalCost, ValueDate } = el;
+        return {
+          DocUrl,
+          Accountname,
+          Action,
+          ValueDate,
+          TotalCost,
+          DocNumber,
+          DocumentDetails,
+        };
+      })
+    );
+    toggleUrlsModal(true);
+  };
+
   products &&
     products.forEach((element) => {
       productsOptions.push({
@@ -114,10 +134,10 @@ const AddCustomer = ({
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
   const getProgressBar = async (rowsNumber, fileName) => {
-    let combinedData;
+    let combinedData = [];
     let isPreperd = false;
     let newValue = 0;
-    let chunks;
+
     return await getProgressBarAPI(rowsNumber, fileName)
       .then((response) => response.body)
       .then((rb) => {
@@ -131,6 +151,7 @@ const AddCustomer = ({
               reader.read().then(({ done, value }) => {
                 // If there is no more data to read
                 if (done) {
+                  setUrlsTableValues(combinedData);
                   console.log("done", value);
                   controller.close();
                   return;
@@ -141,43 +162,22 @@ const AddCustomer = ({
 
                 const decodedValue = new TextDecoder("utf-8").decode(value);
                 console.log("decodedValue", decodedValue);
-                if (decodedValue === "finish") {
+                let { stats, gotStats, data, stageName } = JSON.parse(decodedValue);
+                if (stageName === "finish") {
                   newValue = 100;
                 } else {
-                  console.log("type of decoded value", typeof decodedValue);
-                  let { stats, gotStats, data, stageName } = JSON.parse(decodedValue);
+                  if (!isPreperd && data) {
+                    combinedData.push(data);
+                    //  console.log("combined !!!!", { combinedData });
+                  }
 
-                  console.log("getProgressBar data", data);
-                  if (!isPreperd) {
-                    if (combinedData || (data && stageName == "חלקים")) {
-                      if (stageName === "חלקים") chunks = data;
-                      else {
-                        if (data.chunkNumber <= chunks) combinedData.push([...data.partialArray]);
-                        else isPreperd = true;
-                      }
-                    }
-                  }
-                  if (isPreperd && combinedData?.length) {
-                    setInvoiceData(
-                      //  data.map((el) => {
-                      combinedData.map((el) => {
-                        const { Accountname, Action, DocNumber, DocUrl, DocumentDetails, TotalCost, ValueDate } = el;
-                        return {
-                          DocUrl,
-                          Accountname,
-                          Action,
-                          ValueDate,
-                          TotalCost,
-                          DocNumber,
-                          DocumentDetails,
-                        };
-                      })
-                    );
-                    toggleUrlsModal(true);
-                  }
+                  //  console.log("getProgressBar data", data);
+
+                  //   console.log("preperd !!1", { combinedData });
 
                   const { amountFinished, totalToProcess } = stats;
                   if (totalToProcess > 0 && gotStats) {
+                    console.log({ newValue, amountFinished });
                     newValue = amountFinished * (100 / totalToProcess);
                   }
                 }
@@ -559,6 +559,7 @@ const AddCustomer = ({
             handleAction={handleSaving}
             action={savingAsAction}
             matrixName={matrixName}
+            isProduced={savedData?.isProduced}
           />
           <SaveModal
             isOpen={toUpdateDataModal}
@@ -566,6 +567,7 @@ const AddCustomer = ({
             handleAction={handleSaving}
             action={savingAction}
             matrixName={matrixName}
+            isProduced={savedData?.isProduced}
           />
           <LoadModal
             isOpen={toLoadDataModal}

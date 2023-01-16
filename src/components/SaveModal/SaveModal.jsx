@@ -3,26 +3,14 @@ import DatePicker from "../DatePicker";
 import Modal from "../../common/components/Modal/Modal";
 import { modalAction, savingAsAction, savingAction, copyMatrixAction } from "../../utils/constants";
 import { set } from "lodash";
-const assignFileVersion = (fileName) => {
-  const fileLan = fileName?.length;
-  if (!fileLan) return "";
-  const last9 = fileName.slice(fileLan - 9, fileLan);
-  const isDuplicated = last9.slice(0, 7) === "משוכפל_" ? true : false;
-  if (!isDuplicated) return `${fileName.slice(0, fileLan - 9)} משוכפל_01`;
 
-  const versionStr = last9.slice(7, 9);
-  const newVersionInt = parseInt(versionStr) + 1;
-
-  return `${fileName.slice(0, fileLan - 9)} משוכפל_${newVersionInt}`;
-};
-
-const SaveModal = ({ isOpen, toggleModal, handleAction, action, matrixName }) => {
-  console.log({ matrixName, action });
+const SaveModal = ({ isOpen, toggleModal, handleAction, action, matrixName, isProduced = false }) => {
+  console.log({ matrixName, action, isProduced });
   const [isBi, setIsBi] = useState(false);
   const [newMatrixName, setNewMatrixName] = useState("");
   const [dateValue, setDateValue] = useState(new Date());
 
-  useNameChecker(matrixName, setNewMatrixName, newMatrixName, assignFileVersion);
+  useNameChecker(matrixName, setNewMatrixName, newMatrixName, assignFileVersion, isProduced);
 
   const handleChange = () => {
     setIsBi(!isBi);
@@ -104,9 +92,22 @@ const SaveModal = ({ isOpen, toggleModal, handleAction, action, matrixName }) =>
 
 export default SaveModal;
 
-export const useNameChecker = (matrixName, setNewMatrixName, newMatrixName, assignFileVersion) => {
+const assignFileVersion = (fileName) => {
+  const fileLan = fileName?.length;
+  if (!fileLan) return "";
+  const last9 = fileName.slice(fileLan - 9, fileLan);
+  const isDuplicated = last9.slice(0, 7) === "משוכפל_" ? true : false;
+  if (!isDuplicated) return `${fileName.slice(0, fileLan - 9)} משוכפל_01`;
+
+  const versionStr = last9.slice(7, 9);
+  const newVersionInt = parseInt(versionStr) + 1;
+
+  return `${fileName.slice(0, fileLan - 9)} משוכפל_${newVersionInt}`;
+};
+
+export const useNameChecker = (matrixName, setNewMatrixName, newMatrixName, assignFileVersion, isProduced) => {
   useEffect(() => {
-    if (matrixName && newMatrixName == "") {
+    if (matrixName && newMatrixName == "" && isProduced) {
       console.log({ matrixName, newMatrixName });
       setNewMatrixName(assignFileVersion(matrixName));
     }

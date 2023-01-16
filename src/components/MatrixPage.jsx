@@ -398,11 +398,12 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     // ev.preventDefault();
     // return ev.returnValue = 'Do you want to save data before close?';
   };
-
+  const [_savedData, _setSavedData] = useState();
   useEffect(() => {
     (async () => {
       const currentUserID = getUserId();
       const savedData = await loadTablesAPI(axiosPrivate, currentUserID);
+      _setSavedData(savedData);
       if (savedData) {
         const matrixesUiData = savedData.matrixesUiData;
         loadData(matrixesUiData, setMatrixData, 0);
@@ -469,6 +470,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       />
 
       <AddCustomer
+        savedData={_savedData}
         customerName={customerName}
         setCustomerName={setCustomerName}
         addCustomerToTable={addCustomerToTable}
