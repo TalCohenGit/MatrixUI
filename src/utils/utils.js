@@ -1,9 +1,4 @@
-import {
-  numOfColBeforeProducts,
-  numOfColAfterProducts,
-  titleWithoutProduct,
-  produceDocAction,
-} from "./constants";
+import { numOfColBeforeProducts, numOfColAfterProducts, titleWithoutProduct, produceDocAction } from "./constants";
 import { logoutAPI } from "../api";
 import _ from "lodash";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
@@ -21,11 +16,7 @@ export const mapTable = (data, key) =>
     }
   });
 
-export const addProductsToBalanceTable = (
-  currentTableData,
-  data,
-  numCurrentProducts
-) => {
+export const addProductsToBalanceTable = (currentTableData, data, numCurrentProducts) => {
   if (!data.length) {
     return;
   }
@@ -39,26 +30,16 @@ export const addProductsToBalanceTable = (
   fieldsToMap.forEach((field, rowIndx) => {
     const tableData = mapTable(data, field.rowKey);
     const newRow = [
-      ...currentTableData[rowIndx].slice(
-        0,
-        numCurrentProducts + numOfColBeforeProducts
-      ),
+      ...currentTableData[rowIndx].slice(0, numCurrentProducts + numOfColBeforeProducts),
       ...tableData,
-      ...currentTableData[rowIndx].slice(
-        numCurrentProducts + numOfColBeforeProducts
-      ),
+      ...currentTableData[rowIndx].slice(numCurrentProducts + numOfColBeforeProducts),
     ];
     newBalanceTable.push(newRow);
   });
   return newBalanceTable;
 };
 
-export const deleteAllTables = (
-  setMatrixData,
-  setBalanceTableData,
-  setMatrixComments,
-  setSelectedProducts
-) => {
+export const deleteAllTables = (setMatrixData, setBalanceTableData, setMatrixComments, setSelectedProducts) => {
   setMatrixData([]);
   setBalanceTableData([]);
   setSelectedProducts([]);
@@ -78,47 +59,22 @@ export const createBalanceTable = (data) => {
       { rowHeader: "נותר", rowKey: "יתרה כמותית במלאי" },
     ];
   fieldsToMap.forEach((field) => {
-    tableRowData = [
-      null,
-      null,
-      field.rowHeader,
-      ...mapTable(data, field.rowKey),
-      null,
-      null,
-      null,
-      null,
-      null,
-    ];
+    tableRowData = [null, null, field.rowHeader, ...mapTable(data, field.rowKey), null, null, null, null, null];
     currentBalanceData.push(tableRowData);
   });
   return currentBalanceData;
 };
 
-export const updateBalanceTable = (
-  currentTableData,
-  productsToAdd,
-  productsData,
-  numCurrentProducts
-) => {
-  const selectedProducts = productsData.filter((product) =>
-    productsToAdd.includes(product["שם פריט"])
-  );
+export const updateBalanceTable = (currentTableData, productsToAdd, productsData, numCurrentProducts) => {
+  const selectedProducts = productsData.filter((product) => productsToAdd.includes(product["שם פריט"]));
   if (currentTableData.length === 0) {
     return createBalanceTable(selectedProducts);
   } else {
-    return addProductsToBalanceTable(
-      currentTableData,
-      selectedProducts,
-      numCurrentProducts
-    );
+    return addProductsToBalanceTable(currentTableData, selectedProducts, numCurrentProducts);
   }
 };
 
-export const removeColFromTable = (
-  colIndex,
-  numOfColBeforeProducts,
-  matrix
-) => {
+export const removeColFromTable = (colIndex, numOfColBeforeProducts, matrix) => {
   return matrix.map((row) => {
     let newArr;
     newArr = [
@@ -129,17 +85,9 @@ export const removeColFromTable = (
   });
 };
 
-export const removeProductCol = (
-  productIndx,
-  currentMatrix,
-  currentMatrixComments
-) => {
+export const removeProductCol = (productIndx, currentMatrix, currentMatrixComments) => {
   const newMatrixData = removeColFromTable(productIndx, 0, currentMatrix);
-  const newMatrixComments = removeColFromTable(
-    productIndx,
-    numOfColBeforeProducts,
-    currentMatrixComments
-  );
+  const newMatrixComments = removeColFromTable(productIndx, numOfColBeforeProducts, currentMatrixComments);
   return { newMatrixData, newMatrixComments };
 };
 
@@ -160,42 +108,24 @@ export const getInternationalNum = (phoneNum) => {
   return "972" + phoneNum.substring(1);
 };
 
-export const removeColFromBalanceTable = (
-  currentBalanceTable,
-  productsData,
-  productName
-) => {
-  const selectedProduct = productsData.filter(
-    (product) => productName === product["שם פריט"]
-  )[0];
-  const colIndexToRemove = currentBalanceTable[0].indexOf(
-    selectedProduct["מפתח פריט אב"]
-  );
+export const removeColFromBalanceTable = (currentBalanceTable, productsData, productName) => {
+  const selectedProduct = productsData.filter((product) => productName === product["שם פריט"])[0];
+  const colIndexToRemove = currentBalanceTable[0].indexOf(selectedProduct["מפתח פריט אב"]);
   return removeColFromTable(colIndexToRemove, 0, currentBalanceTable);
 };
-export const numOfProducts = (matrixLength) =>
-  matrixLength - titleWithoutProduct;
+export const numOfProducts = (matrixLength) => matrixLength - titleWithoutProduct;
 
 export const customerNumbers = (matrixData) => matrixData.length - 1;
 
-export const removeRowFromBalanceTable = (
-  balanceTableData,
-  tableRowToRemove
-) => {
+export const removeRowFromBalanceTable = (balanceTableData, tableRowToRemove) => {
   const newBalanceTable = [...balanceTableData];
 
   const productsNum = numOfProducts(tableRowToRemove.length);
   const inOrderRow = 2;
   const leftRow = 3;
-  for (
-    let i = numOfColBeforeProducts;
-    i < numOfColBeforeProducts + productsNum;
-    i++
-  ) {
-    newBalanceTable[inOrderRow][i] =
-      newBalanceTable[inOrderRow][i] - tableRowToRemove[i];
-    newBalanceTable[leftRow][i] =
-      newBalanceTable[leftRow][i] + tableRowToRemove[i];
+  for (let i = numOfColBeforeProducts; i < numOfColBeforeProducts + productsNum; i++) {
+    newBalanceTable[inOrderRow][i] = newBalanceTable[inOrderRow][i] - tableRowToRemove[i];
+    newBalanceTable[leftRow][i] = newBalanceTable[leftRow][i] + tableRowToRemove[i];
   }
   return newBalanceTable;
 };
@@ -204,28 +134,17 @@ export const getUniqProducts = (productsData) => {
   return _.uniqBy(productsData, "שם פריט");
 };
 
-export const getMatrixesData = async (
-  matrixData,
-  productsMap,
-  matrixComments,
-  action,
-  setCustomerValidationFailed
-) => {
-  const validatedData = handleMatrixData(
-    matrixData,
-    productsMap,
-    setCustomerValidationFailed,
-    action
-  );
+export const getMatrixesData = async (matrixData, productsMap, matrixComments, action, setCustomerValidationFailed) => {
+  console.log({ matrixData });
+  const validatedData = handleMatrixData(matrixData, productsMap, setCustomerValidationFailed, action);
   if (!validatedData) {
     return;
   }
-  const { cellsData, docCommentsToSend, metaDataToSend } =
-    handleCommentMatrixData(
-      matrixComments,
-      validatedData["docComments"],
-      validatedData["metaData"]
-    );
+  const { cellsData, docCommentsToSend, metaDataToSend } = handleCommentMatrixData(
+    matrixComments,
+    validatedData["docComments"],
+    validatedData["metaData"]
+  );
   return {
     validatedData,
     cellsData,
@@ -261,12 +180,7 @@ const setError = (setCustomerValidationFailed, errorMsg, customerName) => {
   }
 };
 
-export const handleMatrixData = (
-  tableData,
-  productsMap,
-  setCustomerValidationFailed,
-  action
-) => {
+export const handleMatrixData = (tableData, productsMap, setCustomerValidationFailed, action) => {
   let matrix = JSON.parse(JSON.stringify(tableData));
   const titleLength = matrix[0].length;
   let tableDetails = matrix.slice(1);
@@ -288,25 +202,15 @@ export const handleMatrixData = (
     const driverID = rowData.pop();
     const docId = rowData.pop();
     documentIDs.push(docId);
-    const validRow = rowData
-      .slice(numOfColBeforeProducts)
-      .find((element) => element !== 0);
+    const validRow = rowData.slice(numOfColBeforeProducts).find((element) => element !== 0);
     if (action === produceDocAction) {
       if (!validRow) {
-        setError(
-          setCustomerValidationFailed,
-          "שדות ריקים עבור הלקוח: ",
-          rowData[0]
-        );
+        setError(setCustomerValidationFailed, "שדות ריקים עבור הלקוח: ", rowData[0]);
         validationFailed = true;
         break;
       }
       if (!driverID || !actionID || !docId) {
-        setError(
-          setCustomerValidationFailed,
-          ":לא נבחרו כל השדות עבור הלקוח",
-          rowData[0]
-        );
+        setError(setCustomerValidationFailed, ":לא נבחרו כל השדות עבור הלקוח", rowData[0]);
         validationFailed = true;
         break;
       }
@@ -319,10 +223,7 @@ export const handleMatrixData = (
     return;
   }
 
-  const products = matrix[0].slice(
-    numOfColBeforeProducts,
-    titleLength - numOfColAfterProducts
-  );
+  const products = matrix[0].slice(numOfColBeforeProducts, titleLength - numOfColAfterProducts);
   const productsWithKeys = products.map((element) => productsMap[element]);
   matrix = [productsWithKeys, ...newTableDetails];
   return {
@@ -357,17 +258,9 @@ export const loadAllMatrixesData = (matrixesUiData, setArr) => {
 const formatDateSearch = (startDate, endDate) => {
   startDate = new Date(startDate);
   endDate = new Date(endDate);
-  let [sYear, sMonth, sDay] = [
-    startDate.getFullYear(),
-    startDate.getMonth() + 1,
-    startDate.getDate(),
-  ];
+  let [sYear, sMonth, sDay] = [startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate()];
 
-  let [eYear, eMonth, eDay] = [
-    endDate.getFullYear(),
-    endDate.getMonth() + 1,
-    endDate.getDate(),
-  ];
+  let [eYear, eMonth, eDay] = [endDate.getFullYear(), endDate.getMonth() + 1, endDate.getDate()];
   sDay = sDay < 10 ? "0" + sDay : sDay;
   eDay = sDay < 10 ? "0" + eDay : eDay;
   sMonth = sMonth < 10 ? "0" + sMonth : sMonth;
@@ -383,8 +276,6 @@ const formatDateSearch = (startDate, endDate) => {
   };
 };
 
-
-
 export const getFormattedDates = (fromDate, toDate) => {
   const { startDate, endDate } = formatDateSearch(fromDate, toDate);
   return { startDate, endDate };
@@ -392,17 +283,11 @@ export const getFormattedDates = (fromDate, toDate) => {
 
 const handleComments = (comments) => {
   const commentsObj = {};
-  comments.forEach(
-    (comment) => (commentsObj[comment["selectValue"]] = comment["inputValue"])
-  );
+  comments.forEach((comment) => (commentsObj[comment["selectValue"]] = comment["inputValue"]));
   return commentsObj;
 };
 
-export const handleCommentMatrixData = (
-  matrixComments,
-  docComments,
-  metaData
-) => {
+export const handleCommentMatrixData = (matrixComments, docComments, metaData) => {
   const cellsData = [];
   const docCommentsToSend = [];
   const metaDataToSend = [];
@@ -433,9 +318,7 @@ export const handleCommentMatrixData = (
 
 export const getProductsNameKeyMap = (products) => {
   const productNameKey = {};
-  products.map(
-    (element) => (productNameKey[element["שם פריט"]] = element["מפתח פריט"])
-  );
+  products.map((element) => (productNameKey[element["שם פריט"]] = element["מפתח פריט"]));
   return productNameKey;
 };
 
@@ -443,42 +326,33 @@ export const getItemNames = (itemsKeys, productsMap) => {
   const itemsNameArr = [];
 
   itemsKeys.forEach((itemKey) => {
-    const productName = Object.keys(productsMap).find(
-      (key) => productsMap[key] === itemKey
-    );
+    const productName = Object.keys(productsMap).find((key) => productsMap[key] === itemKey);
     itemsNameArr.push(productName);
   });
   return itemsNameArr;
 };
 
-
-export const getMatrixesDataObj = (
-  matrixID,
-  tableData,
-  cellsData,
-  docData,
-  metaData,
-  productsMap
-) => {
+export const getMatrixesDataObj = (matrixID, tableData, cellsData, docData, metaData, productsMap) => {
   const { matrix, driverIDs, actionIDs, documentIDs, acountKeys } = tableData;
+  console.log({ tableData });
   const actionAutho = [];
   // const documentIDsMock = [];
   for (var i = 0; i < driverIDs.length; i++) {
     actionAutho.push("Default");
     // documentIDsMock.push(1);
   }
-  console.log("getMatrixesDataObj matrix", matrix)
+  console.log("getMatrixesDataObj matrix", matrix);
 
   const itemHeaders = matrix[0];
   if (itemHeaders?.length && itemHeaders[0] === null) {
-    console.log("problem with itemHeaders:", itemHeaders)
-    return
+    console.log("problem with itemHeaders:", itemHeaders);
+    return;
   }
 
-  const itemsNames = getItemNames(itemHeaders, productsMap)
+  const itemsNames = getItemNames(itemHeaders, productsMap);
   if (itemsNames?.length && (itemsNames[0] === null || itemsNames[0] === "לקוח")) {
-    console.log("problem with itemsNames:", itemsNames)
-    return
+    console.log("problem with itemsNames:", itemsNames);
+    return;
   }
 
   return {
