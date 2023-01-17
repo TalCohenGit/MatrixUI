@@ -46,6 +46,8 @@ const AddCustomer = ({
   matrixDate,
   setMatrixDate,
   copyMatrix,
+  newMatrixName,
+  setNewMatrixName,
 }) => {
   const {
     toggleList,
@@ -83,6 +85,7 @@ const AddCustomer = ({
     show: false,
     text: produceError,
   });
+
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
   const [isUrlModalSearch, toggleUrlsSearchModal] = useState(false);
   const [invoiceData, setInvoiceData] = useState([]);
@@ -104,6 +107,36 @@ const AddCustomer = ({
   const [stepsAfterProduce, toggleStepsAfterProduce] = useState(false);
 
   const productsOptions = [];
+  /******** * REGULAR PR OBJECT     */
+  //  {
+  //   data: null,
+  //   termenate: false,
+  //   stageName: "c",
+  //   msg: "נשמר בהצלחה",
+  //   errors: "no errors",
+  //   gotStats: false,
+  //   stats: { amountFinished: 0, totalToProcess: 0 },
+  // };
+
+  /******** * PR OBJECT WITH START OF ERROR    */
+  // let newd = {
+  //   data: "no",
+  //   termenate: true,
+  //   stageName: "serverError",
+  //   msg: "serverError",
+  //   errors: [
+  //     {
+  //       path: "matrixID",
+  //       error: "missing",
+  //     },
+  //     {
+  //       path: "matrixesData.mainMatrix",
+  //       error: "unequal arrays length",
+  //     },
+  //   ],
+  //   gotStats: false,
+  //   stats: { amountFinished: 0, totalToProcess: 0 },
+  // };
 
   const setUrlsTableValues = (combinedData) => {
     setInvoiceData(
@@ -135,7 +168,6 @@ const AddCustomer = ({
 
   const getProgressBar = async (rowsNumber, fileName) => {
     let combinedData = [];
-    let isPreperd = false;
     let newValue = 0;
 
     return await getProgressBarAPI(rowsNumber, fileName)
@@ -149,38 +181,30 @@ const AddCustomer = ({
             function push() {
               // "done" is a Boolean and value a "Uint8Array"
               reader.read().then(({ done, value }) => {
+                //    let serverError = value ? new TextDecoder(value) : null;
+
                 // If there is no more data to read
                 if (done) {
                   setUrlsTableValues(combinedData);
-                  console.log("done", value);
                   controller.close();
                 }
                 // Get the data and send it to the browser via the controller
                 controller.enqueue(value);
                 // Check chunks by logging to the console
 
-                const decodedValue = new TextDecoder("utf-8").decode(value);
+                const decodedValue = new TextDecoder().decode(value);
                 console.log("decodedValue", decodedValue);
+
                 let { stats, gotStats, data, stageName } = JSON.parse(decodedValue);
-                if (stageName === "finish") {
-                  newValue = 100;
-                } else {
-                  if (!isPreperd && data) {
-                    combinedData.push(data);
-                    //  console.log("combined !!!!", { combinedData });
-                  }
-
-                  //  console.log("getProgressBar data", data);
-
-                  //   console.log("preperd !!1", { combinedData });
+                if (stageName === "finish") newValue = 100;
+                else {
+                  if (data) combinedData.push(data);
 
                   const { amountFinished, totalToProcess } = stats;
                   if (totalToProcess > 0 && gotStats) {
-                    console.log({ newValue, amountFinished });
                     newValue = amountFinished * (100 / totalToProcess);
                   }
                 }
-
                 setProgressValue(newValue);
                 push();
               });
@@ -266,8 +290,8 @@ const AddCustomer = ({
 
   const deleteAllMatrixDate = () => {
     deleteAllTables(setMatrixData, setBalanceTableData, setMatrixComments, setSelectedProducts);
-    setMatrixName("");
-    setMatrixDate("");
+
+    setMatrixDate(new Date());
   };
 
   const deleteMatrix = async () => {
@@ -488,9 +512,10 @@ const AddCustomer = ({
     toggleStepsAfterProduce(false);
   };
 
-  const createNewMatrix = () => {
-    console.log("creating new matrix");
+  const createNewMatrix = (name) => {
+    console.log("creating new matrix", name);
     deleteAllMatrixDate();
+    setMatrixName(name);
     setMatrixID("");
     toggleStepsAfterProduce(false);
   };
@@ -533,6 +558,10 @@ const AddCustomer = ({
             afterProduce={true}
             onNewMatrix={createNewMatrix}
             action={copyMatrixAction}
+            matrixName={matrixName}
+            isProduced={savedData?.isProduced}
+            setNewMatrixName={setNewMatrixName}
+            newMatrixName={newMatrixName}
           />
           <ListModal
             isOpen={isUrlsModalOpen}
@@ -551,22 +580,24 @@ const AddCustomer = ({
             toggleModal={toggleDetailsToCopyModal}
             handleAction={copyMatrix}
             action={copyMatrixAction}
+            newMatrixName={newMatrixName}
+            setNewMatrixName={setNewMatrixName}
           />
           <SaveModal
             isOpen={toSaveDataModal}
             toggleModal={toggleToSaveDataModal}
             handleAction={handleSaving}
             action={savingAsAction}
-            matrixName={matrixName}
-            isProduced={savedData?.isProduced}
+            newMatrixName={newMatrixName}
+            setNewMatrixName={setNewMatrixName}
           />
           <SaveModal
             isOpen={toUpdateDataModal}
             toggleModal={toggleToUpdateDataModal}
             handleAction={handleSaving}
             action={savingAction}
-            matrixName={matrixName}
-            isProduced={savedData?.isProduced}
+            newMatrixName={newMatrixName}
+            setNewMatrixName={setNewMatrixName}
           />
           <LoadModal
             isOpen={toLoadDataModal}

@@ -85,7 +85,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     isInProgress,
     progressValue,
   } = useContext(DataContext);
-
+  const [newMatrixName, setNewMatrixName] = useState("");
   const [isOpenValidationModal, toggleValidationModal] = useState(false);
   const [validationErrors, setValidationError] = useState([]);
   const axiosPrivate = useAxiosPrivate();
@@ -467,9 +467,13 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
         handleAction={copyMatrix}
         action={copyMatrixAction}
         matrixName={matrixName}
+        newMatrixName={newMatrixName}
+        setNewMatrixName={setNewMatrixName}
       />
 
       <AddCustomer
+        newMatrixName={newMatrixName}
+        setNewMatrixName={setNewMatrixName}
         savedData={_savedData}
         customerName={customerName}
         setCustomerName={setCustomerName}
