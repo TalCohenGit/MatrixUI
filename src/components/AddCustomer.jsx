@@ -316,7 +316,16 @@ const AddCustomer = ({
       });
       return;
     }
+
     const validatedData = handleMatrixData(matrixData, productsMap, setCustomerValidationFailed, produceDocAction);
+
+    const validatedData = handleMatrixData(
+      matrixData,
+      productsMap,
+      produceDocAction,
+      setCustomerValidationFailed
+    );
+
     if (!validatedData) {
       return;
     }

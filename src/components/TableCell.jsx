@@ -139,6 +139,9 @@ const TableCell = (props) => {
           balanceTableData?.length > 0 && balanceTableData[3][colIndex] < 0
             ? "red"
             : "black",
+         position: colIndex === 0 && "sticky",  
+         right: colIndex === 0 && 0,   
+         zIndex: colIndex === 0 && 1,
       }}
     >
       {cellType}
