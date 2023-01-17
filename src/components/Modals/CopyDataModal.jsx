@@ -14,6 +14,7 @@ const CopyDataModal = ({
   isProduced,
   setNewMatrixName,
   newMatrixName,
+  setMatrixName,
 }) => {
   const handlePrefixedName = (e) => {
     const saveType = e.target.id;
@@ -83,18 +84,21 @@ const assignFileVersion = (fileName) => {
   return ctr;
 };
 
-function useNameChecker(matrixName, setNewMatrixName, newMatrixName, isProduced, saveType, onNewMatrix) {
+export function useNameChecker(matrixName, setNewMatrixName, newMatrixName, isProduced, saveType, onNewMatrix) {
   console.log("useNameChecker ", { matrixName, newMatrixName, saveType, isProduced });
 
   if (matrixName) {
     console.log({ matrixName, newMatrixName });
     let isNewMatrix = matrixName.slice(0, 10);
     console.log({ isNewMatrix });
-    if ((saveType == "save-new-as" && matrixName.slice(0, 10) == "מטריצה חדשה") || saveType == "duplicate") {
+    if (
+      (saveType == "save-new-as" && matrixName.slice(0, 10) == "מטריצה חדשה") ||
+      saveType == "duplicate" ||
+      saveType == "onload"
+    ) {
       setNewMatrixName(assignFileVersion(matrixName, saveType));
     } else {
-      setNewMatrixName("מטריצה חדשה לתאריך " + new Date());
-      onNewMatrix("מטריצה חדשה לתאריך " + new Date());
+      onNewMatrix("מטריצה חדשה לתאריך " + new Date().toLocaleString());
     }
   } else {
     console.log("did not pass");

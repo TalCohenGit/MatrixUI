@@ -19,6 +19,9 @@ const SaveModal = ({
 
   const [dateValue, setDateValue] = useState(new Date());
 
+  useEffect(() => {
+    setNewMatrixName(matrixName);
+  }, [matrixName]);
   const handleChange = () => {
     setIsBi(!isBi);
   };

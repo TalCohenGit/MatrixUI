@@ -560,6 +560,7 @@ const AddCustomer = ({
             action={copyMatrixAction}
             matrixName={matrixName}
             isProduced={savedData?.isProduced}
+            setMatrixName={setMatrixName}
             setNewMatrixName={setNewMatrixName}
             newMatrixName={newMatrixName}
           />
@@ -576,6 +577,7 @@ const AddCustomer = ({
             invoices={searchedInvoices}
           />
           <SaveModal
+            matrixName={matrixName}
             isOpen={detailsToCopyModal}
             toggleModal={toggleDetailsToCopyModal}
             handleAction={copyMatrix}
@@ -584,6 +586,7 @@ const AddCustomer = ({
             setNewMatrixName={setNewMatrixName}
           />
           <SaveModal
+            matrixName={matrixName}
             isOpen={toSaveDataModal}
             toggleModal={toggleToSaveDataModal}
             handleAction={handleSaving}
@@ -592,6 +595,7 @@ const AddCustomer = ({
             setNewMatrixName={setNewMatrixName}
           />
           <SaveModal
+            matrixName={matrixName}
             isOpen={toUpdateDataModal}
             toggleModal={toggleToUpdateDataModal}
             handleAction={handleSaving}
@@ -614,6 +618,7 @@ const AddCustomer = ({
             setNoResults={setNoResults}
             Component={
               <SearchMatrixes
+                setNewMatrixName={setMatrixName}
                 matrixesDetails={matrixesDetails}
                 loadTablesByID={loadTablesByID}
                 noResults={noResults}
