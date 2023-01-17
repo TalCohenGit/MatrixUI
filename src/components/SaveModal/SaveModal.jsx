@@ -85,6 +85,10 @@ const SaveModal = ({
             ((action === savingAsAction || action === copyMatrixAction) && !newMatrixName?.length ? " disabled" : "")
           }
           onClick={() => {
+            if (action === savingAsAction && newMatrixName === matrixName) {
+              setNewMatrixName('שם חייב להיות שונה מקובץ המקור"');
+              return console.log("שם חייב להיות שונה מקובץ המקור");
+            }
             let martrixNameToSave = newMatrixName;
             if (!martrixNameToSave) {
               martrixNameToSave = matrixName;
