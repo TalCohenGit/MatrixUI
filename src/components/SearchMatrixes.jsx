@@ -1,7 +1,7 @@
 import { set } from "lodash";
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
-import { useNameChecker } from "./Modals/CopyDataModal";
+import { nameChecker } from "./Modals/CopyDataModal";
 import NoResults from "./NoResults";
 
 const SearchMatrixes = ({ matrixesDetails, loadTablesByID, noResults, isMatrixNames, setNewMatrixName }) => {
@@ -19,7 +19,7 @@ const SearchMatrixes = ({ matrixesDetails, loadTablesByID, noResults, isMatrixNa
       console.log({ matrixesDetails, selectedMatrix });
       const name = matrixesDetails.filter((matrix) => matrix.matrixID === selectedMatrix)[0].matrixName;
       console.log({ name });
-      useNameChecker(name, setNewMatrixName, "", true, "onload");
+      nameChecker(name, setNewMatrixName, "", true, "onload");
       setUpdateName(true);
     }
   }, [selectedMatrix, updateName]);

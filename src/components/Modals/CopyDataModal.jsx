@@ -19,7 +19,7 @@ const CopyDataModal = ({
   const handlePrefixedName = (e) => {
     const saveType = e.target.id;
     if (saveType == "save-new-as" || saveType == "duplicate")
-      useNameChecker(matrixName, setNewMatrixName, newMatrixName, isProduced, saveType, onNewMatrix);
+      nameChecker(matrixName, setNewMatrixName, newMatrixName, isProduced, saveType, onNewMatrix);
   };
   return (
     <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={modalHeader} action={action}>
@@ -84,7 +84,7 @@ const assignFileVersion = (fileName) => {
   return ctr;
 };
 
-export function useNameChecker(matrixName, setNewMatrixName, newMatrixName, isProduced, saveType, onNewMatrix) {
+export function nameChecker(matrixName, setNewMatrixName, newMatrixName, isProduced, saveType, onNewMatrix) {
   console.log("useNameChecker ", { matrixName, newMatrixName, saveType, isProduced });
 
   if (matrixName) {
