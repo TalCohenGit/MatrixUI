@@ -84,8 +84,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     calcProductsSum,
     isInProgress,
     progressValue,
+    newMatrixName,
+    setNewMatrixName
   } = useContext(DataContext);
-  const [newMatrixName, setNewMatrixName] = useState("");
   const [isOpenValidationModal, toggleValidationModal] = useState(false);
   const [validationErrors, setValidationError] = useState([]);
   const axiosPrivate = useAxiosPrivate();
