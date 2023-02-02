@@ -6,8 +6,13 @@ const ConfigPageTable = ({ value, setValue }) => {
  
   const handleRadioChange = (e) => {
     const { value: newValue, name } = e.target;
-    setValue({ ...value, [name]: {input:"",radio:newValue }});
+    setValue({ ...value, [name]: {...value[name],input:"",radio:newValue }});
   };
+
+  const handleDataTypeChange = (e) => {
+    const { value: newValue, name } = e.target;
+    setValue({ ...value, [name]: {...value[name],input:"",dataType:newValue }});
+  }
 
   const handleInputChange = (e) => {
     const { value: newValue, name } = e.target;
@@ -20,26 +25,13 @@ const ConfigPageTable = ({ value, setValue }) => {
         secondCell={"מפתח מיון"}
       />
       <ConfigPageTableRow
-        firstCell={"פריטים"}
+        firstCell={<p className="row-tag">פריטים</p>}
         secondCell={
           <ConfigPageRadioCell
             value={value}
             onChange={handleRadioChange}
-            label="מחסן"
-            name="warehouse"
-            onInputChange={handleInputChange}
-            setValue={setValue}
-          
-          />
-        }
-      />
-      <ConfigPageTableRow
-        firstCell={"פריטים"}
-        secondCell={
-          <ConfigPageRadioCell
-            value={value}
-            onChange={handleRadioChange}
-            label="קוד מיון"
+            onDataTypeChange={handleDataTypeChange}
+            // label="קוד מיון"
             name="detailsCode"
             onInputChange={handleInputChange}
             setValue={setValue}
@@ -48,7 +40,7 @@ const ConfigPageTable = ({ value, setValue }) => {
         }
       />
       <ConfigPageTableRow
-        firstCell={"לקוחות"}
+        firstCell={<p className="row-tag">לקוחות</p>}
         secondCell={
           <ConfigPageRadioCell
             value={value}

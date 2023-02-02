@@ -451,6 +451,16 @@ export const sendMsgsAPI = async (numbers, msgs) => {
   }
 };
 
+export const setConfigAPI = async (configObj) => {
+  try {
+    await axiosRegister.post("/api/setConfig", {
+      configObj
+    });
+  } catch (e) {
+    console.log("error in setConfigAPI: ", e);
+  }
+};
+
 export const getProgressBarAPI = async (axiosPrivate, fileName) => {
   try {
     return await fetch(`${matrixServerURL}api/getProgressBar`, {

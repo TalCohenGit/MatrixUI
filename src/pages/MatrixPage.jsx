@@ -43,11 +43,10 @@ import {
   copyMatrixAction,
 } from "../utils/constants";
 import Modal from "../common/components/Modal/Modal";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 import ProgressBar from "../components/ProgressBar/ProgressBar";
 
-function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
+function MatrixPage({ seconds, setSeconds, setRefreshToken, axiosPrivate}) {
   const {
     matrixData,
     setMatrixData,
@@ -88,7 +87,6 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   const [isOpenValidationModal, toggleValidationModal] = useState(false);
   const [validationErrors, setValidationError] = useState([]);
-  const axiosPrivate = useAxiosPrivate();
   const [toCopyDataModal, toggleToCopyDataModal] = useState(false);
   const [dataToLoad, setDataToLoad] = useState({
     matrixName: "",

@@ -6,8 +6,9 @@ import Checkbox from "@mui/material/Checkbox";
 import { useLocation } from "react-router-dom";
 import RegisterConfigUserDetails from "../components/RegisterConfigUserDetails";
 import ConfigPageTable from "../components/ConfigPageTable";
+import { setConfigAPI } from "../api";
 
-const ConfigPage = () => {
+const ConfigPage = ({ axiosPrivate }) => {
   const initialState = {
     value: "none",
     label: "ללא",
@@ -19,35 +20,177 @@ const ConfigPage = () => {
   const [isRefoundMaxAmount, setIsRefoundMaxAmount] = useState(false);
   const [refoundMaxAmount, setRefoundMaxAmount] = useState(null);
   const [value, setValue] = useState({
-    warehouse: { radio: "singleChoice", input: "" },
-    detailsCode: { radio: "singleChoice", input: "" },
-    customersCode: { radio: "singleChoice", input: "" },
+    // warehouse: { radio: "single", input: "" },
+    detailsCode: { radio: "single", dataType: "sort", input: "" },
+    customersCode: { radio: "single", input: "" },
   });
-  
+
   const location = useLocation();
-  const { inputs,from } = location.state || {};
-  console.log("location",location?.state)
-  const saveConfig = () => {
+  const { inputs, from, erpName } = location.state || {};
+  console.log("location", location?.state);
+
+  const parseTableInput = (str) => {
+    let splitingChar = "-";
+    if (str.includes(",")) {
+      splitingChar = ",";
+    }
+    return str.split(splitingChar).map((el) => Number(el));
+  };
+
+  const handleChange = (e) => {
+    setSelectedDoc(e);
+  };
+  // const config = new Schema(
+  //   {
+  //     userID: { type: String, required: true },
+  //     AccountState: String,
+  //     ModulsPremission: {
+  //       BiziRoutes: {
+  //         isAllow: Boolean,
+  //         pivotType: String,
+  //         mtxPreferences: {
+  //           isDefault: { type: Boolean, default: false },
+  //           pivotKey: Number,
+  //         },
+  //       },
+  //       Messages: {
+  //         whatsApp: {
+  //           isAllow: Boolean,
+  //           remainingSum: Number,
+  //         },
+  //       },
+  //     },
+
+  //     mtxConfig: {
+  //       documentDef: {
+  //         isDefault: { type: Boolean, default: false },
+  //         DocumentNumber: String,
+  //       },
+  //       docLimit: { isLimited: Boolean, Amount: Number },
+  //       sumLimit: { isLimited: Boolean, Amount: Number },
+  //       taxDocs: {
+  //         isAllow: Boolean,
+  //         Refund: {
+  //           isAllow: {
+  //             type: Boolean,
+  //             default: true,
+  //           },
+  //           isLimited: {
+  //             type: Boolean,
+  //             default: false,
+  //           },
+
+  //           Amount: Number,
+  //         },
+  //         Discount: { isAllow: Boolean, isLimited: Boolean, Amount: Number },
+  //         ObligoPass: { isAllow: Boolean },
+  //       },
+  //     },
+  //     // {sortKey:"sort"|"storage",type: "range"|"multi",data:[...theData] }
+  //     Reports: {
+  //       defaultReports: {
+  //         castumers: {
+  //           sortingKey: { type: String, enum: "sort" },
+  //           sortingType: { type: String, enum: "range" | "multi" | "single" },
+  //           sortingValue: { type: Array },
+  //         },
+  //         products: {
+  //           sortingKey: { type: String, enum: "sort" | "storage" },
+  //           sortingType: { type: String, enum: "range" | "multi" | "single" },
+  //           sortingValue: { type: Array },
+  //         },
+  //       },
+  //     },
+  //     ErpConfig: {
+  //       erpName: { type: String, enum: "HA" | "RI", required: true },
+  //       CompanyKey: { type: String, default: tempKey },
+  //       CompanyServer: { type: String, default: tempServer },
+  //       CompanyDbName: { type: String, default: tempDbName },
+  //       CompanyPassword: String,
+  //       CompanyUserName: String,
+  //       CompanyNumber: String,
+  //     },
+
+  //   },
+  //   { timestamps: true, strict: true, strictQuery: false }
+  // );
+
+  // hToken: "",
+  // hServerName: "",
+  // hDbName: "",
+  const saveConfig = async () => {
     const configData = {
+      ErpConfig: {
+        erpName,
+        CompanyKey: inputs?.hToken,
+        CompanyServer: inputs?.hServerName,
+        CompanyDbName: inputs?.hDbName,
+      },
+      Reports: {
+        defaultReports: {
+          castumers: {
+            sortingKey: "sort",
+            sortingType: value.customersCode.radio,
+            sortingValue: parseTableInput(value.customersCode.input),
+          },
+          products: {
+            sortingKey: value.detailsCode.dataType,
+            sortingType: value.detailsCode.radio,
+            sortingValue: parseTableInput(value.detailsCode.input),
+          },
+        },
+      },
+      mtxConfig: {
+        // documentDef: {
+        //   isDefault: { type: Boolean, default: false },
+        //   DocumentNumber: String,
+        // },
+        docLimit: {
+          isLimited: docsAmount > 0,
+          Amount: docsAmount ? Number(docsAmount) : null,
+        },
+        // sumLimit: { isLimited: Boolean, Amount: Number },
+        taxDocs: {
+          isAllow: isRefoundMaxAmount,
+          Refund: {
+            // isAllow: {
+            //   type: Boolean,
+            //   default: true,
+            // },
+            // isLimited: {
+            //   type: Boolean,
+            //   default: false,
+            // },
+
+            Amount: refoundMaxAmount,
+          },
+          // Discount: { isAllow: Boolean, isLimited: Boolean, Amount: Number },
+          // ObligoPass: { isAllow: Boolean },
+        },
+      },
       selectedDoc: selectedDoc["value"], //string
       selectedAction: selectedAction["value"], //string
       docsAmount: docsAmount ? Number(docsAmount) : null, // number
       refoundMaxAmount: refoundMaxAmount ? Number(refoundMaxAmount) : null, // number
-      warehouse: value.warehouse.input.split('-').map(el=>Number(el)), // array of numbers
-      detailsCode: value.detailsCode.input.split('-').map(el=>Number(el)), // array of numbers
-      customersCode: value.customersCode.input.split('-').map(el=>Number(el)), // array of numbers
+      detailsCode: value.detailsCode.input.split("-").map((el) => Number(el)), // array of numbers
+      customersCode: value.customersCode.input
+        .split("-")
+        .map((el) => Number(el)), // array of numbers
       erpSelect: {
-        ...inputs
-      }
-
+        ...inputs,
+      },
     };
-    console.log("configData",configData,from.pathname)
+    console.log("configData", configData, from.pathname);
+    await setConfigAPI(configData);
   };
 
-  if(location?.state?.from?.pathname !== "/erp") {
-    return <h1 style={{textAlign:"center"}}>Please go to login page and start the registration process</h1>
+  if (location?.state?.from?.pathname !== "/erp") {
+    return (
+      <h1 style={{ textAlign: "center" }}>
+        Please go to login page and start the registration process
+      </h1>
+    );
   }
-
 
   return (
     <div className="config-page">
@@ -96,15 +239,12 @@ const ConfigPage = () => {
           />
         )}
       </div>
-      <ConfigPageTable
-        value={value}
-        setValue={setValue}
-      />
+      <ConfigPageTable value={value} setValue={setValue} />
       <RegisterConfigUserDetails location={location} />
       <button
         className="next-button"
         onClick={(e) => {
-          saveConfig()
+          saveConfig();
         }}
       >
         המשך לעמוד הבא

@@ -5,8 +5,12 @@ import Login from "./pages/Login";
 import ErpSelect from "./pages/ErpSelect";
 import Register from "./pages/Register";
 import ConfigPage from "./pages/ConfigPage";
+import useAxiosPrivate from "./hooks/useAxiosPrivate";
+
 
 const App = () => {
+  const axiosPrivate = useAxiosPrivate();
+
   const [refreshToken, setRefreshToken] = useState("");
   const [seconds, setSeconds] = useState(0);
 
@@ -28,6 +32,7 @@ const App = () => {
         seconds={seconds}
         setSeconds={setSeconds}
         setRefreshToken={setRefreshToken}
+        axiosPrivate={axiosPrivate}
       />
     );
 
@@ -37,7 +42,7 @@ const App = () => {
         <Route exact path="/" element={MainPage} />
         <Route path="/erp" element={<ErpSelect/>}/>
         <Route path="/register" element={<Register/>}/>
-        <Route path="/config" element={<ConfigPage/>}/>
+        <Route path="/config" element={<ConfigPage axiosPrivate={axiosPrivate}/>}/>
       </Routes>
     </div>
   );

@@ -30,10 +30,19 @@ const ErpSelect = () => {
     console.log("inputs", name, value, inputs);
   };
 
+  const nextPageValidation = () =>  {
+    let isValid = false;
+    if(value === "hashvsevet"){
+      isValid = Object.keys(inputs).every(field => inputs[field]?.length)
+    }
+    
+  return isValid
+  }
+  
   const handleNextClick = (event) => {
     event.preventDefault();
     
-    navigate("/config",{state:{firstName,lastName,userEmail,from:location,inputs}});
+    navigate("/config",{state:{firstName,lastName,userEmail,from:location,inputs,erpName: value === "hashvsevet" ? "HA" : "RI"}});
   };
 
   return (
@@ -88,7 +97,7 @@ const ErpSelect = () => {
         <div />
       )}
       <button
-        className="next-button"
+        className={"next-button" + (!nextPageValidation() ? " btnDisabled" : "")}
         onClick={(e) => {
           handleNextClick(e);
         }}

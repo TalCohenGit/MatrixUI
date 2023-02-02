@@ -11,12 +11,9 @@ const ConfigPageRadioCell = ({
   name,
   onInputChange,
   setValue,
+  onDataTypeChange,
 }) => {
   const [rangeInput, setRangeInput] = useState({
-    warehouse: {
-      start: "",
-      end: "",
-    },
     detailsCode: {
       start: "",
       end: "",
@@ -26,6 +23,7 @@ const ConfigPageRadioCell = ({
       end: "",
     },
   });
+  const [multiInput, setMultiInput] = useState("");
 
   console.log("value", value);
 
@@ -38,7 +36,7 @@ const ConfigPageRadioCell = ({
   };
 
   useEffect(() => {
-    if (value[name].radio !== "singleChoice") {
+    if (value[name].radio !== "single") {
       setValue({
         ...value,
         [name]: {
@@ -49,52 +47,88 @@ const ConfigPageRadioCell = ({
     }
   }, [rangeInput]);
 
-  return (
-    <>
-      <div
-       
-        className="config-page-range-cell"
-      >
-        <RadioGroup value={value[name].radio} onChange={onChange} name={name}>
-          <FormControlLabel
-            value="singleChoice"
-            control={<Radio />}
-            label="בודד"
-          />
-          <FormControlLabel value="range" control={<Radio />} label="טווח" />
-        </RadioGroup>
-        <p>{label}</p>
-      </div>
-      <div className="config-page-row-table-cell-inputs">
-        {value[name].radio === "singleChoice" ? (
-          <Input
+  let inputToShow;
+
+  switch (value[name].radio) {
+    case "single":
+      inputToShow = (
+        <Input
           style={{ width: "80px" }}
-            name={name}
-            onChange={onInputChange}
-            value={value[name].input}
+          name={name}
+          onChange={onInputChange}
+          value={value[name].input}
+          type="number"
+        />
+      );
+
+      break;
+    case "range":
+      inputToShow = (
+        <div>
+          <Input
+            style={{ width: "40px" }}
+            name="end"
+            onChange={(e) => {
+              handleRangeInput(e);
+            }}
             type="number"
           />
-        ) : (
-          <div>
-            <Input
-              style={{ width: "40px" }}
-              name="end"
-              onChange={(e) => {
-                handleRangeInput(e);
-              }}
-              type="number"
+          &nbsp; -&nbsp;
+          <Input
+            style={{ width: "40px" }}
+            name="start"
+            onChange={(e) => {
+              handleRangeInput(e);
+            }}
+            type="number"
+          />{" "}
+        </div>
+      );
+      break;
+    case "multi":
+      inputToShow = (
+        <Input
+          style={{ width: "90%" }}
+          name={name}
+          onChange={onInputChange}
+          value={value[name].input}
+          type="text"
+          placeholder="0,2,5,20,31 ..."
+        />
+      );
+      break;
+    default:
+      inputToShow = null;
+  }
+
+  const hasDataType = value[name]?.dataType?.length;
+  console.log("dddd", value[name].dataType);
+  return (
+    <>
+      <div className="config-page-range-cell">
+        <RadioGroup value={value[name].radio} onChange={onChange} name={name}>
+          <FormControlLabel value="single" control={<Radio />} label="בודד" />
+          <FormControlLabel value="range" control={<Radio />} label="טווח" />
+          <FormControlLabel value="multi" control={<Radio />} label="ריבוי" />
+        </RadioGroup>
+        {!hasDataType && <p>{label}</p>}
+        {hasDataType && (
+          <RadioGroup
+            value={value[name].dataType}
+            onChange={onDataTypeChange}
+            name={name}
+          >
+            <FormControlLabel value="sort" control={<Radio />} label="מיון" />
+            <FormControlLabel
+              value="storage"
+              control={<Radio />}
+              label="מחסן"
             />
-            &nbsp; -&nbsp;
-            <Input
-              style={{ width: "40px" }}
-              name="start"
-              onChange={(e) => {
-                handleRangeInput(e);
-              }}
-              type="number"
-            />{" "}
-          </div>
+          </RadioGroup>
         )}
+      </div>
+      <div className="config-page-row-table-cell-inputs">
+        {inputToShow}
       </div>
     </>
   );

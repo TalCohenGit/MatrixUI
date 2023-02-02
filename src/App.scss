@@ -528,10 +528,12 @@ input[type="checkbox"] {
 
 .details-box {
   position: absolute;
+  direction: rtl;
   padding: 15px;
-  bottom: 300px;
+  top: -130px;
   text-align: start;
-  right: -300px;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 18px;
   font-family: "Roboto", "Helvetica", "Arial", sans-serif;
   p {
@@ -583,7 +585,7 @@ input[type="checkbox"] {
       &-cell {
         min-width: 250px;
         border: 1px solid black;
-
+       
         &-inputs {
           display: flex;
           margin: 10px;
@@ -592,4 +594,16 @@ input[type="checkbox"] {
       }
     }
   }
+}
+
+
+.row {
+  &-tag {
+      margin-top: 55px;
+  }
+}
+
+.btnDisabled {
+  opacity: 0.5;
+  pointer-events: none;
 }
