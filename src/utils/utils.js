@@ -135,7 +135,6 @@ export const getUniqProducts = (productsData) => {
 };
 
 export const getMatrixesData = async (matrixData, productsMap, matrixComments, action, setCustomerValidationFailed) => {
-  console.log({ matrixData });
   const validatedData = handleMatrixData(matrixData, productsMap, setCustomerValidationFailed, action);
   if (!validatedData) {
     return;
@@ -334,15 +333,12 @@ export const getItemNames = (itemsKeys, productsMap) => {
 
 export const getMatrixesDataObj = (matrixID, tableData, cellsData, docData, metaData, productsMap) => {
   const { matrix, driverIDs, actionIDs, documentIDs, acountKeys } = tableData;
-  console.log({ tableData });
   const actionAutho = [];
   // const documentIDsMock = [];
   for (var i = 0; i < driverIDs.length; i++) {
     actionAutho.push("Default");
     // documentIDsMock.push(1);
   }
-  console.log("getMatrixesDataObj matrix", matrix);
-
   const itemHeaders = matrix[0];
   if (itemHeaders?.length && itemHeaders[0] === null) {
     console.log("problem with itemHeaders:", itemHeaders);

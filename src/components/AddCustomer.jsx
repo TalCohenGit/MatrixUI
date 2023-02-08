@@ -360,6 +360,7 @@ const AddCustomer = ({
           await getProgressBar(matrixesData.mainMatrix.AccountKey.length, fileName);
           setIsInProgress(false);
           setProgressValue(0);
+          updateProducedInUI()
         })
         .catch((error) => {
           setIsInProgress(false);
@@ -521,6 +522,20 @@ const AddCustomer = ({
     setMatrixID("");
     toggleStepsAfterProduce(false);
   };
+
+  const updateProducedInUI = () => {
+    const currentData = [...matrixData]
+
+    for(let row of currentData){
+      if(row[0] === "שם לקוח"){
+        continue
+      }
+
+      row[row.length - 3] = 4;
+    }
+    
+    setMatrixData(currentData)
+  }
 
   return (
     <>

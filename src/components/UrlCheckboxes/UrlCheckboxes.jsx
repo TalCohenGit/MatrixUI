@@ -73,8 +73,6 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     await sendMsgsAPI(numbers, msgs);
   };
 
-  console.log("invoiceTableData",invoiceTableData)
-
   const invoiceDataToShow = invoiceTableData.map((invoice) => {
     const { DocUrl, checked } = invoice;
     return {

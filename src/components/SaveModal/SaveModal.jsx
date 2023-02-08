@@ -14,7 +14,6 @@ const SaveModal = ({
   matrixName,
   isProduced = false,
 }) => {
-  console.log({ matrixName, action, isProduced, newMatrixName });
   const [isBi, setIsBi] = useState(false);
 
   const [dateValue, setDateValue] = useState(new Date());

@@ -29,7 +29,7 @@ const TableCell = (props) => {
   const { drivers, balanceTableData } = useContext(DataContext);
 
   let cellType;
-  const minimizeIndex = rowIndex === 3 & colIndex === 1;
+  const minimizeIndex = rowIndex === 3 && colIndex === 1 && tableName !== "main";
 
   if (rowIndex === 0) {
     if (colIndex < 3 || (rowLength > 7 && colIndex > rowLength - 6)) {
@@ -96,6 +96,7 @@ const TableCell = (props) => {
           { name: "להפקה", key: 1 },
           { name: "ללא", key: 2 },
           { name: "מיוחד", key: 3 },
+          { name: "הופק", key: 4 },
         ]}
         rowIndex={rowIndex}
         colIndex={colIndex}

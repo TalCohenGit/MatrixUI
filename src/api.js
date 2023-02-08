@@ -336,7 +336,6 @@ export const sendMsgsAPI = async (numbers, msgs) => {
 };
 
 export const getProgressBarAPI = async (rowsNumber, fileName) => {
-  console.log({ rowsNumber, fileName });
   try {
     return await fetch(`${matrixServerURL}api/getProgressBar`, {
       method: "POST",
