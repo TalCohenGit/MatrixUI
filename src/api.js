@@ -337,7 +337,7 @@ export const sendMsgsAPI = async (numbers, msgs) => {
 
 export const getProgressBarAPI = async (rowsNumber, fileName) => {
   try {
-    return await fetch(`${matrixServerURL}api/getProgressBar`, {
+    const res = await fetch(`${matrixServerURL}api/getProgressBar`, {
       method: "POST",
       cache: "no-cache",
       headers: {
@@ -349,6 +349,8 @@ export const getProgressBarAPI = async (rowsNumber, fileName) => {
         Connection: "keep-alive",
       },
     });
+
+    return res;
   } catch (e) {
     console.log("error in getProgressBarAPI: ", e);
   }

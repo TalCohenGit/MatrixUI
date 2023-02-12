@@ -31,6 +31,8 @@ import Toast from "./Toast/Toast";
 import SearchMatrixes from "./SearchMatrixes";
 import SearchDocs from "./SearchDocs";
 import CopyDataModal from "../components/Modals/CopyDataModal";
+import molestLoggerApi from "../hooks/useLogerApi";
+import { counter } from "@fortawesome/fontawesome-svg-core";
 
 const AddCustomer = ({
   savedData,
@@ -167,8 +169,12 @@ const AddCustomer = ({
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
   const getProgressBar = async (rowsNumber, fileName) => {
+    const DELAY_TIME = 20000;
+
+    let counter = 0;
     let combinedData = [];
     let newValue = 0;
+    let newCounter = 0;
 
     return await getProgressBarAPI(rowsNumber, fileName)
       .then((response) => response.body)
@@ -184,8 +190,10 @@ const AddCustomer = ({
                 //    let serverError = value ? new TextDecoder(value) : null;
 
                 // If there is no more data to read
+
                 if (done) {
                   setUrlsTableValues(combinedData);
+
                   controller.close();
                 }
                 // Get the data and send it to the browser via the controller
@@ -193,6 +201,19 @@ const AddCustomer = ({
                 // Check chunks by logging to the console
 
                 const decodedValue = new TextDecoder().decode(value);
+
+                let handeler = setTimeout(() => {
+                  molestLoggerApi(decodedValue);
+                  setErrorMsg({
+                    show: true,
+                    text: produceError,
+                  });
+                  controller.close();
+                }, DELAY_TIME);
+                if (newCounter != counter) {
+                  clearTimeout(handeler);
+                }
+                newCounter = counter;
                 console.log("decodedValue", decodedValue);
 
                 let { stats, gotStats, data, stageName } = JSON.parse(decodedValue);
@@ -205,6 +226,7 @@ const AddCustomer = ({
                     newValue = amountFinished * (100 / totalToProcess);
                   }
                 }
+                counter += 1;
                 setProgressValue(newValue);
                 push();
               });
@@ -356,11 +378,16 @@ const AddCustomer = ({
         return;
       }
       createDocAPI(axiosPrivate, newMatrixId, matrixName, fileName, matrixesData)
-        .then(async () => {
-          await getProgressBar(matrixesData.mainMatrix.AccountKey.length, fileName);
+        .then(async (res) => {
+          if (res.data.status == "no") {
+            setErrorMsg({
+              show: true,
+              text: produceError,
+            });
+          } else await getProgressBar(matrixesData.mainMatrix.AccountKey.length, fileName);
           setIsInProgress(false);
           setProgressValue(0);
-          updateProducedInUI()
+          updateProducedInUI();
         })
         .catch((error) => {
           setIsInProgress(false);
@@ -524,18 +551,18 @@ const AddCustomer = ({
   };
 
   const updateProducedInUI = () => {
-    const currentData = [...matrixData]
+    const currentData = [...matrixData];
 
-    for(let row of currentData){
-      if(row[0] === "שם לקוח"){
-        continue
+    for (let row of currentData) {
+      if (row[0] === "שם לקוח") {
+        continue;
       }
 
       row[row.length - 3] = 4;
     }
-    
-    setMatrixData(currentData)
-  }
+
+    setMatrixData(currentData);
+  };
 
   return (
     <>
