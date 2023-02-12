@@ -31,7 +31,7 @@ import Toast from "./Toast/Toast";
 import SearchMatrixes from "./SearchMatrixes";
 import SearchDocs from "./SearchDocs";
 import CopyDataModal from "../components/Modals/CopyDataModal";
-import molestLoggerApi from "../hooks/useLogerApi";
+import { molestLoggerApi } from "../hooks/useLogerApi";
 import { counter } from "@fortawesome/fontawesome-svg-core";
 
 const AddCustomer = ({
@@ -379,7 +379,10 @@ const AddCustomer = ({
       }
       createDocAPI(axiosPrivate, newMatrixId, matrixName, fileName, matrixesData)
         .then(async (res) => {
-          if (res.data.status == "no") {
+          console.log("data ", res.data.data);
+          if (res?.data?.data?.status == "no") {
+            console.log("status no");
+            molestLoggerApi(res.data.data.data);
             setErrorMsg({
               show: true,
               text: produceError,
