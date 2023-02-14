@@ -13,10 +13,11 @@ const updateErrorLogApi = (data) => {
 };
 
 export const useLoggerApi = (data, delay) => {
+  const [value, setValue] = useState(data);
   const [isStuck, setIsStack] = useState(false);
 
   useEffect(() => {
-    if (!delay) return updateErrorLogApi(data);
+    // if (!delay) return updateErrorLogApi(data);
     const handler = setTimeout(() => {
       setIsStack(true);
       updateErrorLogApi(data);
@@ -24,7 +25,7 @@ export const useLoggerApi = (data, delay) => {
     return () => {
       clearTimeout(handler);
     };
-  }, [data, delay]);
+  }, [value, delay]);
   return isStuck;
 };
 

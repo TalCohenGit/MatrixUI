@@ -169,12 +169,8 @@ const AddCustomer = ({
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
   const getProgressBar = async (rowsNumber, fileName) => {
-    const DELAY_TIME = 20000;
-
-    let counter = 0;
     let combinedData = [];
     let newValue = 0;
-    let newCounter = 0;
 
     return await getProgressBarAPI(rowsNumber, fileName)
       .then((response) => response.body)
@@ -193,8 +189,8 @@ const AddCustomer = ({
 
                 if (done) {
                   setUrlsTableValues(combinedData);
-
                   controller.close();
+                  return;
                 }
                 // Get the data and send it to the browser via the controller
                 controller.enqueue(value);
@@ -202,19 +198,6 @@ const AddCustomer = ({
 
                 const decodedValue = new TextDecoder().decode(value);
 
-                let handeler = setTimeout(() => {
-                  if (done) return;
-                  molestLoggerApi(decodedValue);
-                  setErrorMsg({
-                    show: true,
-                    text: produceError,
-                  });
-                  controller.close();
-                }, DELAY_TIME);
-                if (newCounter != counter) {
-                  clearTimeout(handeler);
-                }
-                newCounter = counter;
                 console.log("decodedValue", decodedValue);
 
                 let { stats, gotStats, data, stageName } = JSON.parse(decodedValue);
@@ -227,7 +210,7 @@ const AddCustomer = ({
                     newValue = amountFinished * (100 / totalToProcess);
                   }
                 }
-                counter += 1;
+
                 setProgressValue(newValue);
                 push();
               });
