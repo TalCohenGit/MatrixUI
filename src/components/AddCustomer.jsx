@@ -203,6 +203,7 @@ const AddCustomer = ({
                 const decodedValue = new TextDecoder().decode(value);
 
                 let handeler = setTimeout(() => {
+                  if (done) return;
                   molestLoggerApi(decodedValue);
                   setErrorMsg({
                     show: true,
