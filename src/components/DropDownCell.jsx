@@ -4,6 +4,7 @@ import Select from "react-select";
 
 const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData, key }) => {
   const [loadedKey, setLoadedKey] = useState("")
+  const [selectedOption, setSelectedOption] = useState(null);
   useEffect(() => {
     (async() => {
     const dropDownValue = data[rowIndex][colIndex]
@@ -11,6 +12,7 @@ const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData, key 
       const dropdownOption = dropdownOptions.find(e => e.key === dropDownValue)
       if(dropdownOption) {
         setLoadedKey(dropdownOption.name)
+        setSelectedOption({value:dropdownOption.key,label:dropdownOption.name})
       }
     }
   })()
@@ -25,17 +27,19 @@ const DropDownCell = ({ dropdownOptions, rowIndex, colIndex, data, setData, key 
   }
   );
   const handleSelect = (e) => {
+    console.log("handleSelect",e)
     setSelectedOption(e);
     const currentData = [...data];
     currentData[rowIndex][colIndex] = e.value;
     setData(currentData);
   };
-  const [selectedOption, setSelectedOption] = useState(null);
+  
 
   return (
     <Select
       key={key}
       defaultValue={selectedOption}
+      value={selectedOption}
       onChange={(e) => handleSelect(e)}
       options={options}
       styles={customStyles}

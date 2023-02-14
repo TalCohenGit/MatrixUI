@@ -560,8 +560,12 @@ const AddCustomer = ({
       if (row[0] === "שם לקוח") {
         continue;
       }
+      if(row[row.length - 3] === 1){
+        row[row.length - 3] = 4;
+      }
+      
 
-      row[row.length - 3] = 4;
+     
     }
 
     setMatrixData(currentData);
