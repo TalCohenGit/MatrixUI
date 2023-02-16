@@ -13,6 +13,12 @@ const saveTables = async (matrixDate, isBI, action, newIsInitiated, newMatrixNam
 
   const matrixesUiData = JSON.stringify([matrixData, matrixComments, selectedProducts, balanceTableData]);
 
+  // המצבים הם:
+  // שמירה בשם,
+  // שמירה,
+  // שכפול לאחר הפקה,
+  // שכפול בטעינה,
+
   const returnedValue = await saveTablesAPI(
     axiosPrivate,
     newMatrixId,
@@ -39,10 +45,10 @@ const saveTables = async (matrixDate, isBI, action, newIsInitiated, newMatrixNam
     //status: 'yes'
     //zero action
     //status: 'no'
-    //data:
-    //error:null |{int:str},
+    //data:{
+    //error:null |{number:int, content:str},
     //newName: null |string
-    //  תאריך 15-2 משוכפל 3
+    //}  תאריך 15-2 משוכפל 3
     // (2) תאריך 15-2 משוכפל 3
   };
 
@@ -54,7 +60,7 @@ const saveTables = async (matrixDate, isBI, action, newIsInitiated, newMatrixNam
   returnValue;
 };
 
-const f = {
-  1: "תקלה בשרת 2223",
-  2: "אמש של משה לא בסדר",
+const error = {
+  number: 1,
+  content: "תקלה בשרת 2223",
 };

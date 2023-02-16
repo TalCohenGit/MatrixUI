@@ -46,6 +46,7 @@ import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
 import ProgressBar from "./ProgressBar/ProgressBar";
+import { molestLoggerApi } from "../hooks/useLogerApi";
 
 function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   const {
@@ -320,7 +321,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
     const matrixesUiData = JSON.stringify([matrixData, matrixComments, selectedProducts, balanceTableData]);
 
-    await saveTablesAPI(
+    const returnedValue = await saveTablesAPI(
       axiosPrivate,
       newMatrixId,
       validatedData,
@@ -334,6 +335,11 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       productsMap,
       newIsInitiated
     );
+    if (returnedValue.data.status == "no") molestLoggerApi(returnedValue.data.data);
+    if (returnedValue.data.saveStatus.status == "no") molestLoggerApi(returnedValue.data.saveStatus.data);
+    if (returnedValue.data.saveStatus.status == "no")
+      if (returnedValue.data.saveStatus.data.newName) console.log("new name !!"); // refresh name state
+      else console.log("error message ", returnedValue.data.saveStatus.data.error.content);
     return newMatrixId;
   };
 
