@@ -85,7 +85,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     isInProgress,
     progressValue,
     newMatrixName,
-    setNewMatrixName
+    setNewMatrixName,
   } = useContext(DataContext);
   const [isOpenValidationModal, toggleValidationModal] = useState(false);
   const [validationErrors, setValidationError] = useState([]);
