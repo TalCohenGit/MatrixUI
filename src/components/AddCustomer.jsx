@@ -69,8 +69,10 @@ const AddCustomer = ({
     setIsInProgress,
     setProgressValue,
     isInProgress,
+    errorMsg,
+    setErrorMsg
   } = useContext(DataContext);
-  console.log("mmmmma", { matrixData, savedData });
+ 
   const intialRangeState = [
     {
       startDate: new Date(),
@@ -83,10 +85,7 @@ const AddCustomer = ({
     failure: false,
     error: "",
   });
-  const [errorMsg, setErrorMsg] = useState({
-    show: false,
-    text: produceError,
-  });
+
 
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
   const [isUrlModalSearch, toggleUrlsSearchModal] = useState(false);
