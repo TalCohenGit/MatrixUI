@@ -87,8 +87,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     progressValue,
     newMatrixName,
     setNewMatrixName,
-    setErrorMsg
-
+    setErrorMsg,
   } = useContext(DataContext);
   const [isOpenValidationModal, toggleValidationModal] = useState(false);
   const [validationErrors, setValidationError] = useState([]);
@@ -337,23 +336,22 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       productsMap,
       newIsInitiated
     );
-    if(returnedValue && returnedValue.data) {
+    if (returnedValue && returnedValue.data) {
       if (returnedValue.data.status == "no") molestLoggerApi(returnedValue.data.data);
       if (returnedValue.data.saveStatus.status == "no") {
-        molestLoggerApi(returnedValue.data.saveStatus.data);
-        const resNewName = returnedValue.data.saveStatus.data.newName
-        if (resNewName){
-          console.log(`new name is ` + resNewName); 
-          setMatrixName(resNewName)
-        }
-         else {
+        const resNewName = returnedValue.data.saveStatus.data.newName;
+        if (resNewName) {
+          console.log(`new name is ` + resNewName);
+          setMatrixName(resNewName);
+        } else {
+          molestLoggerApi(returnedValue.data.saveStatus.data);
           console.log("error message ", returnedValue.data.saveStatus.data.error.content);
           setErrorMsg({
             show: true,
             text: "שמירת המצטריצה נכשלה, נסה שנית",
-          })
-         }
-         console.log("error message ", returnedValue.data.saveStatus.data.error.content);
+          });
+        }
+        console.log("error message ", returnedValue.data.saveStatus.data.error.content);
       }
     }
     return newMatrixId;
