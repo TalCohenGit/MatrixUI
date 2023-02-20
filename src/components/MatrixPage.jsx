@@ -338,7 +338,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
     );
     if (returnedValue && returnedValue.data) {
       if (returnedValue.data.status == "no") molestLoggerApi(returnedValue.data.data);
-      if (returnedValue.data.saveStatus.status == "no") {
+      else if (returnedValue.data.saveStatus.status == "no") {
         const resNewName = returnedValue.data.saveStatus.data.newName;
         if (resNewName) {
           console.log(`new name is ` + resNewName);
