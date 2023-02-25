@@ -337,8 +337,18 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       newIsInitiated
     );
     if (returnedValue && returnedValue.data) {
-      if (returnedValue.data.status == "no") molestLoggerApi(returnedValue.data.data);
-      else if (returnedValue.data.saveStatus.status == "no") {
+      if (returnedValue.data.status == "no") {
+        let codes = [];
+        if (returnedValue?.data?.code == 11000) {
+          codes.push(11000);
+          console.log("matrix id is alreadt exist in data base");
+        }
+        if (returnedValue?.data?.code == 11001) {
+          codes.push(11001);
+          console.log("matrix id is empty");
+        }
+        molestLoggerApi({ data: returnedValue.data.data, codes: codes ?? null });
+      } else if (returnedValue.data.saveStatus.status == "no") {
         const resNewName = returnedValue.data.saveStatus.data.newName;
         if (resNewName) {
           console.log(`new name is ` + resNewName);
