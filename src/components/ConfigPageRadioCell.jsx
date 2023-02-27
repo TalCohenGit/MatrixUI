@@ -118,9 +118,9 @@ const ConfigPageRadioCell = ({
             onChange={onDataTypeChange}
             name={name}
           >
-            <FormControlLabel value="sort" control={<Radio />} label="מיון" />
+            <FormControlLabel value="קוד מיון" control={<Radio />} label="מיון" />
             <FormControlLabel
-              value="storage"
+              value="מחסן"
               control={<Radio />}
               label="מחסן"
             />

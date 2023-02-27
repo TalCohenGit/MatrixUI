@@ -6,7 +6,7 @@ import Checkbox from "@mui/material/Checkbox";
 import { useLocation } from "react-router-dom";
 import RegisterConfigUserDetails from "../components/RegisterConfigUserDetails";
 import ConfigPageTable from "../components/ConfigPageTable";
-import { setConfigAPI } from "../api";
+import { initvalidateAPI, setConfigAPI } from "../api";
 
 const ConfigPage = ({ axiosPrivate }) => {
   const initialState = {
@@ -40,104 +40,34 @@ const ConfigPage = ({ axiosPrivate }) => {
   const handleChange = (e) => {
     setSelectedDoc(e);
   };
-  // const config = new Schema(
-  //   {
-  //     userID: { type: String, required: true },
-  //     AccountState: String,
-  //     ModulsPremission: {
-  //       BiziRoutes: {
-  //         isAllow: Boolean,
-  //         pivotType: String,
-  //         mtxPreferences: {
-  //           isDefault: { type: Boolean, default: false },
-  //           pivotKey: Number,
-  //         },
-  //       },
-  //       Messages: {
-  //         whatsApp: {
-  //           isAllow: Boolean,
-  //           remainingSum: Number,
-  //         },
-  //       },
-  //     },
+ 
+  const getCustomersReport = () => {
+    return {
+        sortingKey: "קוד מיון",
+        sortingType: value.customersCode.radio,
+        sortingValue: parseTableInput(value.customersCode.input)
+    };
+  };
 
-  //     mtxConfig: {
-  //       documentDef: {
-  //         isDefault: { type: Boolean, default: false },
-  //         DocumentNumber: String,
-  //       },
-  //       docLimit: { isLimited: Boolean, Amount: Number },
-  //       sumLimit: { isLimited: Boolean, Amount: Number },
-  //       taxDocs: {
-  //         isAllow: Boolean,
-  //         Refund: {
-  //           isAllow: {
-  //             type: Boolean,
-  //             default: true,
-  //           },
-  //           isLimited: {
-  //             type: Boolean,
-  //             default: false,
-  //           },
+  const getProductsReport = () => {
+    return {
+      sortingKey: value.detailsCode.dataType,
+      sortingType: value.detailsCode.radio,
+      sortingValue: parseTableInput(value.detailsCode.input),
+    }
+  }
 
-  //           Amount: Number,
-  //         },
-  //         Discount: { isAllow: Boolean, isLimited: Boolean, Amount: Number },
-  //         ObligoPass: { isAllow: Boolean },
-  //       },
-  //     },
-  //     // {sortKey:"sort"|"storage",type: "range"|"multi",data:[...theData] }
-  //     Reports: {
-  //       defaultReports: {
-  //         castumers: {
-  //           sortingKey: { type: String, enum: "sort" },
-  //           sortingType: { type: String, enum: "range" | "multi" | "single" },
-  //           sortingValue: { type: Array },
-  //         },
-  //         products: {
-  //           sortingKey: { type: String, enum: "sort" | "storage" },
-  //           sortingType: { type: String, enum: "range" | "multi" | "single" },
-  //           sortingValue: { type: Array },
-  //         },
-  //       },
-  //     },
-  //     ErpConfig: {
-  //       erpName: { type: String, enum: "HA" | "RI", required: true },
-  //       CompanyKey: { type: String, default: tempKey },
-  //       CompanyServer: { type: String, default: tempServer },
-  //       CompanyDbName: { type: String, default: tempDbName },
-  //       CompanyPassword: String,
-  //       CompanyUserName: String,
-  //       CompanyNumber: String,
-  //     },
-
-  //   },
-  //   { timestamps: true, strict: true, strictQuery: false }
-  // );
-
-  // hToken: "",
-  // hServerName: "",
-  // hDbName: "",
   const saveConfig = async () => {
+    const res = initvalidateAPI(axiosPrivate, {
+      castumers: [getCustomersReport()],
+      products: [getProductsReport()]
+    }, "reports")
+    // if res is ok
     const configData = {
-      ErpConfig: {
-        erpName,
-        CompanyKey: inputs?.hToken,
-        CompanyServer: inputs?.hServerName,
-        CompanyDbName: inputs?.hDbName,
-      },
       Reports: {
         defaultReports: {
-          castumers: {
-            sortingKey: "sort",
-            sortingType: value.customersCode.radio,
-            sortingValue: parseTableInput(value.customersCode.input),
-          },
-          products: {
-            sortingKey: value.detailsCode.dataType,
-            sortingType: value.detailsCode.radio,
-            sortingValue: parseTableInput(value.detailsCode.input),
-          },
+          castumers: [getCustomersReport()],
+          products: [getProductsReport()]
         },
       },
       mtxConfig: {
@@ -181,7 +111,7 @@ const ConfigPage = ({ axiosPrivate }) => {
       },
     };
     console.log("configData", configData, from.pathname);
-    await setConfigAPI(configData);
+    await setConfigAPI(axiosPrivate, configData);
   };
 
   if (location?.state?.from?.pathname !== "/erp") {

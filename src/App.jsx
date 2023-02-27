@@ -40,7 +40,7 @@ const App = () => {
     <div>
       <Routes>
         <Route exact path="/" element={MainPage} />
-        <Route path="/erp" element={<ErpSelect/>}/>
+        <Route path="/erp" element={<ErpSelect axiosPrivate={axiosPrivate}/>}/>
         <Route path="/register" element={<Register/>}/>
         <Route path="/config" element={<ConfigPage axiosPrivate={axiosPrivate}/>}/>
       </Routes>

@@ -7,8 +7,9 @@ import FormLabel from "@mui/material/FormLabel";
 import Input from "@mui/material/Input";
 import { useNavigate, useLocation } from "react-router-dom";
 import RegisterConfigUserDetails from "../components/RegisterConfigUserDetails";
+import { initvalidateAPI, setConfigAPI } from "../api";
 
-const ErpSelect = () => {
+const ErpSelect = ({axiosPrivate}) => {
   const [value, setValue] = useState("hashvsevet");
   const [inputs, setInputs] = useState({
     hToken: "",
@@ -30,19 +31,50 @@ const ErpSelect = () => {
     console.log("inputs", name, value, inputs);
   };
 
-  const nextPageValidation = () =>  {
+  const nextPageValidation = () => {
     let isValid = false;
-    if(value === "hashvsevet"){
-      isValid = Object.keys(inputs).every(field => inputs[field]?.length)
+    if (value === "hashvsevet") {
+      isValid = Object.keys(inputs).every((field) => inputs[field]?.length);
     }
-    
-  return isValid
+
+    return isValid;
+  };
+
+  const getERPDetails = () => {
+    return {
+      usserPrivetKey: inputs?.hToken,
+      usserServerName: inputs?.hServerName,
+      usserDbname: inputs?.hDbName,
+    }
   }
-  
-  const handleNextClick = (event) => {
+
+  const handleNextClick = async (event) => {
     event.preventDefault();
-    
-    navigate("/config",{state:{firstName,lastName,userEmail,from:location,inputs,erpName: value === "hashvsevet" ? "HA" : "RI"}});
+    const res = await initvalidateAPI(
+      axiosPrivate,
+      getERPDetails(),
+      "conection"
+    );
+    //if res is ok
+    let erpName = "HA"
+    if (value !== "hashvsevet") {
+      erpName = "RI"
+    }
+    setConfigAPI(axiosPrivate, {
+      accountState: "active",
+      ErpConfig: {
+        erpName,
+        [erpName]:  getERPDetails()
+      },
+    });
+    navigate("/config", {
+      state: {
+        firstName,
+        lastName,
+        userEmail,
+        from: location
+      },
+    });
   };
 
   return (
@@ -97,7 +129,9 @@ const ErpSelect = () => {
         <div />
       )}
       <button
-        className={"next-button" + (!nextPageValidation() ? " btnDisabled" : "")}
+        className={
+          "next-button" + (!nextPageValidation() ? " btnDisabled" : "")
+        }
         onClick={(e) => {
           handleNextClick(e);
         }}

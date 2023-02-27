@@ -340,6 +340,12 @@ const getData = async (axiosPrivate, fromDate, toDate, collection, date) => {
   });
 };
 
+export const initvalidateAPI = async (axiosPrivate, bodyToCheck, stage) => {
+  return await axiosPrivate.post("/api/initvalidate", bodyToCheck,  {headers: {
+    stage}
+  });
+};
+
 export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
     const res = await getData(axiosPrivate, fromDate, toDate, "MtxLog", "Date");
@@ -451,11 +457,9 @@ export const sendMsgsAPI = async (numbers, msgs) => {
   }
 };
 
-export const setConfigAPI = async (configObj) => {
+export const setConfigAPI = async (axiosPrivate, configObj) => {
   try {
-    await axiosRegister.post("/api/setConfig", {
-      configObj
-    });
+    await axiosPrivate.post("/api/setConfig", configObj);
   } catch (e) {
     console.log("error in setConfigAPI: ", e);
   }
@@ -479,3 +483,5 @@ export const getProgressBarAPI = async (axiosPrivate, fileName) => {
     console.log("error in getProgressBarAPI: ", e);
   }
 };
+
+

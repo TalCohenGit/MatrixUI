@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
+import jwt from 'jwt-decode'
 import {
   faCheck,
   faTimes,
@@ -14,7 +15,7 @@ const USER_REGEX =
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
 const Register = ({ setNeedToRegister }) => {
-  const {businessName, setBusinessName} = useContext(DataContext)
+  const {businessName, setBusinessName, setAccessToken, setTimelimit, setUserID } = useContext(DataContext);
   const navigate = useNavigate();
   
   const [userEmail, setUserEmail] = useState("");
@@ -60,10 +61,14 @@ const Register = ({ setNeedToRegister }) => {
     value ? setValidation(true) : setValidation(false);
   };
 
+  const getUserPermission  = (userConfig) => {
+    return userConfig?.ModulsPremission?.Messages?.whatsApp?.isOpend
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      const resi = await registerAPI(
+      const res = await registerAPI(
         firstName,
         lastName,
         phone,
@@ -71,8 +76,21 @@ const Register = ({ setNeedToRegister }) => {
         userPass,
         accountName
       );
-      console.log("resi",resi)
+      console.log("res",res)
       // setSuccess(true);
+      const accessToken = res?.data?.loginData?.result?.data?.accessToken
+      const refreshToken =  res?.data?.loginData?.result?.data?.refreshToken
+      const timeLimit =  res?.data?.loginData?.result?.data?.timeLimit
+      const userConfig =  res?.data?.loginData?.result?.data?.userConfig
+      localStorage.setItem("refreshToken", refreshToken);
+      setAccessToken(accessToken)
+      setTimelimit(timeLimit)
+      const whatsappPermissions = getUserPermission(userConfig)
+      localStorage.setItem("whatsapp", whatsappPermissions)
+
+      const userID = jwt(accessToken).fetchedData.userID
+      setUserID(userID)
+
       localStorage.setItem("businessName", businessName)
       navigate("/erp",{state:{firstName,lastName,userEmail}})
    } catch (e) {
