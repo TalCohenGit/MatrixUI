@@ -110,7 +110,8 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     </div>
   );
 
-  const hasPermission = localStorage.getItem("whatsapp") === "true";
+  // const hasPermission = localStorage.getItem("whatsapp") === "true";
+  const hasPermission = true
   const sendingDisabled = invoiceTableData.every((urlObj) => !urlObj.checked);
   const enableMessagesFeature = hasPermission && !sendingDisabled;
 
