@@ -109,7 +109,7 @@ const HeaderNavigation = ({ children, data, setData, colIndex, tableName }) => {
         onMouseLeave={() => setHover(false)}
       >
         {" "}
-        {
+        {colIndex > 3 && 
           <ArrowButton
             showArrow={showRightArrow}
             rotation={180}
@@ -118,7 +118,7 @@ const HeaderNavigation = ({ children, data, setData, colIndex, tableName }) => {
           />
         }
         {children}
-        {
+        {colIndex < data[0].length - 6 &&
           <ArrowButton
             showArrow={showLeftArrow}
             handleClick={() => handleClick(colIndex + 1)}

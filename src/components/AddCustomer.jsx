@@ -7,6 +7,7 @@ import {
   customerNumbers,
   deleteAllTables,
   getFormattedDates,
+  getMatrixesDataObj,
 } from "../utils/utils";
 import ReactMultiSelectCheckboxes from "react-multiselect-checkboxes";
 import {
@@ -24,18 +25,17 @@ import UrlCheckboxes from "./UrlCheckboxes/UrlCheckboxes";
 import SaveModal from "./SaveModal/SaveModal";
 import LoadModal from "./Modals/LoadModal";
 import AreUSureModal from "./Modals/AreUSureModal";
-import {
-  savingAction,
-  savingAsAction,
-  produceDocAction,
-  copyMatrixAction,
-} from "../utils/constants";
+import { savingAction, savingAsAction, produceDocAction, copyMatrixAction } from "../utils/constants";
 import { produceError } from "../utils/constants";
 import Toast from "./Toast/Toast";
 import SearchMatrixes from "./SearchMatrixes";
 import SearchDocs from "./SearchDocs";
+import CopyDataModal from "../components/Modals/CopyDataModal";
+import { molestLoggerApi } from "../hooks/useLogerApi";
+import { counter } from "@fortawesome/fontawesome-svg-core";
 
 const AddCustomer = ({
+  savedData,
   customerName,
   setCustomerName,
   addCustomerToTable,
@@ -48,6 +48,8 @@ const AddCustomer = ({
   matrixDate,
   setMatrixDate,
   copyMatrix,
+  newMatrixName,
+  setNewMatrixName,
 }) => {
   const {
     toggleList,
@@ -61,13 +63,16 @@ const AddCustomer = ({
     matrixComments,
     products,
     matrixID,
+    setMatrixID,
     selectedProducts,
     setSelectedProducts,
     setIsInProgress,
     setProgressValue,
     isInProgress,
+    errorMsg,
+    setErrorMsg
   } = useContext(DataContext);
-
+ 
   const intialRangeState = [
     {
       startDate: new Date(),
@@ -80,10 +85,8 @@ const AddCustomer = ({
     failure: false,
     error: "",
   });
-  const [errorMsg, setErrorMsg] = useState({
-    show: false,
-    text: produceError,
-  });
+
+
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
   const [isUrlModalSearch, toggleUrlsSearchModal] = useState(false);
   const [invoiceData, setInvoiceData] = useState([]);
@@ -102,8 +105,58 @@ const AddCustomer = ({
   const [checked, setChecked] = useState([]);
   const [errorModal, toggleErrorModal] = useState(false);
   const [noResults, setNoResults] = useState(false);
+  const [stepsAfterProduce, toggleStepsAfterProduce] = useState(false);
 
   const productsOptions = [];
+  /******** * REGULAR PR OBJECT     */
+  //  {
+  //   data: null,
+  //   termenate: false,
+  //   stageName: "c",
+  //   msg: "נשמר בהצלחה",
+  //   errors: "no errors",
+  //   gotStats: false,
+  //   stats: { amountFinished: 0, totalToProcess: 0 },
+  // };
+
+  /******** * PR OBJECT WITH START OF ERROR    */
+  // let newd = {
+  //   data: "no",
+  //   termenate: true,
+  //   stageName: "serverError",
+  //   msg: "serverError",
+  //   errors: [
+  //     {
+  //       path: "matrixID",
+  //       error: "missing",
+  //     },
+  //     {
+  //       path: "matrixesData.mainMatrix",
+  //       error: "unequal arrays length",
+  //     },
+  //   ],
+  //   gotStats: false,
+  //   stats: { amountFinished: 0, totalToProcess: 0 },
+  // };
+
+  const setUrlsTableValues = (combinedData) => {
+    setInvoiceData(
+      //  data.map((el) => {
+      combinedData.map((el) => {
+        const { Accountname, Action, DocNumber, DocUrl, DocumentDetails, TotalCost, ValueDate } = el;
+        return {
+          DocUrl,
+          Accountname,
+          Action,
+          ValueDate,
+          TotalCost,
+          DocNumber,
+          DocumentDetails,
+        };
+      })
+    );
+    toggleUrlsModal(true);
+  };
 
   products &&
     products.forEach((element) => {
@@ -114,9 +167,11 @@ const AddCustomer = ({
     });
   const options = [{ value: "*", label: "הכל" }, ...productsOptions];
 
-  const getProgressBar = async (fileName) => {
+  const getProgressBar = async (rowsNumber, fileName) => {
+    let combinedData = [];
     let newValue = 0;
-    return await getProgressBarAPI(axiosPrivate, fileName)
+
+    return await getProgressBarAPI(rowsNumber, fileName)
       .then((response) => response.body)
       .then((rb) => {
         const reader = rb.getReader();
@@ -127,20 +182,28 @@ const AddCustomer = ({
             function push() {
               // "done" is a Boolean and value a "Uint8Array"
               reader.read().then(({ done, value }) => {
+                //    let serverError = value ? new TextDecoder(value) : null;
+
                 // If there is no more data to read
+
                 if (done) {
-                  console.log("done", done);
+                  setUrlsTableValues(combinedData);
                   controller.close();
                   return;
                 }
                 // Get the data and send it to the browser via the controller
                 controller.enqueue(value);
                 // Check chunks by logging to the console
+
                 const decodedValue = new TextDecoder().decode(value);
-                if (decodedValue === "finish") {
-                  newValue = 100;
-                } else {
-                  const { stats, gotStats } = JSON.parse(decodedValue);
+
+                console.log("decodedValue", decodedValue);
+
+                let { stats, gotStats, data, stageName } = JSON.parse(decodedValue);
+                if (stageName === "finish") newValue = 100;
+                else {
+                  if (data) combinedData.push(data);
+
                   const { amountFinished, totalToProcess } = stats;
                   if (totalToProcess > 0 && gotStats) {
                     newValue = amountFinished * (100 / totalToProcess);
@@ -185,10 +248,7 @@ const AddCustomer = ({
     if (event.action === "select-option" && event.option.value === "*") {
       setSelectedProducts(options);
       selectedValues = productsOptions.map((element) => element.value);
-    } else if (
-      event.action === "deselect-option" &&
-      event.option.value === "*"
-    ) {
+    } else if (event.action === "deselect-option" && event.option.value === "*") {
       setSelectedProducts([]);
     } else if (event.action === "deselect-option") {
       const values = value.filter((o) => o.value !== "*");
@@ -214,12 +274,7 @@ const AddCustomer = ({
   };
 
   const deleteAll = () => {
-    deleteAllTables(
-      setMatrixData,
-      setBalanceTableData,
-      setMatrixComments,
-      setSelectedProducts
-    );
+    deleteAllTables(setMatrixData, setBalanceTableData, setMatrixComments, setSelectedProducts);
   };
 
   const handleDeleteData = () => {
@@ -238,26 +293,20 @@ const AddCustomer = ({
     toggleToDeleteMatrix(false);
   };
 
+  const deleteAllMatrixDate = () => {
+    deleteAllTables(setMatrixData, setBalanceTableData, setMatrixComments, setSelectedProducts);
+
+    setMatrixDate(new Date());
+  };
+
   const deleteMatrix = async () => {
     await deleteMatrixAPI(axiosPrivate, matrixID);
-    deleteAllTables(
-      setMatrixData,
-      setBalanceTableData,
-      setMatrixComments,
-      setSelectedProducts
-    );
-    setMatrixName("");
-    setMatrixDate("");
+    deleteAllMatrixDate();
     toggleToDeleteMatrix(false);
   };
 
   const deleteData = () => {
-    deleteAllTables(
-      setMatrixData,
-      setBalanceTableData,
-      setMatrixComments,
-      setSelectedProducts
-    );
+    deleteAllTables(setMatrixData, setBalanceTableData, setMatrixComments, setSelectedProducts);
     toggleToDeleteData(false);
   };
 
@@ -272,12 +321,9 @@ const AddCustomer = ({
       });
       return;
     }
-    const validatedData = handleMatrixData(
-      matrixData,
-      productsMap,
-      setCustomerValidationFailed,
-      produceDocAction
-    );
+
+    const validatedData = handleMatrixData(matrixData, productsMap, setCustomerValidationFailed, produceDocAction);
+
     if (!validatedData) {
       return;
     }
@@ -285,12 +331,11 @@ const AddCustomer = ({
       ...customerValidationFailed,
       failure: false,
     });
-    const { cellsData, docCommentsToSend, metaDataToSend } =
-      handleCommentMatrixData(
-        matrixComments,
-        validatedData["docComments"],
-        validatedData["metaData"]
-      );
+    const { cellsData, docCommentsToSend, metaDataToSend } = handleCommentMatrixData(
+      matrixComments,
+      validatedData["docComments"],
+      validatedData["metaData"]
+    );
 
     let newMatrixId = matrixID;
     if (!newMatrixId) {
@@ -300,28 +345,35 @@ const AddCustomer = ({
     try {
       const fileName = Math.random().toString();
       setIsInProgress(true);
-      createDocAPI(
-        axiosPrivate,
-        validatedData,
+      const matrixesData = getMatrixesDataObj(
         newMatrixId,
+        validatedData,
         cellsData,
         docCommentsToSend,
         metaDataToSend,
-        productsMap,
-        matrixName,
-        fileName
-      )
+        productsMap
+      );
+      if (!matrixesData) {
+        setCustomerValidationFailed({
+          failure: true,
+          error: "תקלה בהפקה",
+        });
+        return;
+      }
+      createDocAPI(axiosPrivate, newMatrixId, matrixName, fileName, matrixesData)
         .then(async (res) => {
-          await getProgressBar(fileName);
-          const invoiceDataArr = await getUrlsAPI(axiosPrivate);
-          const relavantInvoiceData = invoiceDataArr.slice(
-            invoiceDataArr.length - customerNumbers(matrixData),
-            invoiceDataArr.length
-          );
-          setInvoiceData(relavantInvoiceData);
-          toggleUrlsModal(true);
+          console.log("data ", res.data.data);
+          if (res?.data?.data?.status == "no") {
+            console.log("status no");
+            molestLoggerApi(res.data.data.data);
+            setErrorMsg({
+              show: true,
+              text: produceError,
+            });
+          } else await getProgressBar(matrixesData.mainMatrix.AccountKey.length, fileName);
           setIsInProgress(false);
           setProgressValue(0);
+          updateProducedInUI();
         })
         .catch((error) => {
           setIsInProgress(false);
@@ -336,6 +388,10 @@ const AddCustomer = ({
       setIsInProgress(false);
       setProgressValue(0);
       toggleErrorModal(true);
+      setErrorMsg({
+        show: true,
+        text: produceError,
+      });
     }
   };
 
@@ -357,13 +413,7 @@ const AddCustomer = ({
     toggleToLoadDataModal(true);
   };
 
-  const handleSaving = async (
-    action,
-    toggleModal,
-    isBI,
-    newMatrixName,
-    dateValue
-  ) => {
+  const handleSaving = async (action, toggleModal, isBI, newMatrixName, dateValue) => {
     const newIsInitiated = true;
     await saveTables(dateValue, isBI, action, newIsInitiated, newMatrixName);
     setMatrixName(newMatrixName);
@@ -372,15 +422,8 @@ const AddCustomer = ({
   };
 
   const loadTableNames = async () => {
-    const { startDate, endDate } = getFormattedDates(
-      dateRangesLoad[0]["startDate"],
-      dateRangesLoad[0]["endDate"]
-    );
-    const matrixesDetails = await getTablesByDatesAPI(
-      axiosPrivate,
-      startDate,
-      endDate
-    );
+    const { startDate, endDate } = getFormattedDates(dateRangesLoad[0]["startDate"], dateRangesLoad[0]["endDate"]);
+    const matrixesDetails = await getTablesByDatesAPI(axiosPrivate, startDate, endDate);
     if (matrixesDetails?.length) {
       if (noResults) {
         setNoResults(false);
@@ -394,19 +437,12 @@ const AddCustomer = ({
   };
 
   const loadUrls = async () => {
-    const { startDate, endDate } = getFormattedDates(
-      dateRangesSearch[0]["startDate"],
-      dateRangesSearch[0]["endDate"]
-    );
+    const { startDate, endDate } = getFormattedDates(dateRangesSearch[0]["startDate"], dateRangesSearch[0]["endDate"]);
 
-    const invoices = await getUrlsByDatesAPI(
-      axiosPrivate,
-      startDate.toString(),
-      endDate.toString()
-    );
+    const invoices = await getUrlsByDatesAPI(axiosPrivate, startDate, endDate);
     if (invoices?.length) {
-      if(noResults){
-        setNoResults(false)
+      if (noResults) {
+        setNoResults(false);
       }
       setSearchedInvoices(invoices);
       toggleToSearchDocs(false);
@@ -430,24 +466,21 @@ const AddCustomer = ({
   };
 
   const cancelSearch = () => {
-    if(noResults){
-      setNoResults(false)
+    if (noResults) {
+      setNoResults(false);
     }
     toggleToSearchDocs(false);
   };
 
   const ListModal = ({ isOpen, toggleModal, header, invoices }) => {
+    console.log("invoices".invoices);
     return (
       isOpen &&
       (invoices?.length ? (
         <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={header}>
           {/* <div>{dataToShow}</div> */}
           <React.Fragment>
-            <UrlCheckboxes
-              axiosPrivate={axiosPrivate}
-              invoiceData={invoices}
-              toggleModal={toggleModal}
-            />
+            <UrlCheckboxes axiosPrivate={axiosPrivate} invoiceData={invoices} toggleModal={toggleModal} />
           </React.Fragment>
         </Modal>
       ) : (
@@ -487,7 +520,38 @@ const AddCustomer = ({
 
   const finishProduce = () => {
     toggleUrlsModal(false);
+    toggleStepsAfterProduce(true);
+  };
+
+  const handleCopy = () => {
     toggleDetailsToCopyModal(true);
+    toggleStepsAfterProduce(false);
+  };
+
+  const createNewMatrix = (name) => {
+    console.log("creating new matrix", name);
+    deleteAllMatrixDate();
+    setMatrixName(name);
+    setMatrixID("");
+    toggleStepsAfterProduce(false);
+  };
+
+  const updateProducedInUI = () => {
+    const currentData = [...matrixData];
+
+    for (let row of currentData) {
+      if (row[0] === "שם לקוח") {
+        continue;
+      }
+      if(row[row.length - 3] === 1){
+        row[row.length - 3] = 4;
+      }
+      
+
+     
+    }
+
+    setMatrixData(currentData);
   };
 
   return (
@@ -520,6 +584,20 @@ const AddCustomer = ({
             header={"האם אתה בטוח שברצונך למחוק נתונים?"}
             deleteBtnText={"מחק נתונים"}
           />
+          <CopyDataModal
+            isOpen={stepsAfterProduce}
+            toggleModal={toggleStepsAfterProduce}
+            onCopy={handleCopy}
+            modalHeader={"בשביל להמשיך ניתן לשכפל את המטריצה או ליצור מטריצה חדשה"}
+            afterProduce={true}
+            onNewMatrix={createNewMatrix}
+            action={copyMatrixAction}
+            matrixName={matrixName}
+            isProduced={savedData?.isProduced}
+            setMatrixName={setMatrixName}
+            setNewMatrixName={setNewMatrixName}
+            newMatrixName={newMatrixName}
+          />
           <ListModal
             isOpen={isUrlsModalOpen}
             toggleModal={finishProduce}
@@ -533,24 +611,31 @@ const AddCustomer = ({
             invoices={searchedInvoices}
           />
           <SaveModal
+            matrixName={matrixName}
             isOpen={detailsToCopyModal}
             toggleModal={toggleDetailsToCopyModal}
             handleAction={copyMatrix}
             action={copyMatrixAction}
+            newMatrixName={newMatrixName}
+            setNewMatrixName={setNewMatrixName}
           />
           <SaveModal
+            matrixName={matrixName}
             isOpen={toSaveDataModal}
             toggleModal={toggleToSaveDataModal}
             handleAction={handleSaving}
             action={savingAsAction}
-            matrixName={matrixName}
+            newMatrixName={newMatrixName}
+            setNewMatrixName={setNewMatrixName}
           />
           <SaveModal
+            matrixName={matrixName}
             isOpen={toUpdateDataModal}
             toggleModal={toggleToUpdateDataModal}
             handleAction={handleSaving}
             action={savingAction}
-            matrixName={matrixName}
+            newMatrixName={newMatrixName}
+            setNewMatrixName={setNewMatrixName}
           />
           <LoadModal
             isOpen={toLoadDataModal}
@@ -567,6 +652,7 @@ const AddCustomer = ({
             setNoResults={setNoResults}
             Component={
               <SearchMatrixes
+                setNewMatrixName={setMatrixName}
                 matrixesDetails={matrixesDetails}
                 loadTablesByID={loadTablesByID}
                 noResults={noResults}
@@ -582,7 +668,7 @@ const AddCustomer = ({
             onCancel={cancelSearch}
             onSearch={loadUrls}
             modalHeader={"חיפוש מסמכים לפי תאריכים"}
-            Component={<SearchDocs noResults={noResults}/>}
+            Component={<SearchDocs noResults={noResults} />}
           />
           {/* <ErrorModal
             isOpen={errorModal}
@@ -621,22 +707,13 @@ const AddCustomer = ({
         {customerValidationFailed.failure ? (
           <p className="validationComment">
             {" "}
-            הפקת חשבונית לא בוצעה! {customerValidationFailed.error}{" "}
-            {customerValidationFailed.customerName}
+            הפקת חשבונית לא בוצעה! {customerValidationFailed.error} {customerValidationFailed.customerName}
           </p>
         ) : null}
-        <button
-          className="save-tables"
-          disabled={matrixData?.length === 0 || !matrixID}
-          onClick={() => savingMatrix()}
-        >
+        <button className="save-tables" disabled={matrixData?.length === 0 || !matrixID} onClick={() => savingMatrix()}>
           שמירה
         </button>
-        <button
-          className="save-tables"
-          disabled={matrixData.length === 0}
-          onClick={() => saveWithNameData()}
-        >
+        <button className="save-tables" disabled={matrixData.length === 0} onClick={() => saveWithNameData()}>
           שמירה בשם
         </button>
         <button className="save-tables" onClick={() => loadData()}>
@@ -649,26 +726,17 @@ const AddCustomer = ({
         >
           הפקת חשבונית
         </button>
-        <button
-          className="deleteAll-button"
-          disabled={matrixData.length === 0}
-          onClick={() => handleDeleteData()}
-        >
+        <button className="deleteAll-button" disabled={matrixData.length === 0} onClick={() => handleDeleteData()}>
           מחק נתונים
         </button>
-        <button
-          className="deleteAll-button"
-          onClick={() => handleDeleteMatrix()}
-        >
+        <button className="deleteAll-button" onClick={() => handleDeleteMatrix()}>
           מחק מטריצה
         </button>
         <button className="deleteAll-button" onClick={() => handleSearchDocs()}>
           חיפוש מסמכים
         </button>
       </div>
-      {errorMessage?.length ? (
-        <p className="error-message">{errorMessage}</p>
-      ) : null}
+      {errorMessage?.length ? <p className="error-message">{errorMessage}</p> : null}
     </>
   );
 };

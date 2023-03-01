@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import {produceError} from "../utils/constants"
 export const DataContext = React.createContext(null);
 
 const DataContextProvider = (props) => {
@@ -24,6 +24,12 @@ const DataContextProvider = (props) => {
   const [businessName, setBusinessName] = useState("");
   const [progressValue, setProgressValue] = useState(0);
   const [isInProgress,setIsInProgress] = useState(false);
+  const [newMatrixName, setNewMatrixName] = useState("");
+   const [errorMsg, setErrorMsg] = useState({
+    show: false,
+    text: produceError,
+  });
+
 
   const getNewCustomerData = () => {
     const customerObject = customers.find(
@@ -99,6 +105,10 @@ const DataContextProvider = (props) => {
         setProgressValue,
         isInProgress,
         setIsInProgress,
+        newMatrixName,
+        setNewMatrixName,
+        errorMsg,
+        setErrorMsg
       }}
     >
       {props.children}

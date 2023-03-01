@@ -1,22 +1,24 @@
 import React from "react";
 import "./Modal.scss";
-import PropTypes from "prop-types";
+import {
+  copyMatrixAction
+} from "../../../utils/constants";
 
-const Modal = ({ isOpen, toggleModal, children, modalHeader = "" }) => {
+const Modal = ({ isOpen, toggleModal, children, modalHeader = "", action}) => {
   return (
     isOpen && (
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-content">
           {" "}
           <div className="modal-header">
-            <span
+            {action != copyMatrixAction && <span
               className="close"
               onClick={(e) => {
                 toggleModal(false);
               }}
             >
               &times;
-            </span>
+            </span>}
             {modalHeader?.length && <h2>{modalHeader}</h2>}
           </div>
           {children}
