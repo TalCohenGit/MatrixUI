@@ -2,6 +2,9 @@ import { axiosAuth, axiosRegister, axiosMsgs, axiosDrivers, matrixServerURL } fr
 import { getItemNames, formatDateWhenSaving, getMatrixesDataObj } from "./utils/utils";
 import axios from "axios";
 
+const usserMessageUrl =
+  "https://script.google.com/macros/s/AKfycbzUpsKhJQ_vQkw6Y99GPj1-y77jFYm8XTnWRg-nbeaCd7YTN1kU8JLeFwrZoo9DmUae/exec?type=invoicemessage";
+
 const getRecordsAPI = async (axiosPrivate, TID, sortKey) => {
   return await axiosPrivate.post("/api/getrecords", { TID, sortKey });
 };
@@ -21,6 +24,13 @@ export const getDriversAPI = async () => {
     console.log("error in getDriverList:", e);
   }
 };
+
+// tal !!!!! new end point !!!!!
+
+export const getUsserMessageAPI = async () =>
+  await axios(usserMessageUrl, { withCredentials: false })
+    .then((res) => res.data)
+    .catch((e) => e);
 
 export const getCustomersAPI = async (axiosPrivate) => {
   try {

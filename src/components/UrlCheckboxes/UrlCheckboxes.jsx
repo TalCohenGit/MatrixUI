@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import "./UrlCheckboxes.scss";
 import PropTypes from "prop-types";
-import { mergePdfAPI, sendMsgsAPI } from "../../api";
+import { getUsserMessageAPI, mergePdfAPI, sendMsgsAPI } from "../../api";
 import InvoiceTable from "../InvoiceTable";
 import { getInternationalNum } from "../../utils/utils";
 import { Tooltip } from "@mui/material";
@@ -15,8 +15,7 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     const invoiceIndex = currentInvoiceTableData.findIndex((invoiceObject) => {
       return invoiceObject.DocUrl === url;
     });
-    currentInvoiceTableData[invoiceIndex].checked =
-      !currentInvoiceTableData[invoiceIndex].checked;
+    currentInvoiceTableData[invoiceIndex].checked = !currentInvoiceTableData[invoiceIndex].checked;
     if (currentInvoiceTableData.every((urlObj) => urlObj.checked)) {
       setCheckAll(true);
     } else {
@@ -55,20 +54,31 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     const msgs = [];
     const numbers = [];
     const businessName = localStorage.getItem("businessName");
+    const usserMessage = await getUsserMessageAPI();
     filteredUrls.map((checkedUrl) => {
       const url = checkedUrl["DocUrl"];
       const accountName = checkedUrl["Accountname"];
       const docNumber = checkedUrl["DocNumber"];
       const phoneNumber = checkedUrl["DocumentDetails"];
-      const fixedNum = getInternationalNum(phoneNumber);
+      const fixedNum = getInternationalNum(usserMessage?.inTesting ? usserMessage?.testingNum : phoneNumber);
+
+      // the returned object !!
+      // {
+      //   businessNameText: "הודעה מעסק ",
+      //   castumerNameText: "שלום",
+      //   invoiceText: "מצורפת בזאת חשבונית מס ",
+      //   inTesting: false,
+      //   testingNum: ""
+      //   }
+
       const msg =
-        `הודעה מעסק ${businessName}\n` +
-        `שלום ${accountName}\n` +
-        `מצורפת בזאת חשבונית מס ${docNumber}\n` +
+        `${usserMessage?.businessNameText ?? "הודעה מעסק"} ${businessName}\n` +
+        `${usserMessage?.castumerNameText ?? " שלום"} ${accountName}\n` +
+        `${usserMessage?.invoiceText ?? "מצורפת בזאת חשבונית מס "}${docNumber}\n` +
         `${url}`;
       console.log("msg: ", msg);
       msgs.push(msg);
-      numbers.push("972526544346");
+      numbers.push(fixedNum);
     });
     await sendMsgsAPI(numbers, msgs);
   };
@@ -77,13 +87,7 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     const { DocUrl, checked } = invoice;
     return {
       ...invoice,
-      checked: (
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={(e) => handleChange(DocUrl)}
-        />
-      ),
+      checked: <input type="checkbox" checked={checked} onChange={(e) => handleChange(DocUrl)} />,
       DocUrl: <a href={DocUrl}>קישור למסמך</a>,
     };
   });
@@ -95,49 +99,34 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     setInvoiceTableData(parsedInvoiceData);
   }, []);
 
-  useEffect(() => {
-  }, [invoiceData]);
+  useEffect(() => {}, [invoiceData]);
 
   const checkAllHeader = (
     <div className="url-row">
-      <input
-        type="checkbox"
-        checked={checkAll}
-        onChange={(e) => handleCheckAll()}
-      />
+      <input type="checkbox" checked={checkAll} onChange={(e) => handleCheckAll()} />
       <p>בחר הכל</p>
       <br />
     </div>
   );
 
   // const hasPermission = localStorage.getItem("whatsapp") === "true";
-  const hasPermission = true
+  const hasPermission = true;
   const sendingDisabled = invoiceTableData.every((urlObj) => !urlObj.checked);
   const enableMessagesFeature = hasPermission && !sendingDisabled;
 
   return (
     <>
-      {invoiceDataToShow?.length ? <InvoiceTable
-        tableData={invoiceDataToShow}
-        tableHeader={[
-          checkAllHeader,
-          "קישור",
-          "שם",
-          "מס פעולה",
-          "תאריך",
-          "סכום",
-          "מס' מסמך",
-          "מס' טלפון",
-        ]}
-      /> : null}
+      {invoiceDataToShow?.length ? (
+        <InvoiceTable
+          tableData={invoiceDataToShow}
+          tableHeader={[checkAllHeader, "קישור", "שם", "מס פעולה", "תאריך", "סכום", "מס' מסמך", "מס' טלפון"]}
+        />
+      ) : null}
       <div className="action-buttons">
         <button className="cancel-button" onClick={() => toggleModal(false)}>
           בטל
         </button>
-        <button
-          className={"send-to-print" + (sendingDisabled ? " disabled" : "")}
-          onClick={() => sendUrlToPrint()}
-        >
+        <button className={"send-to-print" + (sendingDisabled ? " disabled" : "")} onClick={() => sendUrlToPrint()}>
           שלח להדפסה
         </button>
         <Tooltip
@@ -150,9 +139,7 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
           disableHoverListener={hasPermission}
         >
           <button
-            className={
-              "send-to-print" + (enableMessagesFeature ? "" : " hasOpacity")
-            }
+            className={"send-to-print" + (enableMessagesFeature ? "" : " hasOpacity")}
             onClick={(e) => {
               if (enableMessagesFeature) {
                 sendMessages();
