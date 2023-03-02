@@ -3,7 +3,7 @@ import Input from "@mui/material/Input";
 import { docConfigOptions, actionConfigOptions } from "../utils/constants";
 import ConfigPageRowSelect from "../components/ConfigPageRowSelect";
 import Checkbox from "@mui/material/Checkbox";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import RegisterConfigUserDetails from "../components/RegisterConfigUserDetails";
 import ConfigPageTable from "../components/ConfigPageTable";
 import { initvalidateAPI, setConfigAPI } from "../api";
@@ -26,6 +26,7 @@ const ConfigPage = ({ axiosPrivate }) => {
   });
 
   const location = useLocation();
+  const navigate = useNavigate();
   const { inputs, from, erpName } = location.state || {};
   console.log("location", location?.state);
 
@@ -110,8 +111,14 @@ const ConfigPage = ({ axiosPrivate }) => {
         ...inputs,
       },
     };
-    console.log("configData", configData, from.pathname);
-    await setConfigAPI(axiosPrivate, configData);
+    const configRes = await setConfigAPI(axiosPrivate, configData);
+
+
+    console.log("configData", configRes);
+
+    navigate("/")
+
+
   };
 
   if (location?.state?.from?.pathname !== "/erp") {

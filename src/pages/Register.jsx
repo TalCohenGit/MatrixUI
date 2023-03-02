@@ -15,7 +15,7 @@ const USER_REGEX =
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
 const Register = ({ setNeedToRegister }) => {
-  const {businessName, setBusinessName, setAccessToken, setTimelimit, setUserID } = useContext(DataContext);
+  const {businessName, setBusinessName, setAccessToken, setTimelimit, setUserID, setErrorMsg } = useContext(DataContext);
   const navigate = useNavigate();
   
   const [userEmail, setUserEmail] = useState("");
@@ -96,6 +96,10 @@ const Register = ({ setNeedToRegister }) => {
    } catch (e) {
       console.log("error in handleSubmit: ", e);
       setErrMsg(e);
+      setErrorMsg({
+        show: true,
+        text: "שגיאה ברישום"
+      })
     }
   };
 
