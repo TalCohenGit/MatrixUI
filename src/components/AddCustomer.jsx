@@ -70,9 +70,9 @@ const AddCustomer = ({
     setProgressValue,
     isInProgress,
     errorMsg,
-    setErrorMsg
+    setErrorMsg,
   } = useContext(DataContext);
- 
+
   const intialRangeState = [
     {
       startDate: new Date(),
@@ -85,7 +85,6 @@ const AddCustomer = ({
     failure: false,
     error: "",
   });
-
 
   const [isUrlsModalOpen, toggleUrlsModal] = useState(false);
   const [isUrlModalSearch, toggleUrlsSearchModal] = useState(false);
@@ -210,7 +209,7 @@ const AddCustomer = ({
                   }
                 }
 
-                setProgressValue(newValue);
+                setProgressValue({ prec: newValue, content: decodedValue });
                 push();
               });
             }
@@ -345,14 +344,7 @@ const AddCustomer = ({
     try {
       const fileName = Math.random().toString();
       setIsInProgress(true);
-      const matrixesData = getMatrixesDataObj(
-        newMatrixId,
-        validatedData,
-        cellsData,
-        docCommentsToSend,
-        metaDataToSend,
-        productsMap
-      );
+      const matrixesData = getMatrixesDataObj(newMatrixId, validatedData, cellsData, docCommentsToSend, metaDataToSend, productsMap);
       if (!matrixesData) {
         setCustomerValidationFailed({
           failure: true,
@@ -370,10 +362,15 @@ const AddCustomer = ({
               show: true,
               text: produceError,
             });
-          } else await getProgressBar(matrixesData.mainMatrix.AccountKey.length, fileName);
-          setIsInProgress(false);
-          setProgressValue(0);
-          updateProducedInUI();
+          } else {
+            if (res?.data?.errors) {
+              console.log("got errors but not major ones");
+            }
+            await getProgressBar(matrixesData.mainMatrix.AccountKey.length, fileName);
+            setIsInProgress(false);
+            setProgressValue(0);
+            updateProducedInUI();
+          }
         })
         .catch((error) => {
           setIsInProgress(false);
@@ -543,12 +540,9 @@ const AddCustomer = ({
       if (row[0] === "שם לקוח") {
         continue;
       }
-      if(row[row.length - 3] === 1){
+      if (row[row.length - 3] === 1) {
         row[row.length - 3] = 4;
       }
-      
-
-     
     }
 
     setMatrixData(currentData);
@@ -598,18 +592,8 @@ const AddCustomer = ({
             setNewMatrixName={setNewMatrixName}
             newMatrixName={newMatrixName}
           />
-          <ListModal
-            isOpen={isUrlsModalOpen}
-            toggleModal={finishProduce}
-            header={"מסמכים שהופקו"}
-            invoices={invoiceData}
-          />
-          <ListModal
-            isOpen={isUrlModalSearch}
-            toggleModal={toggleUrlsSearchModal}
-            header={"מסמכים שהופקו"}
-            invoices={searchedInvoices}
-          />
+          <ListModal isOpen={isUrlsModalOpen} toggleModal={finishProduce} header={"מסמכים שהופקו"} invoices={invoiceData} />
+          <ListModal isOpen={isUrlModalSearch} toggleModal={toggleUrlsSearchModal} header={"מסמכים שהופקו"} invoices={searchedInvoices} />
           <SaveModal
             matrixName={matrixName}
             isOpen={detailsToCopyModal}

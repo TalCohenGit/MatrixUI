@@ -26,7 +26,6 @@ export const getDriversAPI = async () => {
 };
 
 // tal !!!!! new end point !!!!!
-
 export const getUsserMessageAPI = async () =>
   await axios(usserMessageUrl, { withCredentials: false })
     .then((res) => res.data)
