@@ -55,6 +55,7 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     const numbers = [];
     const businessName = localStorage.getItem("businessName");
     const usserMessage = await getUsserMessageAPI();
+
     filteredUrls.map((checkedUrl) => {
       const url = checkedUrl["DocUrl"];
       const accountName = checkedUrl["Accountname"];
