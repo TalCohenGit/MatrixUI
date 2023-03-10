@@ -105,7 +105,7 @@ export const getUserEmail = () => {
 };
 
 export const getInternationalNum = (phoneNum) => {
-  return "972" + phoneNum.substring(1);
+  return "972" + phoneNum;
 };
 
 export const removeColFromBalanceTable = (currentBalanceTable, productsData, productName) => {

@@ -59,7 +59,7 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
       const url = checkedUrl["DocUrl"];
       const accountName = checkedUrl["Accountname"];
       const docNumber = checkedUrl["DocNumber"];
-      const phoneNumber = checkedUrl["DocumentDetails"];
+      const phoneNumber = checkedUrl["DocumentDetails"].substring(1)
       const fixedNum = getInternationalNum(usserMessage?.inTesting ? usserMessage?.testingNum : phoneNumber);
 
       // the returned object !!
