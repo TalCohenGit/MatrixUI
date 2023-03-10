@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -8,8 +8,10 @@ import Input from "@mui/material/Input";
 import { useNavigate, useLocation } from "react-router-dom";
 import RegisterConfigUserDetails from "../components/RegisterConfigUserDetails";
 import { initvalidateAPI, setConfigAPI } from "../api";
+import { DataContext } from "../context/DataContext";
+import Toast from "../components/Toast/Toast";
 
-const ErpSelect = ({axiosPrivate}) => {
+const ErpSelect = ({ axiosPrivate }) => {
   const [value, setValue] = useState("hashvsevet");
   const [inputs, setInputs] = useState({
     hToken: "",
@@ -19,6 +21,7 @@ const ErpSelect = ({axiosPrivate}) => {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const {setErrorMsg,errorMsg} = useContext(DataContext)
   const { firstName, lastName, userEmail } = location.state || {};
 
   const handleRadioChange = (event) => {
@@ -45,8 +48,8 @@ const ErpSelect = ({axiosPrivate}) => {
       usserPrivetKey: inputs?.hToken,
       usserServerName: inputs?.hServerName,
       usserDbname: inputs?.hDbName,
-    }
-  }
+    };
+  };
 
   const handleNextClick = async (event) => {
     event.preventDefault();
@@ -55,16 +58,24 @@ const ErpSelect = ({axiosPrivate}) => {
       getERPDetails(),
       "conection"
     );
-    //if res is ok
-    let erpName = "HA"
+    console.log("ErpSelect res:", res);
+    if (!res || res?.data?.status === "no") {
+      console.log("error in erpSelect");
+      setErrorMsg({
+        show: true,
+        text: "שגיאה בנתונים המוזנים. נא נסה שנית.",
+      });
+      return;
+    }
+    let erpName = "HA";
     if (value !== "hashvsevet") {
-      erpName = "RI"
+      erpName = "RI";
     }
     setConfigAPI(axiosPrivate, {
       accountState: "active",
       ErpConfig: {
         erpName,
-        [erpName]:  getERPDetails()
+        [erpName]: getERPDetails(),
       },
     });
     navigate("/config", {
@@ -72,7 +83,7 @@ const ErpSelect = ({axiosPrivate}) => {
         firstName,
         lastName,
         userEmail,
-        from: location
+        from: location,
       },
     });
   };
@@ -139,6 +150,16 @@ const ErpSelect = ({axiosPrivate}) => {
         המשך לעמוד הבא
       </button>
       <RegisterConfigUserDetails location={location} />
+      <Toast
+            isOpen={errorMsg.show}
+            text={errorMsg.text}
+            handleClose={() => {
+              setErrorMsg({
+                ...errorMsg,
+                show: false,
+              });
+            }}
+          />
     </div>
   );
 };

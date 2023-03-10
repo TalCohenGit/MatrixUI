@@ -44,7 +44,7 @@ import {
 } from "../utils/constants";
 import Modal from "../common/components/Modal/Modal";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
-import ProgressBar from "./ProgressBar/ProgressBar";
+import ProgressBar from "../components/ProgressBar/ProgressBar";
 import { molestLoggerApi } from "../hooks/useLogerApi";
 
 function MatrixPage({ seconds, setSeconds, setRefreshToken, axiosPrivate}) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useState } from "react";
 import { Routes, Route } from "react-router-dom";
 import MatrixPage from "./pages/MatrixPage";
 import Login from "./pages/Login";
@@ -6,6 +6,7 @@ import ErpSelect from "./pages/ErpSelect";
 import Register from "./pages/Register";
 import ConfigPage from "./pages/ConfigPage";
 import useAxiosPrivate from "./hooks/useAxiosPrivate";
+import { DataContext } from "./context/DataContext";
 
 
 const App = () => {
@@ -13,10 +14,12 @@ const App = () => {
 
   const [refreshToken, setRefreshToken] = useState("");
   const [seconds, setSeconds] = useState(0);
+  const {finishedConfigStage} = useContext(DataContext)
 
-  const getRefreshToken = () => {
+  const existRefreshToken = () => {
     const newRefreshToken = localStorage.getItem("refreshToken");
-    if (newRefreshToken) {
+    console.log("newRefreshToken", newRefreshToken)
+    if (newRefreshToken && newRefreshToken !== "undefined") {
       return true;
     }
     return false;
@@ -25,7 +28,7 @@ const App = () => {
   // useEffect(() => {}, [refreshToken]);
 
   const MainPage =
-    !refreshToken && !getRefreshToken() ? (
+    (!refreshToken && !existRefreshToken()) || !finishedConfigStage ? (
       <Login setSeconds={setSeconds} setRefreshToken={setRefreshToken} />
     ) : (
       <MatrixPage
@@ -41,9 +44,10 @@ const App = () => {
       <Routes>
         <Route exact path="/" element={MainPage} />
         <Route path="/erp" element={<ErpSelect axiosPrivate={axiosPrivate}/>}/>
-        <Route path="/register" element={<Register/>}/>
+        <Route path="/register" element={<Register setRefreshToken={setRefreshToken}/>}/>
         <Route path="/config" element={<ConfigPage axiosPrivate={axiosPrivate}/>}/>
       </Routes>
+
     </div>
   );
 };

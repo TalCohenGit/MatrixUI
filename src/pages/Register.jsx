@@ -9,13 +9,14 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { registerAPI } from "../api";
 import { DataContext } from "../context/DataContext";
 import { useNavigate } from "react-router-dom";
+import Toast from "../components/Toast/Toast";
 
 const USER_REGEX =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 const PWD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%]).{8,24}$/;
 
-const Register = ({ setNeedToRegister }) => {
-  const {businessName, setBusinessName, setAccessToken, setTimelimit, setUserID, setErrorMsg } = useContext(DataContext);
+const Register = ({ setNeedToRegister, setRefreshToken }) => {
+  const {businessName, setBusinessName, setAccessToken, setTimelimit, setUserID, errorMsg, setErrorMsg } = useContext(DataContext);
   const navigate = useNavigate();
   
   const [userEmail, setUserEmail] = useState("");
@@ -77,14 +78,25 @@ const Register = ({ setNeedToRegister }) => {
         accountName
       );
       console.log("res",res)
-      // setSuccess(true);
+      
+      if(!res || res?.data?.result?.status === "no") {
+        console.log("error")
+        setErrorMsg({
+          show: true,
+          text: "נא בדוק שהשם משתמש אינו קיים במערכת .שגיאה ברישום"
+        })
+        return 
+      }
       const accessToken = res?.data?.loginData?.result?.data?.accessToken
       const refreshToken =  res?.data?.loginData?.result?.data?.refreshToken
       const timeLimit =  res?.data?.loginData?.result?.data?.timeLimit
       const userConfig =  res?.data?.loginData?.result?.data?.userConfig
+      
       localStorage.setItem("refreshToken", refreshToken);
+      setRefreshToken(refreshToken)
       setAccessToken(accessToken)
       setTimelimit(timeLimit)
+      localStorage.setItem("userEmail", accountName)
       const whatsappPermissions = getUserPermission(userConfig)
       localStorage.setItem("whatsapp", whatsappPermissions)
 
@@ -92,7 +104,7 @@ const Register = ({ setNeedToRegister }) => {
       setUserID(userID)
 
       localStorage.setItem("businessName", businessName)
-      navigate("/erp",{state:{firstName,lastName,userEmail}})
+      navigate("/erp",{state:{firstName,lastName,userEmail,setErrorMsg}})
    } catch (e) {
       console.log("error in handleSubmit: ", e);
       setErrMsg(e);
@@ -252,6 +264,16 @@ const Register = ({ setNeedToRegister }) => {
         </div>
       </form>
       {errMsg ? <p> שם משתמש או סיסמה שגויים, נא לנסות שוב </p> : null}
+      <Toast
+            isOpen={errorMsg.show}
+            text={errorMsg.text}
+            handleClose={() => {
+              setErrorMsg({
+                ...errorMsg,
+                show: false,
+              });
+            }}
+          />
     </div>
   );
 };

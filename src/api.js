@@ -248,6 +248,12 @@ const getData = async (axiosPrivate, fromDate, toDate, collection, date) => {
   });
 };
 
+export const getConfigDataAPI = async(axiosPrivate) => {
+  return await axiosPrivate.post("/api/getdata", {
+    collection: "Config"
+  });
+}
+
 export const initvalidateAPI = async (axiosPrivate, bodyToCheck, stage) => {
   return await axiosPrivate.post("/api/initvalidate", bodyToCheck,  {headers: {
     stage}

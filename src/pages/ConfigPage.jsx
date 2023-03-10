@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import Input from "@mui/material/Input";
 import { docConfigOptions, actionConfigOptions } from "../utils/constants";
 import ConfigPageRowSelect from "../components/ConfigPageRowSelect";
@@ -6,7 +6,9 @@ import Checkbox from "@mui/material/Checkbox";
 import { useLocation, useNavigate } from "react-router-dom";
 import RegisterConfigUserDetails from "../components/RegisterConfigUserDetails";
 import ConfigPageTable from "../components/ConfigPageTable";
-import { initvalidateAPI, setConfigAPI } from "../api";
+import { initvalidateAPI, setConfigAPI, getConfigDataAPI } from "../api";
+import { DataContext } from "../context/DataContext";
+import Toast from "../components/Toast/Toast";
 
 const ConfigPage = ({ axiosPrivate }) => {
   const initialState = {
@@ -24,6 +26,7 @@ const ConfigPage = ({ axiosPrivate }) => {
     detailsCode: { radio: "single", dataType: "sort", input: "" },
     customersCode: { radio: "single", input: "" },
   });
+  const {setConfig,errorMsg,setErrorMsg, setFinishConfigStage} = useContext(DataContext)
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -41,12 +44,12 @@ const ConfigPage = ({ axiosPrivate }) => {
   const handleChange = (e) => {
     setSelectedDoc(e);
   };
- 
+
   const getCustomersReport = () => {
     return {
-        sortingKey: "קוד מיון",
-        sortingType: value.customersCode.radio,
-        sortingValue: parseTableInput(value.customersCode.input)
+      sortingKey: "קוד מיון",
+      sortingType: value.customersCode.radio,
+      sortingValue: parseTableInput(value.customersCode.input),
     };
   };
 
@@ -55,20 +58,40 @@ const ConfigPage = ({ axiosPrivate }) => {
       sortingKey: value.detailsCode.dataType,
       sortingType: value.detailsCode.radio,
       sortingValue: parseTableInput(value.detailsCode.input),
+    };
+  };
+
+  const nextPageValidation = () => {
+    let isValid = true;
+    console.log("value.customersCode.input", value.customersCode.input)
+    console.log("value.detailsCode.input", value.detailsCode.input)
+
+    if (!value.customersCode.input || !value.detailsCode.input) {
+      console.log("invalid")
+      isValid = false
     }
-  }
+
+    return isValid;
+  };
 
   const saveConfig = async () => {
-    const res = initvalidateAPI(axiosPrivate, {
-      castumers: [getCustomersReport()],
-      products: [getProductsReport()]
-    }, "reports")
-    // if res is ok
-    const configData = {
+    const res = initvalidateAPI(
+      axiosPrivate,
+      {
+        castumers: [getCustomersReport()],
+        products: [getProductsReport()],
+      },
+      "reports"
+    );
+    if (res?.data?.status === "no") {
+      console.log("error in ConfigPage");
+      return;
+    }
+    const configObj = {
       Reports: {
         defaultReports: {
           castumers: [getCustomersReport()],
-          products: [getProductsReport()]
+          products: [getProductsReport()],
         },
       },
       mtxConfig: {
@@ -111,14 +134,13 @@ const ConfigPage = ({ axiosPrivate }) => {
         ...inputs,
       },
     };
-    const configRes = await setConfigAPI(axiosPrivate, configData);
-
-
+    await setConfigAPI(axiosPrivate, configObj);
+    const configRes = await getConfigDataAPI(axiosPrivate)
     console.log("configData", configRes);
-
-    navigate("/")
-
-
+    const configDataRes = configRes?.result?.data[0]
+    setConfig(configDataRes)
+    setFinishConfigStage(true)
+    navigate("/");
   };
 
   if (location?.state?.from?.pathname !== "/erp") {
@@ -179,13 +201,25 @@ const ConfigPage = ({ axiosPrivate }) => {
       <ConfigPageTable value={value} setValue={setValue} />
       <RegisterConfigUserDetails location={location} />
       <button
-        className="next-button"
+        className={
+          "next-button" + (!nextPageValidation() ? " btnDisabled" : "")
+        }
         onClick={(e) => {
           saveConfig();
         }}
       >
         המשך לעמוד הבא
       </button>
+      <Toast
+            isOpen={errorMsg.show}
+            text={errorMsg.text}
+            handleClose={() => {
+              setErrorMsg({
+                ...errorMsg,
+                show: false,
+              });
+            }}
+          />
     </div>
   );
 };

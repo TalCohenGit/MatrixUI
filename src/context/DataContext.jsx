@@ -29,6 +29,8 @@ const DataContextProvider = (props) => {
     show: false,
     text: produceError,
   });
+  const [config, setConfig] = useState([])
+  const [finishedConfigStage, setFinishConfigStage] = useState(false)
 
 
   const getNewCustomerData = () => {
@@ -108,7 +110,10 @@ const DataContextProvider = (props) => {
         newMatrixName,
         setNewMatrixName,
         errorMsg,
-        setErrorMsg
+        setErrorMsg,
+        setConfig,
+        finishedConfigStage,
+        setFinishConfigStage
       }}
     >
       {props.children}
