@@ -53,7 +53,9 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
     const filteredUrls = checkedUrl(invoiceTableData);
     const msgs = [];
     const numbers = [];
-    const businessName = localStorage.getItem("businessName");
+    let businessName = localStorage.getItem("businessName");
+    businessName = businessName ? businessName: ""
+    console.log("businessName", businessName)
     const usserMessage = await getUsserMessageAPI();
 
     filteredUrls.map((checkedUrl) => {
@@ -71,6 +73,9 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
       //   inTesting: false,
       //   testingNum: ""
       //   }
+      console.log("accountName", accountName)
+      console.log("docNumber", docNumber)
+      console.log("url", url)
 
       const msg =
         `${usserMessage?.businessNameText ?? "הודעה מעסק"} ${businessName}\n` +
