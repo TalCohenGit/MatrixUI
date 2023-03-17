@@ -227,7 +227,11 @@ const AddCustomer = ({
       .then((result) => {
         // Do things with result
         console.log(result);
-      });
+      })
+      .catch((error) => {
+        console.log("error in getProgressBarAPI", error)
+      })
+
   };
 
   const handleChange = (value) => {
@@ -343,7 +347,6 @@ const AddCustomer = ({
 
     try {
       const fileName = Math.random().toString();
-      setIsInProgress(true);
       const matrixesData = getMatrixesDataObj(newMatrixId, validatedData, cellsData, docCommentsToSend, metaDataToSend, productsMap);
       if (!matrixesData) {
         setCustomerValidationFailed({
@@ -355,21 +358,24 @@ const AddCustomer = ({
       createDocAPI(axiosPrivate, newMatrixId, matrixName, fileName, matrixesData)
         .then(async (res) => {
           console.log("data ", res.data.data);
-          if (res?.data?.data?.status == "no") {
+          if (res?.data?.data?.status === "no") {
             console.log("status no");
             molestLoggerApi(res.data.data.data);
-            setErrorMsg({
-              show: true,
-              text: produceError,
-            });
+            throw new Error("הלקוח עבורו ניסו לבצע הפקה נמצא בסטטוס שונה מהפקה")
           } else {
-            if (res?.data?.errors) {
-              console.log("got errors but not major ones");
+            const errors = res?.data?.errors
+            let notProducedArr = []
+            if(errors) {
+              console.log("got errors but not major ones:", errors);
+              // notProducedArr = errors.map((error) => {[error["AccountKey"]] : error["ProducedID"]})
+              notProducedArr = errors
+              console.log("notProducedArr:", notProducedArr)
             }
+            setIsInProgress(true);
             await getProgressBar(matrixesData.mainMatrix.AccountKey.length, fileName);
             setIsInProgress(false);
             setProgressValue(0);
-            updateProducedInUI();
+            updateProducedInUI(notProducedArr);
           }
         })
         .catch((error) => {
@@ -533,14 +539,20 @@ const AddCustomer = ({
     toggleStepsAfterProduce(false);
   };
 
-  const updateProducedInUI = () => {
+  const updateProducedInUI = (notProduced) => {
     const currentData = [...matrixData];
 
-    for (let row of currentData) {
+    for (let [index, row] of currentData.entries()) {
       if (row[0] === "שם לקוח") {
         continue;
       }
-      if (row[row.length - 3] === 1) {
+      console.log("row is:", row)
+      console.log("index is:", index)
+      console.log("notProduced", notProduced)
+
+      // console.log("!index.includes(notProduced)", !notProduced.includes(index))
+      // if (row[row.length - 3] === 1 && !notProduced.includes(index)) {
+      if(row[row.length - 3] === 1) {
         row[row.length - 3] = 4;
       }
     }
