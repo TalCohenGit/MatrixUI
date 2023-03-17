@@ -217,11 +217,16 @@ export const handleMatrixData = (tableData, productsMap, setCustomerValidationFa
     driverIDs.push(driverID);
     newTableDetails.push(rowData.slice(3));
   }
-
-  if (action === produceDocAction && validationFailed) {
-    return;
+  if(action === produceDocAction) {
+    if(!actionIDs.includes(1)) {
+      setError(setCustomerValidationFailed, "לא קיים מסמך להפקה");
+      validationFailed = true;
+    }
+  
+    if (validationFailed) {
+      return;
+    }
   }
-
   const products = matrix[0].slice(numOfColBeforeProducts, titleLength - numOfColAfterProducts);
   const productsWithKeys = products.map((element) => productsMap[element]);
   matrix = [productsWithKeys, ...newTableDetails];
