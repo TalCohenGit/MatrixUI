@@ -44,9 +44,10 @@ const Logout = ({ setAccessToken, setRefreshToken }) => {
       <button className="login-button" onClick={() => handleLogout()}>
         ניתוק מהמערכת
       </button>
-      <button className="log-button" onClick={() => showErrorLog()}>
+      <button className="login-button" onClick={() => showErrorLog()}>
         לוג
       </button>
+
       {errorsList.toShow && <ErrorList data={errorsList.data} setErrorsList={setErrorsList} />}
     </div>
   );

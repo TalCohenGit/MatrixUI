@@ -47,10 +47,8 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    font-family: expo-brand-demi, system-ui, -apple-system, BlinkMacSystemFont,
-      "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
-      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-      "Noto Color Emoji";
+    font-family: expo-brand-demi, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+      sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
     input {
       height: 24px;
@@ -91,10 +89,8 @@
     cursor: pointer;
     display: inline-flex;
     flex-direction: column;
-    font-family: expo-brand-demi, system-ui, -apple-system, BlinkMacSystemFont,
-      "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
-      "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
-      "Noto Color Emoji";
+    font-family: expo-brand-demi, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans",
+      sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     height: 30px;
     justify-content: center;
     line-height: 1;
@@ -241,7 +237,11 @@ body {
   @extend .addCustomer-button;
   margin-top: 20px;
 }
-
+.moduls-button {
+  @extend .addCustomer-button;
+  margin-top: 20px;
+  margin-right: 40px;
+}
 .chooseProduct {
   margin-left: auto;
   margin-right: 20px;
@@ -314,7 +314,15 @@ body {
   margin-right: 0;
   margin-left: 10px;
 }
-
+.modules-cancel-button {
+  @extend .addCustomer-button;
+  color: #25292e;
+  border: 1px solid #25292e;
+  background-color: #fff;
+  background-image: none;
+  margin-right: 10px;
+  // margin-left: 10px;
+}
 .action-buttons {
   display: flex;
   margin-top: 10px;
@@ -494,6 +502,6 @@ input[type="checkbox"] {
 .minimize-icon {
   &:hover {
     cursor: pointer;
-    color:"red";
+    color: "red";
   }
 }

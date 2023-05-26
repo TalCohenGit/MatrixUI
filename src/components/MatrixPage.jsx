@@ -2,6 +2,7 @@ import React, { useEffect, useContext, useState } from "react";
 import jwt from "jwt-decode";
 import "../App.scss";
 import "normalize.css";
+import AddedModulesNav from "../modules/AddedModulesNave";
 import AddCustomer from "../components/AddCustomer";
 import Table from "../components/Table";
 import CopyDataModal from "../components/Modals/CopyDataModal";
@@ -35,13 +36,7 @@ import {
   getUserEmail,
 } from "../utils/utils";
 import CircularProgress from "@mui/material/CircularProgress";
-import {
-  numOfColBeforeProducts,
-  numOfColAfterProducts,
-  savingAsAction,
-  savingAction,
-  copyMatrixAction,
-} from "../utils/constants";
+import { numOfColBeforeProducts, numOfColAfterProducts, savingAsAction, savingAction, copyMatrixAction } from "../utils/constants";
 import Modal from "../common/components/Modal/Modal";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { faCommentsDollar } from "@fortawesome/free-solid-svg-icons";
@@ -200,10 +195,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
       let productsToAdd = selectedProductNames;
       if (event.option.value === "*") {
         if (numCurrentProducts > 0) {
-          const currentProducts = currentMatrix[0].slice(
-            numOfColBeforeProducts,
-            numOfColBeforeProducts + numCurrentProducts
-          );
+          const currentProducts = currentMatrix[0].slice(numOfColBeforeProducts, numOfColBeforeProducts + numCurrentProducts);
           productsToAdd = selectedProductNames.filter((product) => !currentProducts.includes(product));
         }
         newMatrix = addProducts(productsToAdd, currentMatrix, numCurrentProducts);
@@ -234,9 +226,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   };
 
   const dataDoubles = validationErrors.map((validation) => {
-    return (
-      <div>{`תקלה בערך: ${validation["ערך "]} בשורות: ${validation["בשורות "]} בכותרת: ${validation["בכותרת "]}`}</div>
-    );
+    return <div>{`תקלה בערך: ${validation["ערך "]} בשורות: ${validation["בשורות "]} בכותרת: ${validation["בכותרת "]}`}</div>;
   });
 
   useEffect(() => {
@@ -384,12 +374,8 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   const copyMatrix = async (action, toggleModal, isBi, newMatrixName, dateValue) => {
     try {
-      loadAllMatrixesData(dataToLoad["matrixesUiData"], [
-        setMatrixData,
-        setMatrixComments,
-        setSelectedProducts,
-        setBalanceTableData,
-      ]);
+      loadAllMatrix;
+      esData(dataToLoad["matrixesUiData"], [setMatrixData, setMatrixComments, setSelectedProducts, setBalanceTableData]);
 
       const newIsInitiated = false;
       const newMatrixID = await saveTables(dateValue, isBi, copyMatrixAction, newIsInitiated, newMatrixName);
@@ -467,17 +453,14 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   return drivers?.length ? (
     <div className="matrix-page">
+      <AddedModulesNav />
       <h1 className="login-details">שלום {getUserEmail()}</h1>
       <Logout setAccessToken={setAccessToken} setRefreshToken={setRefreshToken} />
       {/* <ProgressBar /> */}
       <h1> MatrixUi </h1>
       <h2> שם המטריצה: {matrixName}</h2>
       <h3> תאריך ערך למטריצה: {matrixDate && new Date(matrixDate).toLocaleDateString()}</h3>
-      <Modal
-        isOpen={isOpenValidationModal}
-        toggleModal={toggleValidationModal}
-        modalHeader={"נא לטפל בכפילויות של הנתונים"}
-      >
+      <Modal isOpen={isOpenValidationModal} toggleModal={toggleValidationModal} modalHeader={"נא לטפל בכפילויות של הנתונים"}>
         <div>{dataDoubles}</div>
         <div className="action-buttons">
           <button className="cancel-button" onClick={() => toggleValidationModal(false)}>
