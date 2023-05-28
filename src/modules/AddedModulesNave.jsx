@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import ModulesModal from "./ModulesModal";
 import Frame from "./Frame";
+import { faRotateRight } from "@fortawesome/fontawesome-free-solid";
 import IframeModal from "./IframeModule";
 
 function AddedModulesNav() {
@@ -34,13 +35,17 @@ function AddedModulesNav() {
       <button className="moduls-button" onClick={() => setToggleModal(true)}>
         מודולים
       </button>
-      {activeModules.map(
-        (module, i) =>
-          module.isCheched && (
-            <button key={i} className="moduls-button" onClick={() => setSelectedModule({ isActive: true, moduleName: module.name })}>
-              {module.name}
-            </button>
-          )
+      {activeModules.map((module, i) =>
+        module.isCheched && module.name == "נהגים" ? (
+          <div>
+            <button>נהגים</button>
+            {/* <FontAwesomeIcon icon={faRotateRight} /> */}
+          </div>
+        ) : (
+          <button key={i} className="moduls-button" onClick={() => setSelectedModule({ isActive: true, moduleName: module.name })}>
+            {module.name}
+          </button>
+        )
       )}
       <ModulesChoices
         activeModules={activeModules}
