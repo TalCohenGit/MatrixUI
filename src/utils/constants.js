@@ -5,7 +5,7 @@ export const commentsCellOptions = [
   { value: "ItemName", label: "שם פריט" },
   { value: "Warehouse", label: "מחסן" },
   { value: "Agent", label: "סוכן" },
-  { value: "CommitionPrc", label: "עמלה" }
+  { value: "CommitionPrc", label: "עמלה" },
 ];
 
 export const docInformationOptions = [
@@ -19,23 +19,49 @@ export const docInformationOptions = [
   { value: "Details", label: "פרטים" },
   { value: "Agent", label: "סוכן" },
   { value: "Osek874", label: "עוסק מורשה" },
-  { value: "Email", label: "דואר אלקטרוני" }
-]
+  { value: "Email", label: "דואר אלקטרוני" },
+];
 
-export const MUDUL_SERVER_NAME = "http://localhost:4001"
-export const AUTH_SERVER_NAME = "http://localhost:4000"
+export const ModulesData = [
+  {
+    id: "kjahsfkjfhakljsdhf",
+    name: "הזמנות",
+    isOpen: true,
+    isCheched: false,
+  },
+  {
+    id: "jshf@$#%jmkijdgf9",
+    name: "נהגים",
+    isOpen: false,
+    isCheched: false,
+  },
+  {
+    id: "spoas_&^Sdkjplokjdx",
+    name: "הודעות",
+    isOpen: true,
+    isCheched: false,
+  },
+  {
+    id: "opmsdkojqae+$^%#hgf",
+    name: "תשלומים",
+    isOpen: true,
+    isCheched: false,
+  },
+];
+export const MUDUL_SERVER_NAME = "http://localhost:4001";
+export const AUTH_SERVER_NAME = "http://localhost:4000";
 
-export const numOfColBeforeProducts = 3
-export const numOfColAfterProducts = 5
-export const titleWithoutProduct = numOfColBeforeProducts + numOfColAfterProducts
+export const numOfColBeforeProducts = 3;
+export const numOfColAfterProducts = 5;
+export const titleWithoutProduct = numOfColBeforeProducts + numOfColAfterProducts;
 
-export const savingAsAction = "savingAsAction"
-export const savingAction = "savingAction"
-export const produceDocAction = "produceDoc"
-export const copyMatrixAction = "copyMatrix"
+export const savingAsAction = "savingAsAction";
+export const savingAction = "savingAction";
+export const produceDocAction = "produceDoc";
+export const copyMatrixAction = "copyMatrix";
 
-export const modalAction = {savingAsAction: "שמירה בשם", savingAction: "שמירה", copyMatrix: "שכפול מטריצה"}
+export const modalAction = { savingAsAction: "שמירה בשם", savingAction: "שמירה", copyMatrix: "שכפול מטריצה" };
 
-export const dateFormat = "mm/dd/yyyy"
+export const dateFormat = "mm/dd/yyyy";
 
-export const produceError = " bizmod.solutions@gmail.com המטריצה נכשלה בהפקה. נא נסה שנית או פנה לתמיכה הטכנית במייל"
+export const produceError = " bizmod.solutions@gmail.com המטריצה נכשלה בהפקה. נא נסה שנית או פנה לתמיכה הטכנית במייל";

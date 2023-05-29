@@ -1,52 +1,74 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import ModulesModal from "./ModulesModal";
 import Frame from "./Frame";
-import { faRotateRight } from "@fortawesome/fontawesome-free-solid";
-import IframeModal from "./IframeModule";
+import { useContext } from "react";
+import { DataContext } from "../context/DataContext";
+import faRotateRight from "./rotate-solid.svg";
+import { SaveDriversMatrix } from "./SaveMatrixToDrivers";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import "./modules.scss";
+import { ModulesData } from "../utils/constants";
 
 function AddedModulesNav() {
+  const [isMatrixSavedUpToDate, setIsMatrixSavedUpToDate] = useState(false);
   const [toggleModal, setToggleModal] = useState(false);
   const [selectedModule, setSelectedModule] = useState({ isActive: false, moduleName: null });
-  const [activeModules, setActiveModules] = useState([
-    {
-      name: "הזמנות",
-      isOpen: true,
-      isCheched: false,
-    },
-    {
-      name: "נהגים",
-      isOpen: false,
-      isCheched: false,
-    },
-    {
-      name: "הודעות",
-      isOpen: true,
-      isCheched: false,
-    },
-    {
-      name: "תשלומים",
-      isOpen: true,
-      isCheched: false,
-    },
-  ]);
+  const axiosPrivate = useAxiosPrivate();
+  const [activeModules, setActiveModules] = useState([...ModulesData]);
+  const { productsMap, newMatrixName, matrixDate, matrixData, matrixComments, selectedProducts, balanceTableData, matrixID } =
+    useContext(DataContext);
+
+  useEffect(() => {
+    console.log({ productsMap });
+  }, [productsMap]);
+
+  useEffect(() => {
+    if (!isMatrixSavedUpToDate) setIsMatrixSavedUpToDate(!isMatrixSavedUpToDate);
+  }, [matrixData, isMatrixSavedUpToDate]);
+  const handleDriversMatrixSave = async () => {
+    const x = await SaveDriversMatrix(
+      axiosPrivate,
+      productsMap,
+      newMatrixName,
+      matrixDate,
+      matrixData,
+      matrixComments,
+      selectedProducts,
+      balanceTableData,
+      matrixID
+    );
+    console.log({ x });
+  };
   return (
-    <div>
-      {" "}
-      <button className="moduls-button" onClick={() => setToggleModal(true)}>
+    <div className="modules-container">
+      <button className="moduls-button-main" onClick={() => setToggleModal(true)}>
         מודולים
       </button>
-      {activeModules.map((module, i) =>
-        module.isCheched && module.name == "נהגים" ? (
-          <div>
-            <button>נהגים</button>
-            {/* <FontAwesomeIcon icon={faRotateRight} /> */}
-          </div>
-        ) : (
-          <button key={i} className="moduls-button" onClick={() => setSelectedModule({ isActive: true, moduleName: module.name })}>
-            {module.name}
-          </button>
-        )
-      )}
+      {activeModules.map((module, i) => (
+        <div key={module.id}>
+          {module.isCheched && module.name == "נהגים" ? (
+            <div className="drivers-container">
+              <button className="moduls-button-2" onClick={() => setSelectedModule({ isActive: true, moduleName: module.name })}>
+                נהגים
+              </button>
+              <img
+                onClick={() => handleDriversMatrixSave()}
+                className="refresh-icon-button"
+                height={20}
+                width={20}
+                color={"white"}
+                src={faRotateRight}
+              />
+            </div>
+          ) : (
+            module.isCheched && (
+              <button key={i} className="moduls-button-2" onClick={() => setSelectedModule({ isActive: true, moduleName: module.name })}>
+                {module.name}
+              </button>
+            )
+          )}
+        </div>
+      ))}
       <ModulesChoices
         activeModules={activeModules}
         setActiveModules={setActiveModules}
@@ -115,7 +137,8 @@ const getSrcByName = (name) => {
       return "https://gat-avigdor-castumers-ui.vercel.app/admin/" + authorizedID;
     }
     case "נהגים": {
-      return null;
+      const authorizedID = getOauth();
+      return "https://yotamos5699.github.io/drivers_ui_2/";
     }
     case "תשלומים": {
       return null;

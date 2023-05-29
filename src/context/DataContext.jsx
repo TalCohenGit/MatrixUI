@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {produceError} from "../utils/constants"
+import { produceError } from "../utils/constants";
 export const DataContext = React.createContext(null);
 
 const DataContextProvider = (props) => {
@@ -17,30 +17,26 @@ const DataContextProvider = (props) => {
   const [accessToken, setAccessToken] = useState("");
   const [timeLimit, setTimelimit] = useState("");
   const [userID, setUserID] = useState("");
-  const [selectedProducts, setSelectedProducts] = useState([])
-  const [matrixName, setMatrixName] = useState("")
-  const [matrixDate, setMatrixDate] = useState("")
-  const [isInitiated, setIsInitiated] = useState(false)
+  const [selectedProducts, setSelectedProducts] = useState([]);
+  const [matrixName, setMatrixName] = useState("");
+  const [matrixDate, setMatrixDate] = useState("");
+  const [isInitiated, setIsInitiated] = useState(false);
   const [businessName, setBusinessName] = useState("");
   const [progressValue, setProgressValue] = useState(0);
-  const [isInProgress,setIsInProgress] = useState(false);
+  const [isInProgress, setIsInProgress] = useState(false);
   const [newMatrixName, setNewMatrixName] = useState("");
-   const [errorMsg, setErrorMsg] = useState({
+
+  const [errorMsg, setErrorMsg] = useState({
     show: false,
     text: produceError,
   });
 
-
   const getNewCustomerData = () => {
-    const customerObject = customers.find(
-      (customer) => customer.userName === customerName
-    );
+    const customerObject = customers.find((customer) => customer.userName === customerName);
     if (!customerObject) {
       return null;
     }
-    return Object.values(customerObject).map((customerElement) =>
-      customerElement ? customerElement : "-"
-    );
+    return Object.values(customerObject).map((customerElement) => (customerElement ? customerElement : "-"));
   };
 
   const calcProductsSum = (n) => {
@@ -57,11 +53,11 @@ const DataContextProvider = (props) => {
     setBalanceTableData(currentData);
   };
 
-
   return (
     <DataContext.Provider
       value={{
         matrixData,
+
         setMatrixData,
         drivers,
         setDrivers,
@@ -108,7 +104,7 @@ const DataContextProvider = (props) => {
         newMatrixName,
         setNewMatrixName,
         errorMsg,
-        setErrorMsg
+        setErrorMsg,
       }}
     >
       {props.children}

@@ -230,6 +230,9 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
   });
 
   useEffect(() => {
+    console.log({ productsMap });
+  }, [productsMap]);
+  useEffect(() => {
     // interval = setInterval(() => {
     //   setSeconds((prevSeconds) => prevSeconds + 1);
     // }, 1000);

@@ -77,10 +77,7 @@ export const updateBalanceTable = (currentTableData, productsToAdd, productsData
 export const removeColFromTable = (colIndex, numOfColBeforeProducts, matrix) => {
   return matrix.map((row) => {
     let newArr;
-    newArr = [
-      ...row.slice(0, colIndex - numOfColBeforeProducts),
-      ...row.slice(colIndex + 1 - numOfColBeforeProducts, row.length),
-    ];
+    newArr = [...row.slice(0, colIndex - numOfColBeforeProducts), ...row.slice(colIndex + 1 - numOfColBeforeProducts, row.length)];
     return newArr;
   });
 };
@@ -217,12 +214,12 @@ export const handleMatrixData = (tableData, productsMap, setCustomerValidationFa
     driverIDs.push(driverID);
     newTableDetails.push(rowData.slice(3));
   }
-  if(action === produceDocAction) {
-    if(!actionIDs.includes(1)) {
+  if (action === produceDocAction) {
+    if (!actionIDs.includes(1)) {
       setError(setCustomerValidationFailed, "לא קיים מסמך להפקה");
       validationFailed = true;
     }
-  
+
     if (validationFailed) {
       return;
     }
@@ -328,11 +325,15 @@ export const getProductsNameKeyMap = (products) => {
 
 export const getItemNames = (itemsKeys, productsMap) => {
   const itemsNameArr = [];
-
-  itemsKeys.forEach((itemKey) => {
-    const productName = Object.keys(productsMap).find((key) => productsMap[key] === itemKey);
-    itemsNameArr.push(productName);
-  });
+  console.log({ itemsKeys, productsMap });
+  try {
+    itemsKeys.forEach((itemKey) => {
+      const productName = Object.keys(productsMap).find((key) => productsMap[key] === itemKey);
+      itemsNameArr.push(productName);
+    });
+  } catch (err) {
+    console.log("in get items names", { err });
+  }
   return itemsNameArr;
 };
 

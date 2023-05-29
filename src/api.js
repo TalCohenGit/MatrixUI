@@ -35,7 +35,7 @@ export const getCustomersAPI = async (axiosPrivate) => {
   try {
     const res = await getRecordsAPI(axiosPrivate, "2", { "קוד מיון": "300" });
     const rawData = res.data.data;
-
+    console.log({ rawData });
     return (
       rawData?.length &&
       rawData.map((customer) => {
@@ -57,6 +57,7 @@ export const getProductsAPI = async (axiosPrivate, validationModal) => {
     const validationErrors = res.data.validationError;
     validationModal(validationErrors);
     const elements = res.data.data;
+    console.log({ elements });
     return elements;
   } catch (e) {
     console.log("error in getProductsAPI:", e);
@@ -132,6 +133,37 @@ export const saveTablesAPI = async (
   }
 };
 
+export const saveTablesForDriversAPI = async (
+  axiosPrivate,
+  matrixID,
+  tableData,
+  matrixesUiData,
+  cellsData,
+  docData,
+  metaData,
+
+  date,
+  matrixName,
+  productsMap,
+  isBI = false,
+  isInitiated = true,
+  isDrivers = true
+) => {
+  const matrixesData = getMatrixesDataObj(matrixID, tableData, cellsData, docData, metaData, productsMap);
+  if (!matrixesData) {
+    console.log("error in saveTablesAPI: ", "no matrixesData");
+    return;
+  }
+  try {
+    const res = await axiosPrivate.post("/api/saveMatrix", {
+      ...getMatrixObject(date, matrixID, matrixesData, isBI, matrixName, matrixesUiData, isInitiated),
+      isDrivers,
+    });
+    return matrixID;
+  } catch (e) {
+    console.log("error in saveTablesAPI: ", e);
+  }
+};
 export const loginUserAPI = async (userEmail, password) => {
   try {
     const res = await axiosAuth.post("/api/login", {
@@ -211,6 +243,16 @@ export const getUrlsAPI = async (axiosPrivate, fileName) => {
   }
 };
 
+export const saveSelectedDriversMatrixID = async (id) => {
+  const res = await axios(
+    "https://script.google.com/macros/s/AKfycbwYsPdgqWD6QNjllH8ZB_-Wde6br0CYcXUE2yShDvGb0486ojgzEKkF5_HbBb5Q34iV/exec" +
+      "?type=currentid&id=" +
+      id,
+    {
+      withCredentials: false,
+    }
+  ).catch((error) => console.log("error in settind drivers matrix id", { error }));
+};
 export const deleteMatrixAPI = async (axiosPrivate, matrixID) => {
   try {
     await axiosPrivate.post("/api/deletedata", {
@@ -307,6 +349,11 @@ export const getMatrixByIDAPI = async (axiosPrivate, matrixID) => {
     console.log("error in getMatrixByIDAPI:", e);
   }
 };
+const getLastNotForDriversMatrix = (loadArr) => {
+  for (let i = 0; i <= loadArr.length - 1; i++) {
+    if (!loadArr[i]?.isDrivers) return loadArr[i];
+  }
+};
 
 export const loadTablesAPI = async (axiosPrivate, userID) => {
   try {
@@ -316,7 +363,7 @@ export const loadTablesAPI = async (axiosPrivate, userID) => {
     const loadArr = res.data.result.data;
     const length = loadArr?.length;
     if (length) {
-      const lastLoad = loadArr[length - 1];
+      const lastLoad = getLastNotForDriversMatrix(loadArr.reverse());
       return {
         matrixID: lastLoad.matrixID,
         matrixName: lastLoad.matrixName,
