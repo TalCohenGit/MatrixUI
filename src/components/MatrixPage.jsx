@@ -377,7 +377,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   const copyMatrix = async (action, toggleModal, isBi, newMatrixName, dateValue) => {
     try {
-      loadAllMatrix;
+      // loadAllMatrix;
       esData(dataToLoad["matrixesUiData"], [setMatrixData, setMatrixComments, setSelectedProducts, setBalanceTableData]);
 
       const newIsInitiated = false;
