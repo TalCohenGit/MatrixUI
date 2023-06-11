@@ -377,8 +377,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   const copyMatrix = async (action, toggleModal, isBi, newMatrixName, dateValue) => {
     try {
-      // loadAllMatrix;
-      esData(dataToLoad["matrixesUiData"], [setMatrixData, setMatrixComments, setSelectedProducts, setBalanceTableData]);
+      loadAllMatrixesData(dataToLoad["matrixesUiData"], [setMatrixData, setMatrixComments, setSelectedProducts, setBalanceTableData]);
 
       const newIsInitiated = false;
       const newMatrixID = await saveTables(dateValue, isBi, copyMatrixAction, newIsInitiated, newMatrixName);
