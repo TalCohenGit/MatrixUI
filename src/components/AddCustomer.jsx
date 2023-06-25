@@ -229,9 +229,8 @@ const AddCustomer = ({
         console.log(result);
       })
       .catch((error) => {
-        console.log("error in getProgressBarAPI", error)
-      })
-
+        console.log("error in getProgressBarAPI", error);
+      });
   };
 
   const handleChange = (value) => {
@@ -361,15 +360,15 @@ const AddCustomer = ({
           if (res?.data?.data?.status === "no") {
             console.log("status no");
             molestLoggerApi(res.data.data.data);
-            throw new Error("הלקוח עבורו ניסו לבצע הפקה נמצא בסטטוס שונה מהפקה")
+            throw new Error("הלקוח עבורו ניסו לבצע הפקה נמצא בסטטוס שונה מהפקה");
           } else {
-            const errors = res?.data?.errors
-            let notProducedArr = []
-            if(errors) {
+            const errors = res?.data?.errors;
+            let notProducedArr = [];
+            if (errors) {
               console.log("got errors but not major ones:", errors);
               // notProducedArr = errors.map((error) => {[error["AccountKey"]] : error["ProducedID"]})
-              notProducedArr = errors
-              console.log("notProducedArr:", notProducedArr)
+              notProducedArr = errors;
+              console.log("notProducedArr:", notProducedArr);
             }
             setIsInProgress(true);
             await getProgressBar(matrixesData.mainMatrix.AccountKey.length, fileName);
@@ -483,7 +482,7 @@ const AddCustomer = ({
         <Modal isOpen={isOpen} toggleModal={toggleModal} modalHeader={header}>
           {/* <div>{dataToShow}</div> */}
           <React.Fragment>
-            <UrlCheckboxes axiosPrivate={axiosPrivate} invoiceData={invoices} toggleModal={toggleModal} />
+            <UrlCheckboxes axiosPrivate={axiosPrivate} invoiceData={invoices} toggleModal={toggleModal} matrixData={matrixData} />
           </React.Fragment>
         </Modal>
       ) : (
@@ -546,13 +545,13 @@ const AddCustomer = ({
       if (row[0] === "שם לקוח") {
         continue;
       }
-      console.log("row is:", row)
-      console.log("index is:", index)
-      console.log("notProduced", notProduced)
+      console.log("row is:", row);
+      console.log("index is:", index);
+      console.log("notProduced", notProduced);
 
       // console.log("!index.includes(notProduced)", !notProduced.includes(index))
       // if (row[row.length - 3] === 1 && !notProduced.includes(index)) {
-      if(row[row.length - 3] === 1) {
+      if (row[row.length - 3] === 1) {
         row[row.length - 3] = 4;
       }
     }

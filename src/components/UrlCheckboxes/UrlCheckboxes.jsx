@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import "./UrlCheckboxes.scss";
 import PropTypes from "prop-types";
 import { getUsserMessageAPI, mergePdfAPI, sendMsgsAPI } from "../../api";
@@ -6,7 +6,7 @@ import InvoiceTable from "../InvoiceTable";
 import { getInternationalNum } from "../../utils/utils";
 import { Tooltip } from "@mui/material";
 
-const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
+const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal, matrixData }) => {
   const [invoiceTableData, setInvoiceTableData] = useState([]);
   const [checkAll, setCheckAll] = useState(false);
 
@@ -51,20 +51,22 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
 
   const sendMessages = async () => {
     const filteredUrls = checkedUrl(invoiceTableData);
+    console.log({ matrixData });
     const msgs = [];
     const numbers = [];
     let businessName = localStorage.getItem("businessName");
-    businessName = businessName ? businessName: ""
-    console.log("businessName", businessName)
+    businessName = businessName ? businessName : "";
+    console.log("businessName", businessName);
     const usserMessage = await getUsserMessageAPI();
 
+    console.log({});
     filteredUrls.map((checkedUrl) => {
       const url = checkedUrl["DocUrl"];
       const accountName = checkedUrl["Accountname"];
       const docNumber = checkedUrl["DocNumber"];
-      const phoneNumber = checkedUrl["DocumentDetails"].substring(1)
+      const phoneNumber = matrixData.filter((r) => r[0] == accountName)[0][2];
       const fixedNum = getInternationalNum(usserMessage?.inTesting ? usserMessage?.testingNum : phoneNumber);
-
+      // console.log({ url, accountName, docNumber, phoneNumber, fixedNum });
       // the returned object !!
       // {
       //   businessNameText: "הודעה מעסק ",
@@ -73,9 +75,9 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
       //   inTesting: false,
       //   testingNum: ""
       //   }
-      console.log("accountName", accountName)
-      console.log("docNumber", docNumber)
-      console.log("url", url)
+      console.log("accountName", accountName);
+      console.log("docNumber", docNumber);
+      console.log("url", url);
 
       const msg =
         `${usserMessage?.businessNameText ?? "הודעה מעסק"} ${businessName}\n` +
@@ -86,6 +88,7 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
       msgs.push(msg);
       numbers.push(fixedNum);
     });
+    console.log({ numbers, msgs });
     await sendMsgsAPI(numbers, msgs);
   };
 
@@ -136,11 +139,7 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal }) => {
           שלח להדפסה
         </button>
         <Tooltip
-          title={
-            <p style={{ fontSize: "15px", textAlign: "center" }}>
-              בכדי לאפשר שליחת הודעות עם מסמך מצורף ללקוחות, אנא פנה למייל הבא
-            </p>
-          }
+          title={<p style={{ fontSize: "15px", textAlign: "center" }}>בכדי לאפשר שליחת הודעות עם מסמך מצורף ללקוחות, אנא פנה למייל הבא</p>}
           placement="top"
           disableHoverListener={hasPermission}
         >
