@@ -1,5 +1,15 @@
-import { axiosAuth, axiosRegister, axiosMsgs, axiosDrivers, matrixServerURL } from "./axios";
-import { getItemNames, formatDateWhenSaving, getMatrixesDataObj } from "./utils/utils";
+import {
+  axiosAuth,
+  axiosRegister,
+  axiosMsgs,
+  axiosDrivers,
+  matrixServerURL,
+} from "./axios";
+import {
+  getItemNames,
+  formatDateWhenSaving,
+  getMatrixesDataObj,
+} from "./utils/utils";
 import axios from "axios";
 
 const usserMessageUrl =
@@ -72,7 +82,15 @@ export const getMatrixIDAPI = async (axiosPrivate) => {
   }
 };
 
-const getMatrixObject = (date, matrixID, matrixesData, isBI, matrixName, matrixesUiData, isInitiated) => {
+const getMatrixObject = (
+  date,
+  matrixID,
+  matrixesData,
+  isBI,
+  matrixName,
+  matrixesUiData,
+  isInitiated
+) => {
   return {
     matrixID,
     matrixName,
@@ -84,11 +102,23 @@ const getMatrixObject = (date, matrixID, matrixesData, isBI, matrixName, matrixe
   };
 };
 
-export const createDocAPI = async (axiosPrivate, matrixID, matrixName, fileName, matrixesData) => {
+export const createDocAPI = async (
+  axiosPrivate,
+  matrixID,
+  matrixName,
+  fileName,
+  matrixesData
+) => {
   try {
     const date = formatDateWhenSaving(new Date());
     const isBI = true;
-    const dataToSend = getMatrixObject(date, matrixID, matrixesData, isBI, matrixName);
+    const dataToSend = getMatrixObject(
+      date,
+      matrixID,
+      matrixesData,
+      isBI,
+      matrixName
+    );
     const res = await axiosPrivate.post("/api/createdoc2", dataToSend, {
       headers: {
         fileName,
@@ -116,7 +146,14 @@ export const saveTablesAPI = async (
   productsMap,
   isInitiated
 ) => {
-  const matrixesData = getMatrixesDataObj(matrixID, tableData, cellsData, docData, metaData, productsMap);
+  const matrixesData = getMatrixesDataObj(
+    matrixID,
+    tableData,
+    cellsData,
+    docData,
+    metaData,
+    productsMap
+  );
   if (!matrixesData) {
     console.log("error in saveTablesAPI: ", "no matrixesData");
     return;
@@ -124,7 +161,15 @@ export const saveTablesAPI = async (
   try {
     const res = await axiosPrivate.post(
       "/api/savematrix",
-      getMatrixObject(date, matrixID, matrixesData, isBI, matrixName, matrixesUiData, isInitiated)
+      getMatrixObject(
+        date,
+        matrixID,
+        matrixesData,
+        isBI,
+        matrixName,
+        matrixesUiData,
+        isInitiated
+      )
     );
     return matrixID;
   } catch (e) {
@@ -144,7 +189,14 @@ export const loginUserAPI = async (userEmail, password) => {
   }
 };
 
-export const registerAPI = async (firstName, lastName, phone, email, userPassword, accountName) => {
+export const registerAPI = async (
+  firstName,
+  lastName,
+  phone,
+  email,
+  userPassword,
+  accountName
+) => {
   try {
     const res = await axiosRegister.post("/api/Register", {
       FirstName: firstName,
@@ -195,7 +247,15 @@ export const getUrlsAPI = async (axiosPrivate, fileName) => {
     });
     const data = res.data.result.data;
     return data.map((element) => {
-      const { DocUrl, DocNumber, Accountname, ValueDate, Action, TotalCost, DocumentDetails } = element;
+      const {
+        DocUrl,
+        DocNumber,
+        Accountname,
+        ValueDate,
+        Action,
+        TotalCost,
+        DocumentDetails,
+      } = element;
       return {
         DocUrl,
         Accountname,
@@ -257,6 +317,7 @@ export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
         return {
           matrixID: element.matrixID,
           matrixName: element.matrixName,
+          fullMatrix: element,
         };
       });
     }
@@ -267,11 +328,25 @@ export const getTablesByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
 
 export const getUrlsByDatesAPI = async (axiosPrivate, fromDate, toDate) => {
   try {
-    const res = await getData(axiosPrivate, fromDate, toDate, "DocData", "ValueDate");
+    const res = await getData(
+      axiosPrivate,
+      fromDate,
+      toDate,
+      "DocData",
+      "ValueDate"
+    );
 
     const data = res.data.result.data;
     return data.map((element) => {
-      const { DocUrl, DocNumber, Accountname, ValueDate, Action, TotalCost, DocumentDetails } = element;
+      const {
+        DocUrl,
+        DocNumber,
+        Accountname,
+        ValueDate,
+        Action,
+        TotalCost,
+        DocumentDetails,
+      } = element;
       return {
         DocUrl,
         Accountname,
