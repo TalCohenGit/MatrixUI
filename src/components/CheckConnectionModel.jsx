@@ -2,7 +2,16 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import QRCode from "react-qr-code";
 import CircularProgress from "@mui/material/CircularProgress";
-const msgsServerURL = process.env.REACT_APP_MSGS_URL;
+const MsgsServerURL = process.env.REACT_APP_MSGS_URL;
+const msgsServerURL = "http://localhost:5000";
+const getUsserState = async (setCurrentState) => {
+  console.log("in get usser state");
+  return await getUserState().then(async (data) => {
+    console.log("in get user state: ", { data });
+    return (await data?.status) ? setCurrentState("תקין") : data?.data?.server ? setCurrentState("תקלת שרת") : setCurrentState("יש לסרוק");
+  });
+};
+
 function CheckConnectionModel() {
   const [loading, setLoading] = useState(false);
   const [currentState, setCurrentState] = useState("בודק שרת וואטסאפ");
@@ -11,12 +20,12 @@ function CheckConnectionModel() {
   const [qr, setQr] = useState("");
 
   useEffect(() => {
-    getUserState()
+    getUsserState(setCurrentState)
       .then((data) => data)
       .then((data) => {
         console.log({ data });
         console.log("ssss", data);
-        if (data.status) setCurrentState("שרת תקין");
+        if (data?.status) setCurrentState("שרת תקין");
         else data?.data?.server ? setCurrentState("תקלת שרת") : setCurrentState("יש לסרוק");
       });
   }, []);
@@ -32,10 +41,6 @@ function CheckConnectionModel() {
       .catch((e) => console.log({ e }));
   };
 
-  const getUsserState = async () =>
-    getUserState().then((data) =>
-      data?.status ? setCurrentState("תקין") : data?.data?.server ? setCurrentState("תקלת שרת") : setCurrentState("יש לסרוק")
-    );
   return (
     <div>
       <p>{currentState}</p>
