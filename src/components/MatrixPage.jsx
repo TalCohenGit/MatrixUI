@@ -452,7 +452,7 @@ function MatrixPage({ seconds, setSeconds, setRefreshToken }) {
 
   return drivers?.length ? (
     <div className="matrix-page">
-      <CheckConnectionModel />
+      {/* <CheckConnectionModel /> */}
       <h1 className="login-details">שלום {getUserEmail()}</h1>
       <Logout setAccessToken={setAccessToken} setRefreshToken={setRefreshToken} />
       {/* <ProgressBar /> */}

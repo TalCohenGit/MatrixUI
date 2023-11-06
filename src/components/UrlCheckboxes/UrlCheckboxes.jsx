@@ -6,10 +6,16 @@ import InvoiceTable from "../InvoiceTable";
 import { getInternationalNum } from "../../utils/utils";
 import { Tooltip } from "@mui/material";
 
+const setLocalStorageItems = ({ matrixData, invoiceData }) => {
+  localStorage.setItem("matrixData", JSON.stringify(matrixData));
+  localStorage.setItem("invoiceData", JSON.stringify(invoiceData));
+};
+
 const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal, matrixData }) => {
   const [invoiceTableData, setInvoiceTableData] = useState([]);
   const [checkAll, setCheckAll] = useState(false);
 
+  setLocalStorageItems({ matrixData, invoiceData });
   const handleChange = (url) => {
     const currentInvoiceTableData = [...invoiceTableData];
     const invoiceIndex = currentInvoiceTableData.findIndex((invoiceObject) => {

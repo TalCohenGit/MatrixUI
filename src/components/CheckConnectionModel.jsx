@@ -1,9 +1,21 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import QRCode from "react-qr-code";
+
 import CircularProgress from "@mui/material/CircularProgress";
-const MsgsServerURL = process.env.REACT_APP_MSGS_URL;
+// const MsgsServerURL = process.env.REACT_APP_MSGS_URL;
 const msgsServerURL = "http://localhost:5000";
+const getNewQrCode = async () => {
+  fetch(msgsServerURL + "/api/getQr", { mode: "no-cors" })
+    .then((res) => {
+      console.log(res);
+      return res.body.json();
+    })
+    .then((data) => {
+      console.log({ data });
+      return data;
+    });
+};
 const getUsserState = async (setCurrentState) => {
   console.log("in get usser state");
   return await getUserState().then(async (data) => {
@@ -15,7 +27,7 @@ const getUsserState = async (setCurrentState) => {
 function CheckConnectionModel() {
   const [loading, setLoading] = useState(false);
   const [currentState, setCurrentState] = useState("בודק שרת וואטסאפ");
-
+  const [dialogKey, setDialogKey] = useState("");
   const useDialogRef = useRef(null);
   const [qr, setQr] = useState("");
 
@@ -27,18 +39,36 @@ function CheckConnectionModel() {
         console.log("ssss", data);
         if (data?.status) setCurrentState("שרת תקין");
         else data?.data?.server ? setCurrentState("תקלת שרת") : setCurrentState("יש לסרוק");
-      });
+      })
+      .finally(() => console.log("finished"));
   }, []);
 
   const getQr = async () => {
     console.log("in getQr");
     setLoading(true);
-    const res = await getNewQrCode()
+    await getNewQrCode()
       .then((res) => {
+        console.log({ qr, newQr: res });
         setLoading(false);
-        setQr(res.data);
+        res !== qr && setQr(res);
       })
       .catch((e) => console.log({ e }));
+    const qrInterval =
+      (async () => {
+        console.log("cycle");
+        const usserState = await getUsserState();
+        console.log({ usserState });
+        if (usserState?.status) {
+          clearInterval(qrInterval);
+          return;
+        }
+        getNewQrCode()
+          .then((res) => {
+            res.data !== qr && setQr(res.data);
+          })
+          .catch((e) => console.log({ e }));
+      },
+      [5000]);
   };
 
   return (
@@ -47,7 +77,10 @@ function CheckConnectionModel() {
       {currentState == "יש לסרוק" && (
         <button
           onClick={() => {
+            console.log("scan");
+            setDialogKey(crypto.randomUUID());
             getQr();
+
             useDialogRef?.current?.showModal();
           }}
         >
@@ -55,7 +88,7 @@ function CheckConnectionModel() {
         </button>
       )}
       <dialog ref={useDialogRef}>
-        <div>
+        <div key={dialogKey}>
           {loading ? (
             <CircularProgress />
           ) : (
@@ -103,32 +136,32 @@ export default CheckConnectionModel;
 //     .catch((error) => ({ status: false, data: { Error: error, server: true } }));
 // };
 
-const getNewQrCode = async () => {
-  let data = JSON.stringify({
-    password: "eeeeeeeqwqww",
-    numbers: [972506655699],
-    msg: "בדיקה של שליחה ללקוחות",
-  });
+// const getNewQrCode = async () => {
+//   let data = JSON.stringify({
+//     password: "eeeeeeeqwqww",
+//     numbers: [972506655699],
+//     msg: "בדיקה של שליחה ללקוחות",
+//   });
 
-  let config = {
-    method: "post",
-    maxBodyLength: Infinity,
-    url: msgsServerURL + "/api/getQr",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    data: data,
-  };
+//   let config = {
+//     method: "post",
+//     maxBodyLength: Infinity,
+//     url: msgsServerURL + "/api/getQr",
+//     headers: {
+//       "Content-Type": "application/json",
+//     },
+//     data: data,
+//   };
 
-  return axios
-    .request({ ...config, withCredentials: false })
-    .then((response) => response.data)
-    .then((data) => {
-      console.log({ data });
-      return data;
-    })
-    .catch((error) => ({ status: false, data: { Error: error, server: true } }));
-};
+//   return axios
+//     .request({ ...config, withCredentials: false, "Cache-Control": "no-cache" })
+//     .then((response) => response.data)
+//     .then((data) => {
+//       console.log({ data });
+//       return data;
+//     })
+//     .catch((error) => ({ status: false, data: { Error: error, server: true } }));
+// };
 const getUserState = async () => {
   let data = JSON.stringify({
     password: "eeeeeeeqwqww",
