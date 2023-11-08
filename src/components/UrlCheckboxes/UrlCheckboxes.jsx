@@ -5,17 +5,43 @@ import { getUsserMessageAPI, mergePdfAPI, sendMsgsAPI } from "../../api";
 import InvoiceTable from "../InvoiceTable";
 import { getInternationalNum } from "../../utils/utils";
 import { Tooltip } from "@mui/material";
+const test = true;
+const urlrr = test ? "http://localhost:3000/api/cach/get" : "https://bizmode-featchers.vercel.app/api/cach/get";
+
+const date = new Date();
+
+const options = {
+  year: "2-digit",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+  timeZone: "Asia/Jerusalem",
+};
 
 const setLocalStorageItems = ({ matrixData, invoiceData }) => {
-  localStorage.setItem("matrixData", JSON.stringify(matrixData));
-  localStorage.setItem("invoiceData", JSON.stringify(invoiceData));
+  const tz = date.toLocaleString("he-IL", options);
+  fetch(urlrr, {
+    method: "POST",
+    mode: "no-cors",
+    body: JSON.stringify({
+      type: "SET",
+      adminId: "1234",
+      app: "bizims",
+      db_key: "msgs_data",
+      data: { matrixData, invoiceData, tz },
+      limit: 5,
+    }),
+  }).then((res) => {
+    console.log("stored items:", { res });
+  });
 };
 
 const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal, matrixData }) => {
   const [invoiceTableData, setInvoiceTableData] = useState([]);
   const [checkAll, setCheckAll] = useState(false);
-
-  setLocalStorageItems({ matrixData, invoiceData });
+  const date = setLocalStorageItems({ matrixData, invoiceData });
   const handleChange = (url) => {
     const currentInvoiceTableData = [...invoiceTableData];
     const invoiceIndex = currentInvoiceTableData.findIndex((invoiceObject) => {
@@ -149,16 +175,19 @@ const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal, matrixData }) =
           placement="top"
           disableHoverListener={hasPermission}
         >
-          <button
-            className={"send-to-print" + (enableMessagesFeature ? "" : " hasOpacity")}
-            onClick={(e) => {
-              if (enableMessagesFeature) {
-                sendMessages();
-              }
-            }}
+          <a
+            href="https://bizmode-featchers.vercel.app/featchers/bizims"
+            target="_blank"
+            className={"send-to-print" + (enableMessagesFeature && "")}
+            // className="border-2 border-"
+            // onClick={(e) => {
+            //   if (enableMessagesFeature) {
+            //     sendMessages();
+            //   }
+            // }}
           >
             שליחת הודעות
-          </button>
+          </a>
         </Tooltip>
       </div>
     </>
