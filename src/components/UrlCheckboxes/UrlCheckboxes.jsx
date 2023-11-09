@@ -5,10 +5,8 @@ import { getUsserMessageAPI, mergePdfAPI, sendMsgsAPI } from "../../api";
 import InvoiceTable from "../InvoiceTable";
 import { getInternationalNum } from "../../utils/utils";
 import { Tooltip } from "@mui/material";
-const test = true;
+const test = false;
 const urlrr = test ? "http://localhost:3000/api/cach/get" : "https://bizmode-featchers.vercel.app/api/cach/get";
-
-const date = new Date();
 
 const options = {
   year: "2-digit",
@@ -20,8 +18,8 @@ const options = {
   timeZone: "Asia/Jerusalem",
 };
 
-const setLocalStorageItems = ({ matrixData, invoiceData }) => {
-  const tz = date.toLocaleString("he-IL", options);
+const setLocalStorageItems = ({ matrixData, invoiceData, d }) => {
+  const tz = d.toLocaleString("he-IL", options) + " " + crypto.randomUUID().slice(0, 4);
   fetch(urlrr, {
     method: "POST",
     mode: "no-cors",
@@ -41,7 +39,7 @@ const setLocalStorageItems = ({ matrixData, invoiceData }) => {
 const UrlCheckboxes = ({ axiosPrivate, invoiceData, toggleModal, matrixData }) => {
   const [invoiceTableData, setInvoiceTableData] = useState([]);
   const [checkAll, setCheckAll] = useState(false);
-  const date = setLocalStorageItems({ matrixData, invoiceData });
+  setLocalStorageItems({ matrixData, invoiceData, d: new Date() });
   const handleChange = (url) => {
     const currentInvoiceTableData = [...invoiceTableData];
     const invoiceIndex = currentInvoiceTableData.findIndex((invoiceObject) => {
